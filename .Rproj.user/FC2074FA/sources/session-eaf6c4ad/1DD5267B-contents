@@ -1,0 +1,3 @@
+test_that("Generate probability from truncated Beta distribution", {
+  expect_equal(2 * 2, 4)
+})

@@ -13,15 +13,15 @@ E.P.Leakage.trbb(alpha, beta, cutoff, B, b, m, M, Delta = 1)
 
 \item{cutoff}{Numeric value in (0, 1). The truncation point for the Beta distribution.}
 
-\item{B}{Integer. Number of units in the background group.}
+\item{B}{Integer. Total number of groups (say, bags) in a batch.}
 
-\item{b}{Integer. Number of units in the contaminated group.}
+\item{b}{Integer. Sampled number of groups (say, sample bags used in group-test) for a batch.}
 
-\item{m}{Integer. Number of background samples per contaminated unit.}
+\item{m}{Integer. Pool-size, i.e, number of sampled units used in group-test from each sampled group.}
 
-\item{M}{Integer. Total number of samples (contaminated + background).}
+\item{M}{Integer. Total number of units in a group (bag).}
 
-\item{Delta}{Numeric scalar. Scale factor to adjust contamination prevalence (default = 1).}
+\item{Delta}{Numeric scalar for sensitivity. Scale factor to adjust sensitivity (default = 1).}
 }
 \value{
 A data frame with columns:
@@ -33,26 +33,26 @@ A data frame with columns:
 }
 }
 \description{
-Computes the expected leakage and the probability of leakage from a semi-exact formulation using
-a truncated Beta distribution. The function is numerically stable and uses log-scale incomplete
-Beta functions to avoid underflow.
+Computes the expected leakage and the probability of leakage from a  formulation using
+a truncated Beta distribution. The function provides values from analytic forms and uses log-scale incomplete
+Beta functions to avoid underflow. Analytic function are based on the perfect specificity. The probability of leakage is estimated using an approximate distribution for the group probability of being contaminated when sensitivity is imperfect. For perfect sensitivity, there is no approximate distribution required.
 }
 \details{
 This function evaluates integrals over the tail of the Beta distribution (i.e., from `cutoff` to 1)
 using log-scale calculations to maintain numerical accuracy. The expected leakage is calculated as a
-ratio of incomplete Beta integrals, weighted by group sizes. Two formulations are used depending
-on whether `Delta` equals 1 (exact) or differs from 1 (semi-exact approximation).
+ratio of incomplete Beta integrals, weighted by group sizes. Two formulations for probability of leakage are used depending
+on whether `Delta` equals 1 (exact) or differs from 1 (approximation).
 }
 \examples{
-alpha_vals <- c(2, 3)
-beta_vals <- c(5, 6)
+alpha_vals <- c(0.004, 0.005)
+beta_vals <- c(5.0, 6.0)
 result <- E.P.Leakage.trbb.semi.exact(
   alpha = alpha_vals,
   beta = beta_vals,
-  cutoff = 0.2,
-  B = 100, b = 10,
-  m = 2, M = 20,
-  Delta = 1.5
+  cutoff = 0.02,
+  B = 8000, b = 13,
+  m = 5, M = 40,
+  Delta = 0.70
 )
 print(result)
 

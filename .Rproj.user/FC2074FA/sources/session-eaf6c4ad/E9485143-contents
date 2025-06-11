@@ -28,6 +28,43 @@ rtrbeta <- function(n, shape1, shape2, cutoff) {
   return(samples)
 }
 
+#' Compute the Logit of a Probability
+#'
+#' This function computes the logit (log-odds) transformation of a probability value.
+#'
+#' @param p A numeric value or vector strictly between 0 and 1. Represents the probability.
+#'
+#' @return A numeric value (or vector) representing the logit of the input probability.
+#' @examples
+#' logit(0.7)
+#' logit(c(0.3, 0.5, 0.7))
+#'
+#' @export
+logit <- function(p) {
+  if (any(p <= 0 | p >= 1)) {
+    stop("All p values must be between 0 and 1 (exclusive).")
+  }
+  return(log(p / (1 - p)))
+}
+
+
+#' Compute the Inverse Logit (Logistic Function)
+#'
+#' This function computes the inverse logit transformation, also known as the logistic function.
+#' It maps real-valued inputs to the (0, 1) interval.
+#'
+#' @param x A numeric value or vector. Typically a log-odds or any real number.
+#'
+#' @return A numeric value (or vector) representing the inverse logit of the input.
+#' @examples
+#' inverse_logit(0.8472979)  # Approximately 0.7
+#' inverse_logit(c(-1, 0, 1))
+#'
+#' @export
+inverse_logit <- function(x) {
+  exp_x <- exp(x)
+  return(exp_x / (1 + exp_x))
+}
 
 
 #' Metropolis-Hastings Sampler with Truncated Beta Distribution
@@ -43,21 +80,21 @@ rtrbeta <- function(n, shape1, shape2, cutoff) {
 #' @param beta Logical. Whether to include `beta` in the model.
 #' @param mu Logical. Whether to include `mu` in the model.
 #' @param rho Logical. Whether to include `rho` in the model.
-#' @param G Integer. Number of groups.
+#' @param G Integer. Number of quantiles from beta distribution.
 #' @param R Integer. Number of MCMC iterations.
 #' @param sigma Proposal standard deviation for each parameter (numeric vector).
 #' @param num_chains Number of MCMC chains to run (default is 3).
 #' @param burnin Number of initial iterations to discard (default is `R * 0.5`).
 #' @param thin Thinning interval for MCMC samples (default is 5).
 #' @param seed A vector of integers for random number seed (one per chain).
-#' @param trail Integer. Number of trials per group.
-#' @param ty2 Integer vector of group-level observed successes.
-#' @param wt Numeric vector of weights for each observation.
-#' @param group.size Integer. Number of individuals per group.
-#' @param sensitivity Logical. Whether to model test sensitivity.
-#' @param specificity Logical. Whether to model test specificity.
-#' @param sensitivity.range Optional numeric vector of length 2 indicating [min, max] for sensitivity.
-#' @param specificity.range Optional numeric vector of length 2 indicating [min, max] for specificity.
+#' @param trail Integer. Number of trials (say, number of group-test conducted per batch).
+#' @param ty2 Integer. vector of observed successes (say, no. of groups tested positive).
+#' @param wt Numeric vector of weights for each observation (say, no. of batches with no contamination).
+#' @param group.size Integer. Number of individuals tested per group, in another way pool size.
+#' @param sensitivity Logical. Whether to consider test sensitivity in model development.
+#' @param specificity Logical. Whether to consider test specificity in model development.
+#' @param sensitivity.range Optional numeric vector of length 2 indicating [min, max] for sensitivity. As for example, sensitivity ranges over U(0.65, 0.75)
+#' @param specificity.range Optional numeric vector of length 2 indicating [min, max] for specificity. As for example, specificity. ranges over U(0.90, 0.99)
 #'
 #' @return A list containing:
 #' \item{target.parameters}{List of posterior samples for each parameter across chains.}
@@ -69,7 +106,7 @@ rtrbeta <- function(n, shape1, shape2, cutoff) {
 #' The function implements a flexible Bayesian MCMC sampler with support for multiple parametrizations
 #' (via alpha, beta, mu, and rho). It includes likelihood computation with binomial models using truncated
 #' Beta-distributed prevalence and allows incorporating imperfect test sensitivity/specificity using
-#' logit-transformed priors.
+#' logit-transformed priors. The truncated beta-binomial model with cutoff $k=0$ is nothing but a standard beta-binomial model.
 #'
 #' @examples
 #' \dontrun{
@@ -78,15 +115,15 @@ rtrbeta <- function(n, shape1, shape2, cutoff) {
 #'   cutoff = 0.2,
 #'   initial = c(0.1, 0.1),
 #'   alpha = TRUE, beta = TRUE, mu = FALSE, rho = FALSE,
-#'   G = 10, R = 1000,
-#'   sigma = c(0.1, 0.1),
-#'   num_chains = 2,
-#'   burnin = 500, thin = 10,
-#'   seed = c(123, 456),
-#'   trail = 10,
-#'   ty2 = c(3, 4, 2, 1, 0, 5, 3, 2, 1, 0),
-#'   wt = rep(1, 10),
-#'   group.size = 50,
+#'   G = 1000, R = 1000,
+#'   sigma = c(0.20, 0.20),
+#'   num_chains = 3,
+#'   burnin = 5000, thin = 10,
+#'   seed = c(123, 456, 789),
+#'   trail = 13,
+#'   ty2 = c(0:13),
+#'   wt = c(2815,9,10,6,1,3,2,0,1,2,1,0,0,0),
+#'   group.size = 5,
 #'   sensitivity = FALSE,
 #'   specificity = FALSE
 #' )
@@ -101,18 +138,6 @@ MH.Sampler.Chain.TBB <- function(par,cutoff,initial,alpha,beta,mu,rho,G,R,sigma,
   parameters <- vector("list", num_chains)
   log.likelihood.values <- vector("list", num_chains)
   log.likelihood.yi <- vector("list", num_chains)
-
-  logit <- function(p) {
-    if (p <= 0 || p >= 1) {
-      stop("p must be between 0 and 1 (exclusive).")
-    }
-    return(log(p / (1 - p)))
-  }
-
-  inverse_logit <- function(x) {
-    exp_x <- exp(x)
-    return(exp_x / (1 + exp_x))
-  }
 
 
   prior.log.density.improper.uniform <- function(u){0} # Used for mu, alpha, beta and rho
@@ -420,18 +445,18 @@ MH.Sampler.Chain.TBB <- function(par,cutoff,initial,alpha,beta,mu,rho,G,R,sigma,
 
 #' Expected Leakage and Probability from Truncated Beta Distribution
 #'
-#' Computes the expected leakage and the probability of leakage from a semi-exact formulation using
-#' a truncated Beta distribution. The function is numerically stable and uses log-scale incomplete
-#' Beta functions to avoid underflow.
+#' Computes the expected leakage and the probability of leakage from a  formulation using
+#' a truncated Beta distribution. The function provides values from analytic forms and uses log-scale incomplete
+#' Beta functions to avoid underflow. Analytic function are based on the perfect specificity. The probability of leakage is estimated using an approximate distribution for the group probability of being contaminated when sensitivity is imperfect. For perfect sensitivity, there is no approximate distribution required.
 #'
 #' @param alpha Numeric vector of shape parameters for the Beta distribution.
 #' @param beta Numeric vector of shape parameters for the Beta distribution.
 #' @param cutoff Numeric value in (0, 1). The truncation point for the Beta distribution.
-#' @param B Integer. Number of units in the background group.
-#' @param b Integer. Number of units in the contaminated group.
-#' @param m Integer. Number of background samples per contaminated unit.
-#' @param M Integer. Total number of samples (contaminated + background).
-#' @param Delta Numeric scalar. Scale factor to adjust contamination prevalence (default = 1).
+#' @param B Integer. Total number of groups (say, bags) in a batch.
+#' @param b Integer. Sampled number of groups (say, sample bags used in group-test) for a batch.
+#' @param m Integer. Pool-size, i.e, number of sampled units used in group-test from each sampled group.
+#' @param M Integer. Total number of units in a group (bag).
+#' @param Delta Numeric scalar for sensitivity. Scale factor to adjust sensitivity (default = 1).
 #'
 #' @return A data frame with columns:
 #' \describe{
@@ -444,19 +469,19 @@ MH.Sampler.Chain.TBB <- function(par,cutoff,initial,alpha,beta,mu,rho,G,R,sigma,
 #' @details
 #' This function evaluates integrals over the tail of the Beta distribution (i.e., from `cutoff` to 1)
 #' using log-scale calculations to maintain numerical accuracy. The expected leakage is calculated as a
-#' ratio of incomplete Beta integrals, weighted by group sizes. Two formulations are used depending
-#' on whether `Delta` equals 1 (exact) or differs from 1 (semi-exact approximation).
+#' ratio of incomplete Beta integrals, weighted by group sizes. Two formulations for probability of leakage are used depending
+#' on whether `Delta` equals 1 (exact) or differs from 1 (approximation).
 #'
 #' @examples
-#' alpha_vals <- c(2, 3)
-#' beta_vals <- c(5, 6)
+#' alpha_vals <- c(0.004, 0.005)
+#' beta_vals <- c(5.0, 6.0)
 #' result <- E.P.Leakage.trbb.semi.exact(
 #'   alpha = alpha_vals,
 #'   beta = beta_vals,
-#'   cutoff = 0.2,
-#'   B = 100, b = 10,
-#'   m = 2, M = 20,
-#'   Delta = 1.5
+#'   cutoff = 0.02,
+#'   B = 8000, b = 13,
+#'   m = 5, M = 40,
+#'   Delta = 0.70
 #' )
 #' print(result)
 #'

@@ -44,7 +44,7 @@ MH.Sampler.Chain.TBB(
 
 \item{rho}{Logical. Whether to include `rho` in the model.}
 
-\item{G}{Integer. Number of groups.}
+\item{G}{Integer. Number of quantiles from beta distribution.}
 
 \item{R}{Integer. Number of MCMC iterations.}
 
@@ -58,21 +58,21 @@ MH.Sampler.Chain.TBB(
 
 \item{seed}{A vector of integers for random number seed (one per chain).}
 
-\item{trail}{Integer. Number of trials per group.}
+\item{trail}{Integer. Number of trials (say, number of group-test conducted per batch).}
 
-\item{ty2}{Integer vector of group-level observed successes.}
+\item{ty2}{Integer. vector of observed successes (say, no. of groups tested positive).}
 
-\item{wt}{Numeric vector of weights for each observation.}
+\item{wt}{Numeric vector of weights for each observation (say, no. of batches with no contamination).}
 
-\item{group.size}{Integer. Number of individuals per group.}
+\item{group.size}{Integer. Number of individuals tested per group, in another way pool size.}
 
-\item{sensitivity}{Logical. Whether to model test sensitivity.}
+\item{sensitivity}{Logical. Whether to consider test sensitivity in model development.}
 
-\item{specificity}{Logical. Whether to model test specificity.}
+\item{specificity}{Logical. Whether to consider test specificity in model development.}
 
-\item{sensitivity.range}{Optional numeric vector of length 2 indicating [min, max] for sensitivity.}
+\item{sensitivity.range}{Optional numeric vector of length 2 indicating [min, max] for sensitivity. As for example, sensitivity ranges over U(0.65, 0.75)}
 
-\item{specificity.range}{Optional numeric vector of length 2 indicating [min, max] for specificity.}
+\item{specificity.range}{Optional numeric vector of length 2 indicating [min, max] for specificity. As for example, specificity. ranges over U(0.90, 0.99)}
 }
 \value{
 A list containing:
@@ -90,7 +90,7 @@ test sensitivity and specificity with prior distributions.
 The function implements a flexible Bayesian MCMC sampler with support for multiple parametrizations
 (via alpha, beta, mu, and rho). It includes likelihood computation with binomial models using truncated
 Beta-distributed prevalence and allows incorporating imperfect test sensitivity/specificity using
-logit-transformed priors.
+logit-transformed priors. The truncated beta-binomial model with cutoff $k=0$ is nothing but a standard beta-binomial model.
 }
 \examples{
 \dontrun{
@@ -99,15 +99,15 @@ result <- MH.Sampler.Chain.TBB(
   cutoff = 0.2,
   initial = c(0.1, 0.1),
   alpha = TRUE, beta = TRUE, mu = FALSE, rho = FALSE,
-  G = 10, R = 1000,
-  sigma = c(0.1, 0.1),
-  num_chains = 2,
-  burnin = 500, thin = 10,
-  seed = c(123, 456),
-  trail = 10,
-  ty2 = c(3, 4, 2, 1, 0, 5, 3, 2, 1, 0),
-  wt = rep(1, 10),
-  group.size = 50,
+  G = 1000, R = 1000,
+  sigma = c(0.20, 0.20),
+  num_chains = 3,
+  burnin = 5000, thin = 10,
+  seed = c(123, 456, 789),
+  trail = 13,
+  ty2 = c(0:13),
+  wt = c(2815,9,10,6,1,3,2,0,1,2,1,0,0,0),
+  group.size = 5,
   sensitivity = FALSE,
   specificity = FALSE
 )

@@ -3,9 +3,14 @@ title: "Background for groupedBBMH R Package"
 author: "Sumonkanti Das"
 date: "2025-06-12"
 output:
-  html_document: default
-  pdf_document: default
+  pdf_document:
+    keep_tex: true
+    latex_engine: pdflatex
+    pandoc_args: ["--pdf-engine-opt=--halt-on-error"]
+output_file: "README.pdf"
 ---
+
+
 
 ### Overview of the **groupedBBMH** R Package
 
@@ -21,9 +26,9 @@ Let define the total contamination as $T_{Xi} = \sum_{j=1}^B \sum_{k=1}^M X_{ijk
 
 A key quantity of interest is \textbf{leakage}, defined as:
 
-$$
+\[
 L_i = T_{Xi} \cdot \mathbb{I}(t_{yi(m)} = 0),
-$$
+\]
 
 representing the number of contaminated prawns entering undetected when no sampled group tests positive. We focus on:
 
@@ -33,39 +38,39 @@ representing the number of contaminated prawns entering undetected when no sampl
 
 Now let $p_i$ denote the true prevalence of contamination in batch $i$, and define $\phi_{i(m)} = 1 - (1 - p_i)^m$ as the probability that a pool of $m$ ($\ 1 \le m \le M$) prawns is contaminated. Assuming prawns are randomly distributed among bags, we have:
 
-$$
+\[
 X_{ij} \mid p_i \overset{\text{i.i.d.}}{\sim} \text{Bin}(M, p_i), \quad p_i \overset{\text{i.i.d.}}{\sim} \text{Beta}(\alpha, \beta).
-$$
+\]
 
 Thus, the group-level test outcome $Y_{ij}$ follows:
 
-$$
+\[
 Y_{ij} \mid p_i \sim \text{Bernoulli}(\phi_i), \quad \phi_i = 1 - (1 - p_i)^m,
-$$
+\]
 
 and the observed number of positive groups in the sample is:
 
-$$
+\[
 t_{yi} \mid p_i \sim \text{Binomial}(b, \phi_i).
-$$
+\]
 
 To incorporate **imperfect testing**, we define the effective probability of a positive test as:
 
-$$
+\[
 \tilde{\phi}_{\Delta\Lambda}(p_i) = \Delta \phi(p_i) + (1 - \Lambda)(1 - \phi(p_i)).
-$$
+\]
 
 Under perfect specificity ($\Lambda = 1$), this simplifies to:
 
-$$
+\[
 \tilde{\phi}_\Delta(p_i) = \Delta \phi(p_i).
-$$
+\]
 
 When $\beta \gg \alpha$, the contamination prevalence $p_i$ is approximately Gamma distributed, leading to:
 
-$$
+\[
 \tilde{\phi}_{\Delta\Lambda} \sim (1 - \Lambda) + \text{Beta} \left( \alpha, \frac{\beta}{m(\Delta + \Lambda - 1)} \right).
-$$
+\]
 
 Two important special cases:
 
@@ -74,43 +79,43 @@ Two important special cases:
 
 In either case, $t_{yi}$ approximately follows a Beta-Binomial distribution:
 
-$$
+\[
 t_{yi} \sim \text{Beta-Binomial}(b, \alpha, \beta / (m\Delta)).
-$$
+\]
 
 #### Threshold-Based Risk Estimation
 
 In the context of the prawn biosecurity study, suppose a regulatory threshold is set such that contamination levels below a certain prevalence cut-off are considered acceptable for import. Suppose a regulatory cut-off $k$ is introduced, such that contamination prevalence below $k$ is considered acceptable. The effective prevalence becomes:
 
-$$
+\[
 p_i = p_i \cdot \mathbb{I}(p_i > k), \quad p_i \sim \text{Beta}(\alpha, \beta).
-$$
+\]
 
 Using this truncated model, the **probability of leakage** becomes:
 
-$$
+\[
 \Pr[L_i > 0] = \frac{B_{(k_1,1)}(\alpha, \frac{\beta}{m\Delta} + b)}{B(\alpha, \frac{\beta}{m\Delta})} - \frac{B_{(k,1)}(\alpha, \beta + MB)}{B(\alpha, \beta)},
-$$
+\]
 
 with $k_1 = \Delta(1 - (1 - k)^m)$. Under perfect testing:
 
-$$
+\[
 \Pr[L_i > 0] = \frac{B_{(k,1)}(\alpha, \beta + mb)}{B(\alpha, \beta)} - \frac{B_{(k,1)}(\alpha, \beta + MB)}{B(\alpha, \beta)}.
-$$
+\]
 
 When $k = 0$, this reduces to the standard beta-binomial case.
 
 The **expected leakage** under threshold $k$ is:
 
-$$
+\[
 \mathbb{E}(L_i) = (B - b) M \cdot \mathbb{E}\left[ (1 - p_i)^{bm\Delta} \cdot p_i \cdot \mathbb{I}(p_i > k) \right],
-$$
+\]
 
 which simplifies to:
 
-$$
+\[
 \mathbb{E}(L_i) = (B - b) M \cdot \frac{B_{(k,1)}(\alpha + 1, \beta + bm\Delta)}{B(\alpha, \beta)}.
-$$
+\]
 
 #### Model-Based Simulation to Assess Leakage Risk
 
@@ -118,15 +123,15 @@ Using the posterior estimates of Beta parameters $(\alpha, \beta)$, we simulate 
 
 For each consignment $i$, the contamination prevalence $p_i \sim \text{Beta}(\alpha, \beta)$ is used to simulate the number of contaminated prawns per bag:
 
-$$
+\[
 X_{ij} \sim \text{Binomial}(M, p_i), \quad Y_{ij} = \mathbb{I}(X_{ij} > 0),
-$$
+\]
 
 where $Y_{ij}$ indicates whether bag $j$ is contaminated. The true and sampled contamination counts are:
 
-$$
+\[
 T_{yi} = \sum_{j=1}^{B} Y_{ij}, \quad t_{yi} = \sum_{j=1}^{b} Y_{ij}.
-$$
+\]
 
 To simulate testing, $b$ bags are randomly sampled, and pooled samples of $m = 5$ prawns per bag are tested using PCR with imperfect sensitivity $\Delta = 0.70$. Contamination detection is adjusted accordingly.
 
@@ -156,3 +161,5 @@ You can install the development version of `groupedHG` like so:
 install.packages("devtools")
 devtools::install_github("sumon148/groupedBBMH")
 ```
+
+

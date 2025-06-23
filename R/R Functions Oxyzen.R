@@ -443,7 +443,7 @@ MH.Sampler.Chain.TBB <- function(par,cutoff,initial,alpha,beta,mu,rho,G,R,sigma,
 }
 
 
-#' Expected Leakage and Probability from Truncated Beta Distribution
+#' Expected Leakage and Probability of leakage from Truncated Beta Distribution
 #'
 #' Computes the expected leakage and the probability of leakage from a  formulation using
 #' a truncated Beta distribution. The function provides values from analytic forms and uses log-scale incomplete
@@ -463,7 +463,8 @@ MH.Sampler.Chain.TBB <- function(par,cutoff,initial,alpha,beta,mu,rho,G,R,sigma,
 #'   \item{alpha}{Input vector of alpha values.}
 #'   \item{beta}{Input vector of beta values.}
 #'   \item{E_Li}{Expected leakage for each (alpha, beta) pair.}
-#'   \item{P_Li}{Estimated probability of leakage.}
+#'   \item{P_Li}{Estimated probability of leakage for each (alpha, beta) pair.}
+#'   \item{Note}{Estimation of expected and probability of leakage are under perfect specificty.}
 #' }
 #'
 #' @details
@@ -585,5 +586,193 @@ E.P.Leakage.trbb <- function(alpha, beta, cutoff, B, b, m, M, Delta = 1) {
   }
 
   return(data.frame(alpha = alpha, beta = beta, E_Li = E_Li, P_Li = P_Li))
+}
+
+
+#' Log-Likelihood Function for Group Testing with Imperfect Tests
+#'
+#' Computes the log-likelihood under a truncated Beta-Binomial model in the context of grouped sampling with imperfect sensitivity and specificity.
+#' This function supports flexible parameterizations (e.g., in terms of alpha, beta, mu, rho) and includes extensions for truncated prevalence modeling,
+#' numerical integration over latent prevalence values, and optional leakage estimation under imperfect sensitivity.
+#' Suitable for use with optimization routines (e.g., \code{optim}) to estimate model parameters from grouped test outcome data.
+#'
+#' @param par A numeric vector of parameters (on log or logit scale) depending on what is fixed or estimated.
+#' @param ty Observed number of positive group tests per replicate.
+#' @param freq Frequency of each ty value.
+#' @param theta Precision parameter. Use `Inf` for simplified form.
+#' @param mu Optional; mean of the Beta prior for contamination probability.
+#' @param alpha Optional; shape parameter of the Beta prior.
+#' @param beta Optional; shape parameter of the Beta prior.
+#' @param cutoff Truncation cutoff for the Beta distribution.
+#' @param sensitivity Test sensitivity.
+#' @param specificity Test specificity.
+#' @param b Number of groups per replicate.
+#' @param R Number of integration points for numerical approximation.
+#' @param m Mean number of items per group.
+#' @param M Reference sample size for leakage modeling.
+#' @param deviance Logical. If TRUE, returns deviance (-2 * log-likelihood).
+#' @param subtract A constant to subtract from the log-likelihood.
+#' @param B Reference number of groups for leakage modeling.
+#' @param mushape Logical. If TRUE, parameterize using mu and shape.
+#' @param alpha.mu Logical. If TRUE, parameterize using alpha and mu.
+#' @param leakage Logical. If TRUE, compute expected leakage quantities.
+#'
+#' @return Depending on arguments:
+#' \itemize{
+#'   \item If `leakage = FALSE` and `deviance = TRUE`, returns deviance.
+#'   \item If `leakage = FALSE` and `deviance = FALSE`, returns log-likelihood.
+#'   \item If `leakage = TRUE`, returns a named vector with deviance, expected leakage, and probability leakage.
+#' }
+#'
+#' @details This function integrates over a truncated Beta distribution to compute the expected likelihood,
+#' adjusted for misclassification due to imperfect test sensitivity and specificity. It supports various
+#' parameterizations for alpha, beta, and mu, and incorporates numerical integration over latent prevalence.
+#' Parameter configuration depends on which inputs are missing:
+#' \itemize{
+#' \item If \code{theta}, \code{mu}, and \code{alpha} are all missing, then \code{par = c(log(alpha), log(beta), log(theta))}.
+#' \item If \code{theta} is missing, it is inferred as \code{exp(last element of par)}.
+#' \item If \code{alpha} is missing, it is inferred as \code{exp(first element of par)}.
+#' \item If \code{alpha} is provided, \code{beta} is taken as \code{exp(first element of par)} (when \code{mu} is missing).
+#' \item If \code{mu} is supplied, then \code{beta = (1 - mu) / mu * alpha}.
+#' }
+#'
+#' Users can directly call this function within optimization routines such as \code{optim()} to obtain maximum likelihood estimates.
+#' The user should specify fixed parameters (e.g., mu or alpha) and pass remaining parameters through \code{par}.
+#' For maximum flexibility, the function is not wrapped in a specific optimizer, allowing users to tailor optimization (e.g., convergence criteria, bounds, or transformation) based on their needs.
+#' The output of \code{optim()} provides the parameter estimates on the log or logit scale, depending on the model specification.
+#' Integration is performed over the latent prevalence distribution:
+#' \itemize{
+#' \item \code{R} controls the number of quantile points used for numeric integration over \code{p}.
+#' }
+#'
+#' Expected parameter formats:
+#' \itemize{
+#' \item For given \code{alpha}: \code{par = c(beta, sensitivity, specificity)}
+#' \item For given \code{mu}: \code{par = c(alpha, sensitivity, specificity)}
+#' \item For given \code{beta}: \code{par = c(alpha, sensitivity, specificity)}
+#' }
+#'
+#' @note
+#' This implementation assumes \code{theta = Inf}, which indicates groups are formed randomly (uncluster).
+#'
+#' @section Leakage:
+#' Leakage quantities (\code{E.L}, \code{P.L}) are calculated under the assumption of perfect specificity.
+#' @importFrom Rmpfr log1mexp
+#' @examples
+#'freq = c(2815,9,10,6,1,3,2,0,1,2,1,0,0,0)
+#'ty = c(0:13)
+#'# For estimating log(alpha) and log(beta) for a given cutt-off greater than 0, which reflects BB model
+#'mle.est.cutoff.01 <- optim(c(0, 0), loglikfn.JABES.sp.sn.TrBB,ty = ty,freq = freq,b = 13,m = 5,M = 40,theta = Inf,R = 1e4,sensitivity = 1, specificity = 1,cutoff = 0.01,deviance = FALSE,control = list(reltol = 1e-12, fnscale = -1),hessian = FALSE)
+#'mle.est.cutoff.01$par
+#'# For estimating log(alpha) and log(beta) for a given cutt-off of 1%, which reflects truncated BB model
+#'mle.est.cutoff.01 <- optim(c(0, 0), loglikfn.JABES.sp.sn.TrBB,ty = ty,freq = freq,b = 13,m = 5,M = 40,theta = Inf,R = 1e4,sensitivity = 1, specificity = 1,cutoff = 0.01,deviance = FALSE,control = list(reltol = 1e-12, fnscale = -1),hessian = FALSE)
+#'mle.est.cutoff.01$par
+#'
+#' @export
+loglikfn.JABES.sp.sn.TrBB <- function(par,ty,freq,theta,mu,alpha,beta,cutoff,sensitivity, specificity,b,R=1000,m,M,deviance=FALSE,
+                                      subtract=0,B,mushape=FALSE,alpha.mu=FALSE,leakage=FALSE){
+
+  keep <- freq != 0
+  ty <- ty[keep]
+  freq <- freq[keep]
+
+  Nbar=m
+  missing.alpha <- missing(alpha)
+
+  if(missing(alpha)) alpha <- exp(par[1])
+  if(missing(mu)&missing.alpha&missing(beta)) beta <- exp(par[2])
+  if(missing(mu)&!missing.alpha) beta <- exp(par[1])
+  if(!missing(beta) & missing(alpha)&missing(mu)) alpha <- exp(par[1])
+  if(!missing(mu)&missing(beta)) beta <- (1-mu)/mu*alpha
+
+  # For given mu: Missing alpha, beta, sensitivity and specificity
+  if(missing.alpha & missing(beta) & !missing(mu) & missing(sensitivity) & missing(specificity)) {
+    sensitivity <- exp(par[2])
+    specificity <- exp(par[3])
+  }
+
+  # For given alpha: Missing beta, mu, sensitivity and specificity
+  if(!missing.alpha & missing(beta) & missing(mu) & missing(sensitivity) & missing(specificity) ) {
+    sensitivity <- exp(par[2])
+    specificity <- exp(par[3])
+  }
+
+  # For given beta: Missing alpha, mu, sensitivity and specificity
+  if(missing.alpha & !missing(beta) & missing(mu) & missing(sensitivity) & missing(specificity) ) {
+    sensitivity <- exp(par[2])
+    specificity <- exp(par[3])
+  }
+
+  if(missing.alpha & missing(beta) & missing(mu) & !missing(sensitivity) & missing(specificity)) specificity <- exp(par[3])
+  if(missing.alpha & missing(beta) & missing(mu) & missing(sensitivity)  & !missing(specificity)) sensitivity <- exp(par[3])
+
+  if(missing(sensitivity) & missing(specificity) & missing.alpha & missing(mu) & missing(beta)) {
+    sensitivity <- exp(par[3])
+    specificity <- exp(par[4]) }
+
+
+
+  if(mushape){
+    mu <- 1-1/(1+exp(par[1]))
+    shape <- exp(par[2])
+    alpha <- shape*mu
+    beta <- shape*(1-mu)
+  }
+  if(alpha.mu){
+    alpha <- exp(par[1])
+    mu <- 1 / (1+exp(par[2]))
+    beta <- alpha*(1-mu)/mu
+  }
+
+
+
+
+  if(theta>0){
+
+
+    cdf.cutoff <- pbeta(cutoff,alpha,beta) # Computes the cumulative probability up to the cutoff under the Beta(α, β) distribution.
+    pvals <- qbeta(cdf.cutoff+(1-cdf.cutoff)*c(1:R)/(R+1), alpha, beta) #Generates R quantile points (like a grid) from the truncated Beta distribution over [cutoff,1].
+    # pvals <- pvals * (pvals >= cutoff)
+    log.pvals <- log(pvals)
+
+    if(theta==Inf){
+      log.one.minus.phi.vals.perfect <- Nbar*Rmpfr::log1mexp(-log.pvals) # this is phi when no test errors
+      log.phi.vals.perfect <- Rmpfr::log1mexp(-log.one.minus.phi.vals.perfect)
+      one.minus.phi.vals.perfect <- exp(log.one.minus.phi.vals.perfect)
+      phi.vals.perfect <- exp(log.phi.vals.perfect)
+
+      phi.vals <- (1-specificity)*one.minus.phi.vals.perfect + sensitivity*phi.vals.perfect
+      log.one.minus.phi.vals <- log(1-phi.vals)
+      log.phi.vals <- log(phi.vals)
+    }
+
+
+    out <- 0
+    for(j in c(1:length(ty))){
+      if(ty[j]!=0) log.terms <- ty[j]*log.phi.vals +
+          (b-ty[j])*log.one.minus.phi.vals
+      if(ty[j]==0) log.terms <- b*log.one.minus.phi.vals
+      K <- max(log.terms)-10
+      out <- out + freq[j]*(log((1-cdf.cutoff)*mean(exp(log.terms-K))+cdf.cutoff*(ty[j]==0)*exp(-K))+K)
+      # # numerically stable approximation to the integral:𝐸_{𝜋 > cutoff}[P(Ty = ty | 𝜋)]
+
+    }
+  }
+
+  if(leakage){
+    if(theta==Inf){
+      # P.L <- exp(lbeta(alpha,beta/(Nbar*sensitivity)+b)-lbeta(alpha,beta/(Nbar*sensitivity)))-
+      #   exp(lbeta(alpha,beta/(M*sensitivity)+B)-lbeta(alpha,beta/(M*sensitivity)))
+      # P.L <- exp(lbeta(alpha,beta/(Nbar*sensitivity)+b)-lbeta(alpha,beta/(Nbar*sensitivity)))-
+      #   exp(lbeta(alpha,beta/(M)+B)-lbeta(alpha,beta/(M)))
+      # E.L <- (B-b)*M*exp(lbeta(alpha+1,beta+b*Nbar*sensitivity)-lbeta(alpha,beta))
+      P.L <- exp(lbeta(alpha, beta / (Nbar * sensitivity) + b) - lbeta(alpha, beta / (Nbar * sensitivity))) -
+        exp(lbeta(alpha, beta + B*M) - lbeta(alpha, beta))
+      E.L <- (B - b) * M * exp(lbeta(alpha + 1, beta + b * Nbar * sensitivity) - lbeta(alpha, beta))
+    }
+  }
+  if((!leakage)&deviance) return(-2*out-subtract)
+  if((!leakage)&(!deviance)) return(out-subtract)
+  if(leakage) return(c(deviance=-2*out,P.L=P.L,E.L=E.L))
 }
 

@@ -59,3 +59,31 @@ hist(E.P.trBB.cutoff.00.approx$alpha)
 hist(E.P.trBB.cutoff.00.approx$beta)
 hist(E.P.trBB.cutoff.00.approx$E_Li)
 hist(E.P.trBB.cutoff.00.approx$P_Li)
+
+
+# Test: loglikfn.JABES.sp.sn.TrBB  --------------#
+
+freq = c(2815,9,10,6,1,3,2,0,1,2,1,0,0,0)
+ty = c(0:13)
+mle.est.cutoff.01 <- optim(c(0, 0), loglikfn.JABES.sp.sn.TrBB,
+                           ty = ty,
+                           freq = freq,
+                           b = 13,
+                           m = 5,
+                           M = 40,
+                           theta = Inf,
+                           R = 1e4,
+                           sensitivity = 1,
+                           specificity = 1,
+                           cutoff = 0.01,
+                           deviance = FALSE,
+                           control = list(reltol = 1e-12, fnscale = -1),
+                           hessian = FALSE)
+mle.est.cutoff.01$par
+
+optim_result.cutoff.05 <- mle.est.cutoff.05
+optim_result.cutoff.05$alpha <- exp(optim_result.cutoff.05$par[1])
+optim_result.cutoff.05$beta <- exp(optim_result.cutoff.05$par[2])
+optim_result.cutoff.05$cutoff <- 0.05
+optim_result.cutoff.05$mu.TrBB <- optim_result.cutoff.05$alpha /
+  (optim_result.cutoff.05$alpha + optim_result.cutoff.05$beta)

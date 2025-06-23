@@ -2,7 +2,7 @@
 % Please edit documentation in R/R Functions Oxyzen.R
 \name{E.P.Leakage.trbb}
 \alias{E.P.Leakage.trbb}
-\title{Expected Leakage and Probability from Truncated Beta Distribution}
+\title{Expected Leakage and Probability of leakage from Truncated Beta Distribution}
 \usage{
 E.P.Leakage.trbb(alpha, beta, cutoff, B, b, m, M, Delta = 1)
 }
@@ -29,7 +29,8 @@ A data frame with columns:
   \item{alpha}{Input vector of alpha values.}
   \item{beta}{Input vector of beta values.}
   \item{E_Li}{Expected leakage for each (alpha, beta) pair.}
-  \item{P_Li}{Estimated probability of leakage.}
+  \item{P_Li}{Estimated probability of leakage for each (alpha, beta) pair.}
+  \item{Note}{Estimation of expected and probability of leakage are under perfect specificty.}
 }
 }
 \description{

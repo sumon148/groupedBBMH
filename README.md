@@ -49,14 +49,17 @@ present in group $j$. We then define:
 - $t_{yi} = \sum_{j=1}^{b} Y_{ij}$: number of sampled groups with
   contamination, ranging from 0 to $b$.
 
-Let $\widetilde{Y}_{ij}$ denote the observed test result for group $j$
-in consignment $i$, with 1 indicating a positive result (i.e., apparent
+Let $\tilde{Y}_{ij}$ denote the observed test result for group $j$ in
+consignment $i$, with 1 indicating a positive result (i.e., apparent
 contamination) and 0 denoting a negative result (apparently
 contamination-free). The probability of a positive test results is then
+
 $$
-\Pr \left( \widetilde{Y}_{ij} = 1 \vert Y_{ij} \right) = \Delta Y_{ij} + \left( 1-\Lambda \right) \left(1-Y_{ij}\right). 
-$$ Thus, the observed data for each consignment consists of
-$\tilde{t}_{yi}=\sum_{j=1}^{b} \widetilde{Y}_{ij}$.
+\Pr \left( \tilde{Y}_{ij} = 1 \vert Y_{ij} \right) = \Delta Y_{ij} + \left( 1-\Lambda \right) \left(1-Y_{ij}\right). 
+$$
+
+Thus, the observed data for each consignment consists of
+$\tilde{t}_{yi}=\sum_{j=1}^{b} \tilde{Y}_{ij}$.
 
 A key quantity of interest is , defined as:
 
@@ -80,10 +83,10 @@ $$
 X_{ij} \mid p_i \overset{\text{i.i.d.}}{\sim} \text{Bin}(m, p_i), \quad p_i \overset{\text{i.i.d.}}{\sim} \text{Beta}(\alpha, \beta).
 $$
 
-The group-level test outcome $\widetilde{Y}_{ij}$ follows:
+The group-level test outcome $\tilde{Y}_{ij}$ follows:
 
 $$
-\widetilde{Y}_{ij} \mid p_i \sim \text{Bernoulli}(\tilde{\phi}_i), 
+\tilde{Y}_{ij} \mid p_i \sim \text{Bernoulli}(\tilde{\phi}_i), 
 $$
 
 and the observed number of positive groups in the sample follows:
@@ -175,22 +178,35 @@ using PCR-type assays.
 
 For each consignment $i$, the contamination prevalence $p_i$ is
 simulated from $\text{Beta}(\alpha, \beta)$ and is used to simulate the
-number of contaminated items per bag as $$
+number of contaminated items per bag as
+
+$$
 X_{ij} \sim \text{Binomial}(M, p_i)
-$$ which provides the true contamination status of bag $j$ as
+$$
+
+which provides the true contamination status of bag $j$ as
 $Y_{ij} = \mathbb{I}(X_{ij} > 0)$ (i.e., contains at least one
 contaminated item). The total number of contamination bags in the
-consignment $i$ is $$
+consignment $i$ is
+
+$$
 T_{yi} = \sum_{j=1}^{B} Y_{ij}
-$$ and the total number of contamination bags in the sample of size $b$
-is $$
+$$
+
+and the total number of contamination bags in the sample of size $b$ is
+
+$$
 {t}_{yi} = \sum_{j=1}^{b} {Y}_{ij}.
-$$ To account for imperfect testing, we simulate observed test results
+$$
+
+To account for imperfect testing, we simulate observed test results
 $\tilde{t}_{yi}$ by applying the assumed test sensitivity and
 specificity to the sampled contamination statuses ${Y}_{ij}$. The
 observed number of positive test results among the $b$ sampled bags is
-then $$
-\tilde{t}_{yi} = \sum_{j=1}^{b} \widetilde{Y}_{ij}.
+then
+
+$$
+\tilde{t}_{yi} = \sum_{j=1}^{b} \tilde{Y}_{ij}.
 $$
 
 Test performance is evaluated by comparing true contamination status of

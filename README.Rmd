@@ -71,7 +71,7 @@ and the observed number of positive groups in the sample follows:
 where the effective probability of a positive test is: 
 
 \[
-\tilde{\phi} = \Delta \phi_i + (1 - \Lambda)(1 - \phi_i) \quad \phi_i = 1 - (1 - p_i)^m.
+\tilde{\phi}_i = \Delta \phi_i + (1 - \Lambda)(1 - \phi_i) ; \quad \phi_i = 1 - (1 - p_i)^m.
 \]
 
 

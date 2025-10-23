@@ -7,8 +7,11 @@ library(ggpubr)
 library(xtable)
 
 #-------------------------------------------------------------@
+# Figure 5: JASA PAper
+# Supplementary Figure S5
+# Supplementary Table S4
 # Model-based Simulation using MH-based TrBB model under Imperfect Testing
-# Community Risk: Figure 5
+# Community Risk Assessment
 # Using Frozen-food imported data
 # Exact BB Model: Bayesian method MH Algorithm
 # Target Parameters: TP, TN, FN
@@ -16,7 +19,6 @@ library(xtable)
 # P(Li>0): FN Batches
 # E(Li): Number of contaminated items in FN Batches
 # Delta=0.8, k=0.0, 0.0025, 0.005, 0.01, 0.02, m=5, b=13
-# Relevant Supplementary Table and will be from here
 #-------------------------------------------------------------@
 
 
@@ -127,6 +129,7 @@ save(Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80,file="Sim_Tx_TrBB_Prawn_m5_b
 
 
 # Load the Model-based Simulation results ----------------------------
+# The Simulated Data are not saved in GitHub due to restriction of data size
 # Extract and compute proportions of simulated infection outcomes
 # across different assumed k values (Sn = 0, 0.0025, 0.005, 0.01, 0.02).
 # across different assumed sensitivity values (Sn = 0.7, 0.8, 0.9, 0.95, 1.0).
@@ -533,7 +536,7 @@ ggsave("Test_Outcome_m5_b13_Imperfect_Manuscript_SupMat.png",width = 10,height =
 
 
 
-# Tables for Community Risk - Main Manuscript and Supplementary Material --------------
+# Supplementary Table for Community Risk - Supplementary Material --------------
 
 load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80.Rdata")
 Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80
@@ -874,8 +877,9 @@ write.csv(E.P.Li.Community.Risk,file="E.P.Li.Community.Risk.Sn.80.csv")
 
 
 
-
-# Create Supp Mat Table S4 -----------------
+# --------------------------------------------
+# Create Supp Mat Table S4
+# --------------------------------------------
 
 E.P.Li.Community.Risk <- read.csv("E.P.Li.Community.Risk.Sn.80.csv",header = TRUE)
 

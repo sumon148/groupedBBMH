@@ -98,7 +98,7 @@ $$
 where the effective probability of a positive test is:
 
 $$
-\tilde{\phi} = \Delta \phi_i + (1 - \Lambda)(1 - \phi_i) \quad \phi_i = 1 - (1 - p_i)^m.
+\tilde{\phi}_i = \Delta \phi_i + (1 - \Lambda)(1 - \phi_i) ; \quad \phi_i = 1 - (1 - p_i)^m.
 $$
 
 Under perfect specificity ($\Lambda = 1$), this simplifies to:

@@ -13,13 +13,11 @@ library(VGAM)         # Functions for vector generalized linear and additive mod
 
 
 #-------------------------------------------------------------@
-# Compiling Results for Figure 3 & 4: JASA PAper
-# Posterior Predictive Check and Dunn-Smyth Diagnostic
-# Using Prawn data
-# Exact BB Model with \Delta=0.80: MH in Paper
-# Exact BB Model with \Delta=1.0: MH in Supplementary File
-# Approximate BB Model with \Delta=1.0: HMC in Supplementary File
-# Relevant Supplementary Table will be from here
+# Figure 4: JASA PAper
+# Posterior Predictive Check of model fit: MH algorithm
+# Using Seafood data
+# Exact BB Model with \Delta=0.80: MH Algorithm
+# Exact BB Model with \Delta ~ U(0.75, 0.85): MH Algorithm
 #-------------------------------------------------------------@
 
 library(ggplot2)
@@ -293,27 +291,27 @@ ppc_barplot_fixed_y_scale <- function(ty,yrep,trial){
 }
 
 #-------------------------------------------------------------
-# Prawn Data
+# Seafood Data
 #-------------------------------------------------------------@
 
-df.prawn <- read.csv("JASA Submission/deidentified_frozen_seafood.csv")
-df.prawn$Yfac <- factor(df.prawn$numPos,levels=c(0:13))
-x <- as.numeric(names(table(df.prawn$Yfac)))
-freq <- as.numeric(table(df.prawn$Yfac))
+df.seafood <- read.csv("JASA Submission/deidentified_frozen_seafood.csv")
+df.seafood$Yfac <- factor(df.seafood$numPos,levels=c(0:13))
+x <- as.numeric(names(table(df.seafood$Yfac)))
+freq <- as.numeric(table(df.seafood$Yfac))
 size <- 13 # Number of bags (b)
-prawn.data <- data.frame(ty=df.prawn$Yfac,n=rep(size,length(df.prawn$Yfac)))
-prawn.data$ID <- c(1:dim(prawn.data)[1])
-prawn.data$ty <- as.numeric(paste(prawn.data$ty))
-prawn.data <- prawn.data[order(prawn.data$ty),]
+seafood.data <- data.frame(ty=df.seafood$Yfac,n=rep(size,length(df.seafood$Yfac)))
+seafood.data$ID <- c(1:dim(seafood.data)[1])
+seafood.data$ty <- as.numeric(paste(seafood.data$ty))
+seafood.data <- seafood.data[order(seafood.data$ty),]
 
-summ.prawn.data <- as.data.frame(table(prawn.data$ty))
-colnames(summ.prawn.data) <- c("ty","freq")
-summ.prawn.data$ty <- as.numeric(paste(summ.prawn.data$ty))
+summ.seafood.data <- as.data.frame(table(seafood.data$ty))
+colnames(summ.seafood.data) <- c("ty","freq")
+summ.seafood.data$ty <- as.numeric(paste(summ.seafood.data$ty))
 
 # ----------------------------------------------------------------------------------
 # Posterior Predictive Check: Imperfect Sensitivity (Sensitivity = 0.80)
 # Model: Exact Model using Metropolis-Hastings Algorithm with known Delta = 0.8
-# Data: Prawn Infection Dataset
+# Data: Seafood Infection Dataset
 # Purpose: Generate posterior predictive samples under imperfect test sensitivity
 # ----------------------------------------------------------------------------------
 
@@ -321,7 +319,7 @@ summ.prawn.data$ty <- as.numeric(paste(summ.prawn.data$ty))
 load("JASA Submission/MH.alpha.mu.sigma.20.known.sn.80.Prawn.Rdata")
 
 # Number of test groups (D) from observed data
-D <- length(prawn.data$ty)
+D <- length(seafood.data$ty)
 
 # Generate posterior predictive draws using the 'post_pred_sn' function
 predicted.counts.imperfect.case <- post_pred_sn(
@@ -335,7 +333,7 @@ predicted.counts.imperfect.case <- post_pred_sn(
 
 # Extract simulated and observed count data
 ty_rep_imperfect_case <- predicted.counts.imperfect.case$ty_rep
-ty <- prawn.data$ty
+ty <- seafood.data$ty
 
 # Check proportions of observed vs simulated counts (for model diagnostics)
 prop.table(table(ty))                      # Observed data distribution
@@ -408,7 +406,7 @@ ggsave(
 load("MH.alpha.mu.sigma.20.unknown.sn.80.Prawn.Rdata")
 
 # Extract number of test groups from observed data
-D <- length(prawn.data$ty)
+D <- length(seafood.data$ty)
 
 # Generate posterior predictive replicates under sensitivity uncertainty
 predicted.counts.imperfect.uniform.case <- post_pred_sn(
@@ -422,7 +420,7 @@ predicted.counts.imperfect.uniform.case <- post_pred_sn(
 
 # Extract simulated and observed group-level infection counts
 ty_rep_imperfect_unif_case <- predicted.counts.imperfect.uniform.case$ty_rep
-ty <- prawn.data$ty
+ty <- seafood.data$ty
 
 # Summary: Proportion tables for comparison (optional diagnostics)
 prop.table(table(ty))                        # Observed

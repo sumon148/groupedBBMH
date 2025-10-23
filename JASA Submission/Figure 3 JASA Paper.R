@@ -15,14 +15,15 @@ library(VGAM)         # Functions for vector generalized linear and additive mod
 
 
 #-------------------------------------------------------------@
-# Compiling Results for Figure 3 & 4: JASA PAper
-# Posterior Predictive Check and Dunn-Smyth Diagnostic
-# Using Prawn data
-# Exact BB Model with \Delta=0.80: MH in Paper
-# Exact BB Model with \Delta=1.0: MH in Supplementary File
-# Approximate BB Model with \Delta=1.0: HMC in Supplementary File
-# Relevant Supplementary Table will be from here
+# Figure 3: JASA PAper
+# Dunn-Smyth Residual Goodness-of-Fit: MH Algorithm
+# Using Seafood data
+# Exact BB Model with \Delta=0.80: MH Algorithm
+# Exact BB Model with \Delta ~ U(0.75, 0.85): MH Algorithm
 #-------------------------------------------------------------@
+
+
+
 DunnSmythTestBB <- function(ObservedResponse,size,group_size,alpha,beta,approximate.model=TRUE) {
   # ObservedResponse - Vector of dimension D
   # SimulatedResponse - Matrix of Dimension D X S
@@ -323,29 +324,29 @@ DunnSmythTestBB_Custom <- function(ObservedResponse,size,group_size,alpha,beta,a
 
 
 #-------------------------------------------------------------
-# Prawn Data
+# Seafood Data
 #-------------------------------------------------------------@
 
-df.prawn <- read.csv("JASA Submission/deidentified_frozen_seafood.csv")
-df.prawn$Yfac <- factor(df.prawn$numPos,levels=c(0:13))
-x <- as.numeric(names(table(df.prawn$Yfac)))
-freq <- as.numeric(table(df.prawn$Yfac))
+df.seafood <- read.csv("JASA Submission/deidentified_frozen_seafood.csv")
+df.seafood$Yfac <- factor(df.seafood$numPos,levels=c(0:13))
+x <- as.numeric(names(table(df.seafood$Yfac)))
+freq <- as.numeric(table(df.seafood$Yfac))
 size <- 13 # Number of bags (b)
-prawn.data <- data.frame(ty=df.prawn$Yfac,n=rep(size,length(df.prawn$Yfac)))
-prawn.data$ID <- c(1:dim(prawn.data)[1])
-prawn.data$ty <- as.numeric(paste(prawn.data$ty))
-prawn.data <- prawn.data[order(prawn.data$ty),]
+seafood.data <- data.frame(ty=df.seafood$Yfac,n=rep(size,length(df.seafood$Yfac)))
+seafood.data$ID <- c(1:dim(seafood.data)[1])
+seafood.data$ty <- as.numeric(paste(seafood.data$ty))
+seafood.data <- seafood.data[order(seafood.data$ty),]
 
 
 # ------------------------------------------------------------------#
-# Dunn-Smyth Residual Goodness-of-Fit: MH Estimator with Imperfect Test Sensitivity (0.80)
+# Dunn-Smyth Residual Goodness-of-Fit: MH Estimator with known Imperfect Test Sensitivity (0.80)
 # ------------------------------------------------------------------#
 
 # Load MH-fitted model output (imperfect test sensitivity = 0.80)
 load("JASA Submission/MH.alpha.mu.sigma.20.known.sn.80.Prawn.Rdata")
 
 # Extract observed response (sorted)
-ObservedResponse <- sort(prawn.data$ty)
+ObservedResponse <- sort(seafood.data$ty)
 
 # Run Dunn-Smyth residual diagnostic using posterior samples
 set.seed(123456)
@@ -391,7 +392,7 @@ ggsave("Dunn_Smyth_Test_MH_Estimator_imperfect_Case_sn_0.80.png", height = 4, wi
 load("JASA Submission/MH.alpha.mu.sigma.20.unknown.sn.80.Prawn.Rdata")
 
 # Extract observed response (sorted)
-ObservedResponse <- sort(prawn.data$ty)
+ObservedResponse <- sort(seafood.data$ty)
 
 # Run Dunn-Smyth residual diagnostic using posterior samples
 set.seed(123456)

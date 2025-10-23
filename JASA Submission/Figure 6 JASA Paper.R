@@ -7,8 +7,10 @@ library(ggpubr)
 library(xtable)
 
 #-------------------------------------------------------------@
+# Figure 6: JASA Paper
+# Supplementary Table S5
+# Community Risk: Vary number of sampled bags
 # Model-based Simulation using MH-based TrBB model under Imperfect Testing
-# Community Risk: Figure 6
 # Using Frozen-food imported data
 # Exact BB Model: Bayesian method MH Algorithm
 # Target Parameters: TP, TN, FN
@@ -16,7 +18,6 @@ library(xtable)
 # P(Li>0): FN Batches
 # E(Li): Number of contaminated items in FN Batches
 # Delta=0.8, k=0.01, m=5, b=13, 20, 26
-# Relevant Supplementary Table and will be from here
 #-------------------------------------------------------------@
 
 # -------------------------------------------------------------------
@@ -214,10 +215,13 @@ df_combined$Perc <- (df_combined$Freq / 1000) * 100
 # Save the final combined data frame for use in figures
 save(df_combined, file = "df_combined_Model_Based_Simulation_Sn.0.80_varying_b.Rdata")
 
-# Figures for Community Risk by Bag Size - Main Manuscript and Supplementary Material --------------
+# -------------------------------------------------------------------------------
+# Figure 6
+# Community Risk by Bag Size - Main Manuscript
 # This section generates plots for community-level risk outcomes,
 # based on model-based simulations under varying bag sizes (`b` values),
 # using a diagnostic sensitivity (Sn) of 80%.
+# -------------------------------------------------------------------------------
 
 library(ggplot2)
 library(ggpubr)
@@ -226,7 +230,7 @@ library(dplyr)
 load("df_combined_Model_Based_Simulation_Sn.0.80_varying_b.Rdata")
 
 
-# Figures for Community Risk - Main Manuscript --------------#
+# Figure 6 for Community Risk - Main Manuscript --------------#
 
 df_nonzero <- df_combined[df_combined$Counts == "nonzero" , ]
 df_zero <- df_combined[df_combined$Counts == "zero" , ]
@@ -305,10 +309,15 @@ zero <- ggplot(df_zero, aes(x = b, y = Freq, fill = Outcome)) +
 
 ggsave("Test_Outcome_m5_b13_20_26_Imperfect_Manuscript.png",width = 10,height = 6,units = "in")
 
+# --------------------------------------------------------------------------------
+# Supplementary Table S5
+# Community Risk assessment
+# --------------------------------------------------------------------------------
 
-# Table for Community Risk - Supp Mat Manuscript --------------
 
-# Leakage parameters: By Sampled bag size - b=13,20,26: k=0 ----------------------------
+# --------------------------------------------------------------------------------
+# Leakage parameters: By Sampled bag size - b=13,20,26: k=0
+# --------------------------------------------------------------------------------
 
 load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80.Rdata")
 Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80
@@ -469,7 +478,9 @@ P_E_Li_13_20_26_MH_00 <- read.csv("P_E_Li_13_20_26_MH_00.csv",header = TRUE)
 
 print(xtable(P_E_Li_13_20_26_MH_00),rownames=FALSE)
 
-# Leakage parameters: By Sampled bag size - b=13,20,26: k=0.01 ----------------------------
+# --------------------------------------------------------------------------------
+# Leakage parameters: By Sampled bag size - b=13,20,26: k=0.01
+# --------------------------------------------------------------------------------
 
 
 load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80.Rdata")
@@ -635,7 +646,9 @@ P_E_Li_13_20_26_MH_01 <- read.csv("P_E_Li_13_20_26_MH_01.csv",header=TRUE)
 library(xtable)
 print(xtable(P_E_Li_13_20_26_MH_01),rownames=FALSE)
 
-# Leakage parameters: By Sampled bag size - b=13,20,26: k=0.02 ----------------------------
+# --------------------------------------------------------------------------------
+# Leakage parameters: By Sampled bag size - b=13,20,26: k=0.02
+# --------------------------------------------------------------------------------
 
 load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80.Rdata")
 load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b20_MH_02_Imperfect_Sn_80.Rdata")
@@ -768,7 +781,9 @@ mean_LKG_df_MH_02_m_5_b_26 <- data.frame(
 )
 
 
+# --------------------------------------------------------------------------------
 # Calculate mean and 95% Credible interval by sensitivity, k and bag size
+# --------------------------------------------------------------------------------
 
 
 
@@ -807,7 +822,9 @@ P_E_Li_13_20_26_MH_02 <- read.csv("P_E_Li_13_20_26_MH_02.csv",header = TRUE)
 library(xtable)
 print(xtable(P_E_Li_13_20_26_MH_02),rownames=FALSE)
 
-# Final Results for Table -------------------
+# --------------------------------------------------------------------------------
+# Final Results for Supplementary Table S5
+# --------------------------------------------------------------------------------
 
 P_E_Li_13_20_26_MH_00 <- read.csv("P_E_Li_13_20_26_MH_00.csv",header = TRUE)
 P_E_Li_13_20_26_MH_01 <- read.csv("P_E_Li_13_20_26_MH_01.csv",header = TRUE)

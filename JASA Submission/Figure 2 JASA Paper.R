@@ -1,19 +1,27 @@
-# -------------------------------------------------------------@
-# Figure 2: JASA PAper
-# Profile likelihood for cutoff values
-# Data: Deidentified Frozen Seafood Data 
-# Exact BB Model: Frequentist method using MLE 
-# Using Generailzed log-likelihood function
-# Target Parameters: PLLF of Minimum Positive Propensity (k)
-#-------------------------------------------------------------@
-
 # --------------------------------------------------------------------------- #
 # Load Required Libraries
 # --------------------------------------------------------------------------- #
 library(groupedBBMH)  # Custom package for grouped beta-binomial MH modeling
+library(dplyr)        # Data manipulation
+library(xtable)       # LaTeX table generation
+library(bayesplot)    # Diagnostic and visualization tools for MCMC
+library(coda)         # MCMC diagnostics and summaries
+library(ggplot2)      # General plotting
+library(ggpubr)       # Publication-ready plots and arrangement tools
+library(MASS)         # For multivariate normal distribution functions
+
+
+# -------------------------------------------------------------@
+# Figure 2: JASA PAper
+# Profile likelihood for cutoff values
+# Data: Deidentified Frozen Seafood Data
+# Exact BB Model: MLE method and PLLF
+# Using Generailzed log-likelihood function
+# Target Parameters: PLLF of Minimum Positive Propensity (k)
+#-------------------------------------------------------------@
 
 #-------------------------------------------------------------
-# Deidentified Frozen Seafood Data 
+# Deidentified Frozen Seafood Data
 #-------------------------------------------------------------@
 
 df.seafood <- read.csv("JASA Submission//deidentified_frozen_seafood.csv")
@@ -30,38 +38,40 @@ summ.seafood.data <- as.data.frame(table(seafood.data$ty))
 colnames(summ.seafood.data) <- c("ty","freq")
 summ.seafood.data$ty <- as.numeric(paste(summ.seafood.data$ty))
 
-# PLLF Minimum Positive Propensity: Perfect Sensitivity --------
+# --------------------------------------------------------------
+# PLLF of Minimum Positive Propensity: Perfect Sensitivity
+# --------------------------------------------------------------
+
 
 store_theta_values_prawn <- function(cut_off) {
   # Run the optimization
-  optim_result <- optim(c(0, 0), loglik_group_trbb, 
-                        ty = summ.prawn.data$ty, 
-                        freq = summ.prawn.data$freq, 
-                        b = 13, 
+  optim_result <- optim(c(0, 0), loglik_group_trbb,
+                        ty = summ.prawn.data$ty,
+                        freq = summ.prawn.data$freq,
+                        b = 13,
                         m = 5,
                         M = 40,
-                        theta = Inf, 
+                        theta = Inf,
                         R = 1e5, # R = 3e4
-                        sensitivity = 1, 
-                        specificity = 1, 
+                        sensitivity = 1,
+                        specificity = 1,
                         cutoff = cut_off,
-                        deviance = FALSE, 
-                        control = list(reltol = 1e-12, fnscale = -1), 
+                        deviance = FALSE,
+                        control = list(reltol = 1e-12, fnscale = -1),
                         hessian = FALSE)
-  
+
   # Store the parameter estimates
   optim_result$alpha <- exp(optim_result$par[1])
   optim_result$beta <- exp(optim_result$par[2])
   optim_result$cutoff <- cut_off
   optim_result$mu.TrBB <- optim_result$alpha / (optim_result$alpha + optim_result$beta)
-  #  optim_result$mu.overall <- (1 - optim_result$pi) * optim_result$mu.BB
-  
+
   # Return the relevant values as a data frame
-  return(data.frame(cutoff = optim_result$cutoff, 
-                    alpha = optim_result$alpha, 
-                    beta = optim_result$beta, 
-                    mu.BB = optim_result$mu.TrBB, 
-                    #  mu.overall = optim_result$mu.overall, 
+  return(data.frame(cutoff = optim_result$cutoff,
+                    alpha = optim_result$alpha,
+                    beta = optim_result$beta,
+                    mu.BB = optim_result$mu.TrBB,
+                    #  mu.overall = optim_result$mu.overall,
                     value = optim_result$value,
                     convergence=optim_result$convergence
   ))
@@ -89,8 +99,8 @@ png("pllf CI cutoff Prawn.png",width = 6,height = 6,units = "in",res=300)
 par(mfrow=c(1,1), mgp=c(3, 0.5, 0), oma=c(0,0,0,0), mar=c(5, 4, 4, 2))  # Adjusted margins
 
 range_ll <- range(prawn_results_df_TrBB$value)
-plot(prawn_results_df_TrBB$cutoff, prawn_results_df_TrBB$value,typ="l", 
-     ylab="logL",main="logL under perfect test",yaxt="n",xaxt="n",cex.lab=1.2,cex.axis=1, 
+plot(prawn_results_df_TrBB$cutoff, prawn_results_df_TrBB$value,typ="l",
+     ylab="logL",main="logL under perfect test",yaxt="n",xaxt="n",cex.lab=1.2,cex.axis=1,
      xlab=expression(italic(k)))
 axis(side = 2, at = seq(round(range_ll[1],1), round(range_ll[2],1), by = 1),las = 1)
 axis(side = 1, at = seq(min(prawn_results_df_TrBB$cutoff), max(prawn_results_df_TrBB$cutoff), by = 0.0015),las = 3)
@@ -128,39 +138,41 @@ text(x=max_x+0.02, y=(max_y-40), labels=round(pllf.CI.estimate.cutoff.95$mle.ul,
 
 dev.off()
 
-# PLLF Minimum Positive Propensity: Imperfect Sensitivity (0.8) --------
+# --------------------------------------------------------------
+# PLLF of Minimum Positive Propensity: Imperfect Sensitivity (0.8)
+# --------------------------------------------------------------
 
 store_theta_values_prawn_imperfect <- function(cut_off) {
   # Run the optimization
-  optim_result <- optim(c(0, 0), loglik_group_trbb, 
-                        ty = summ.prawn.data$ty, 
-                        freq = summ.prawn.data$freq, 
-                        b = 13, 
+  optim_result <- optim(c(0, 0), loglik_group_trbb,
+                        ty = summ.prawn.data$ty,
+                        freq = summ.prawn.data$freq,
+                        b = 13,
                         m = 5,
                         M = 40,
-                        theta = Inf, 
-                        R = 1e5, 
+                        theta = Inf,
+                        R = 1e5,
                         # R = 3e4,
-                        sensitivity = 0.8, 
-                        specificity = 1, 
+                        sensitivity = 0.8,
+                        specificity = 1,
                         cutoff = cut_off,
-                        deviance = FALSE, 
-                        control = list(reltol = 1e-12, fnscale = -1), 
+                        deviance = FALSE,
+                        control = list(reltol = 1e-12, fnscale = -1),
                         hessian = FALSE)
-  
+
   # Store the parameter estimates
   optim_result$alpha <- exp(optim_result$par[1])
   optim_result$beta <- exp(optim_result$par[2])
   optim_result$cutoff <- cut_off
   optim_result$mu.TrBB <- optim_result$alpha / (optim_result$alpha + optim_result$beta)
   #  optim_result$mu.overall <- (1 - optim_result$pi) * optim_result$mu.BB
-  
+
   # Return the relevant values as a data frame
-  return(data.frame(cutoff = optim_result$cutoff, 
-                    alpha = optim_result$alpha, 
-                    beta = optim_result$beta, 
-                    mu.BB = optim_result$mu.TrBB, 
-                    #  mu.overall = optim_result$mu.overall, 
+  return(data.frame(cutoff = optim_result$cutoff,
+                    alpha = optim_result$alpha,
+                    beta = optim_result$beta,
+                    mu.BB = optim_result$mu.TrBB,
+                    #  mu.overall = optim_result$mu.overall,
                     value = optim_result$value,
                     convergence=optim_result$convergence
   ))
@@ -179,7 +191,10 @@ save(prawn_results_df_TrBB_imperfect,file="prawn_results_df_TrBB_imperfect_upto_
 
 
 
-# Only under perfect sensitivity ---------
+# -----------------------------------------------------------
+# Figure 2: On Original Scale of logL
+# Under perfect sensitivity
+# -----------------------------------------------------------
 
 load("prawn_results_df_TrBB_upto_3_percent_Re5.Rdata")
 
@@ -193,13 +208,13 @@ png("pllf CI cutoff Prawn.png",width = 6,height = 6,units = "in",res=300)
  par(mfrow=c(1,1), mgp=c(3, 0.5, 0), oma=c(0,0,0,0), mar=c(5, 4, 4, 2))  # Adjusted margins
 
 #par(mfrow = c(1,1), mgp   = c(3, 0.5, 0),      # axis title and label spacing
-#  oma   = c(0,0,0,0), 
+#  oma   = c(0,0,0,0),
 #  mar   = c(4, 4, 1, 1)      # reduced top (1) and right (1) margins
 #)
 
 range_ll <- range(prawn_results_df_TrBB$value)
-plot(prawn_results_df_TrBB$cutoff, prawn_results_df_TrBB$value,typ="l", 
-     ylab="logL",yaxt="n",xaxt="n",cex.lab=1.2,cex.axis=1, 
+plot(prawn_results_df_TrBB$cutoff, prawn_results_df_TrBB$value,typ="l",
+     ylab="logL",yaxt="n",xaxt="n",cex.lab=1.2,cex.axis=1,
      xlab=expression(italic(k))) # main="logL under perfect test",
 axis(side = 2, at = seq(round(range_ll[1],1), round(range_ll[2],1), by = 1),las = 1)
 axis(side = 1, at = seq(min(prawn_results_df_TrBB$cutoff), max(prawn_results_df_TrBB$cutoff), by = 0.0015),las = 3)
@@ -239,7 +254,10 @@ text(x=max_x+0.015, y=(max_y-3), labels=round(pllf.CI.estimate.cutoff.95$mle.ul,
 dev.off()
 
 
-# Only under imperfect sensitivity (Paper) ---------
+# -----------------------------------------------------------
+# Figure 2: On Original Scale of logL
+# Under imperfect sensitivity
+# -----------------------------------------------------------
 
 load("prawn_results_df_TrBB_imperfect_upto_3_percent_Re5.Rdata")
 pllf.CI.estimate.cutoff.99.imperfect <- pllf.CI.estimate(prawn_results_df_TrBB_imperfect$cutoff,prawn_results_df_TrBB_imperfect$value,level=0.99)
@@ -287,8 +305,8 @@ par(mfrow=c(1,1), mgp=c(3, 0.5, 0), oma=c(0,0,0,0), mar=c(5, 4, 4, 2))  # Adjust
 
 range_ll <- range(prawn_results_df_TrBB_imperfect$value)
 
-plot(prawn_results_df_TrBB_imperfect$cutoff, prawn_results_df_TrBB_imperfect$value,typ="l", 
-     ylab="logL",yaxt="n",xaxt="n",cex.lab=1.2,cex.axis=1, 
+plot(prawn_results_df_TrBB_imperfect$cutoff, prawn_results_df_TrBB_imperfect$value,typ="l",
+     ylab="logL",yaxt="n",xaxt="n",cex.lab=1.2,cex.axis=1,
      xlab=expression(k)) # main="logL under imperfect test",
 axis(side = 2, at = seq(round(range_ll[1],1), round(range_ll[2],1), by = 1),las = 1)
 axis(side = 1, at = seq(min(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB_imperfect$cutoff), max(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB_imperfect$cutoff), by = 0.0015),las = 3)
@@ -326,7 +344,11 @@ text(x=max_x+0.017, y=(max_y-2), labels=round(pllf.CI.estimate.cutoff.95.imperfe
 
 dev.off()
 
-# Only under imperfect sensitivity (Paper) : Using rescaled logL ---------
+
+# -----------------------------------------------------------
+# Figure 2: On Re-Scaled logL: logL - max(logL)
+# Under imperfect sensitivity
+# -----------------------------------------------------------
 
 load("prawn_results_df_TrBB_imperfect_upto_3_percent_Re5.Rdata")
 pllf.CI.estimate.cutoff.99.imperfect <- pllf.CI.estimate(prawn_results_df_TrBB_imperfect$cutoff,prawn_results_df_TrBB_imperfect$value,level=0.99)
@@ -347,7 +369,7 @@ ymax <- 0
 ymin <- floor(range_ll[1]*10)/10  # round down to nearest 0.1
 y_ticks <- seq(from = ymax, to = ymin, by = step)
 
-plot(prawn_results_df_TrBB_imperfect$cutoff, prawn_results_df_TrBB_imperfect$value_rescaled,typ="l", 
+plot(prawn_results_df_TrBB_imperfect$cutoff, prawn_results_df_TrBB_imperfect$value_rescaled,typ="l",
      ylab="logL - max(logL)",yaxt="n",xaxt="n",cex.lab=1.5,cex.axis=0.9,
      xlab=expression(italic(k)) ) # main="logL under imperfect test",
 
@@ -391,110 +413,5 @@ abline(h=max(prawn_results_df_TrBB_imperfect$value_rescaled,na.rm=T),col=2,lty=2
 
 dev.off()
 
-
-# Compare Perfect and Imperfect Sensitivity (Supplementary Figure) -------
-
-load("prawn_results_df_TrBB_upto_3_percent_Re5.Rdata")
-
-pllf.CI.estimate.cutoff.99 <- pllf.CI.estimate(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB$value,level=0.99)
-pllf.CI.estimate.cutoff.95 <- pllf.CI.estimate(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB$value,level=0.95)
-pllf.CI.estimate.cutoff.90 <- pllf.CI.estimate(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB$value,level=0.90)
-pllf.CI.estimate.cutoff.80 <- pllf.CI.estimate(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB$value,level=0.80)
-
-load("prawn_results_df_TrBB_imperfect_upto_3_percent_Re5.Rdata")
-pllf.CI.estimate.cutoff.99.imperfect <- pllf.CI.estimate(prawn_results_df_TrBB_imperfect$cutoff,prawn_results_df_TrBB_imperfect$value,level=0.99)
-pllf.CI.estimate.cutoff.95.imperfect <- pllf.CI.estimate(prawn_results_df_TrBB_imperfect$cutoff,prawn_results_df_TrBB_imperfect$value,level=0.95)
-pllf.CI.estimate.cutoff.90.imperfect <- pllf.CI.estimate(prawn_results_df_TrBB_imperfect$cutoff,prawn_results_df_TrBB_imperfect$value,level=0.90)
-pllf.CI.estimate.cutoff.80.imperfect <- pllf.CI.estimate(prawn_results_df_TrBB_imperfect$cutoff,prawn_results_df_TrBB_imperfect$value,level=0.80)
-
-png("pllf CI cutoff Prawn perfect imperfect.png",width = 12,height = 6,units = "in",res=300)
-
-# par(mfrow=c(1,2), mgp=c(3.5, 0.5, 0), oma=c(0,0,0,0), mar=c(5, 4, 4, 2))  # Adjusted margins
-par(mfrow = c(1, 2), mgp = c(4, 1, 0), oma = c(0, 0, 0, 0), mar = c(5, 5.5, 2, 2))
-
-range_ll <- range(prawn_results_df_TrBB$value,prawn_results_df_TrBB_imperfect$value)
-
-plot(prawn_results_df_TrBB$cutoff, prawn_results_df_TrBB$value,typ="l", 
-     ylab="logL",main="logL under perfect test",yaxt="n",xaxt="n",cex.lab=1.2,cex.axis=1, 
-     xlab=expression(italic(k)),xlim=c(min(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB_imperfect$cutoff), max(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB_imperfect$cutoff)))
-axis(side = 2, at = seq(round(range_ll[1],1), round(range_ll[2],1), by = 1),las = 1,cex.axis=0.9,tcl = -0.5)
-axis(side = 1, at = seq(min(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB_imperfect$cutoff), max(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB_imperfect$cutoff), by = 0.0015),
-     las = 3,cex.axis=0.9,tcl = -0.5)
-abline(h=max(prawn_results_df_TrBB$value,na.rm=T),col=2,lty=3)
-# abline(h=max(prawn_results_df_TrBB$value,na.rm=T)-qchisq(0.99,1)/2,col=3,lty=3)
-abline(h=max(prawn_results_df_TrBB$value,na.rm=T)-qchisq(0.95,1)/2,col=4,lty=3)
-abline(h=max(prawn_results_df_TrBB$value,na.rm=T)-qchisq(0.90,1)/2,col=5,lty=6)
-abline(h=max(prawn_results_df_TrBB$value,na.rm=T)-qchisq(0.80,1)/2,col=6,lty=6)
-abline(v=pllf.CI.estimate.cutoff.95$mle,col=2,lty=1)
-abline(v=pllf.CI.estimate.cutoff.95$mle.ul,col=3,lty=2)
-abline(v=pllf.CI.estimate.cutoff.95$mle.ll,col=3,lty=2)
-#abline(v=pllf.CI.estimate.cutoff.99$mle.ul,col=3,lty=2)
-#abline(v=pllf.CI.estimate.cutoff.99$mle.ll,col=3,lty=2)
-abline(v=pllf.CI.estimate.cutoff.90$mle.ul,col=4,lty=2)
-abline(v=pllf.CI.estimate.cutoff.90$mle.ll,col=4,lty=2)
-abline(v=pllf.CI.estimate.cutoff.80$mle.ul,col=6,lty=2)
-abline(v=pllf.CI.estimate.cutoff.80$mle.ll,col=6,lty=2)
-
-legend("topright",legend=c("0.95","0.90","0.80"),col=c(3,4,6),lty=c(2,2,2),lwd=c(2,2,2),bty="n")
-
-
-# Identify the x-value corresponding to the maximum y-value
-max_x <- prawn_results_df_TrBB$cutoff[which.max(prawn_results_df_TrBB$value)]
-max_y <- max(prawn_results_df_TrBB$value)
-
-# Add a vertical line at the max x-value
-#abline(v=max_x, col="red", lty=2)
-
-# Display the x-value on the plot
-text(x=max_x-0.0002, y=(max_y-2), labels=round(max_x, 5), pos=3, col=2, cex=0.9, srt = 90)
-text(x=max_x+0.008, y=(max_y-2), labels=round(pllf.CI.estimate.cutoff.80$mle.ul, 5), pos=3, col=6, cex=0.9, srt = 90)
-text(x=0.002, y=(max_y-2), labels=round(pllf.CI.estimate.cutoff.80$mle.ll, 5), pos=3, col=6, cex=0.9, srt = 90)
-text(x=max_x+0.011, y=(max_y-3), labels=round(pllf.CI.estimate.cutoff.90$mle.ul, 5), pos=3, col=4, cex=0.9, srt = 90)
-text(x=0.001, y=(max_y-3), labels=round(pllf.CI.estimate.cutoff.90$mle.ll, 5), pos=3, col=4, cex=0.9, srt = 90)
-text(x=max_x+0.015, y=(max_y-3), labels=round(pllf.CI.estimate.cutoff.95$mle.ul, 5), pos=3, col=3, cex=0.9, srt = 90)
-
-
-
-plot(prawn_results_df_TrBB_imperfect$cutoff, prawn_results_df_TrBB_imperfect$value,typ="l", 
-     ylab="logL",yaxt="n",xaxt="n",cex.lab=1.2,cex.axis=1,
-     main="logL under imperfect test",
-     xlab=expression(italic(k))) # 
-axis(side = 2, at = seq(round(range_ll[1],1), round(range_ll[2],1), by = 0.5),las = 1)
-axis(side = 1, at = seq(min(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB_imperfect$cutoff), max(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB_imperfect$cutoff), by = 0.0015),
-     las = 3)
-abline(h=max(prawn_results_df_TrBB_imperfect$value,na.rm=T),col=2,lty=3)
-# abline(h=max(prawn_results_df_TrBB$value,na.rm=T)-qchisq(0.99,1)/2,col=3,lty=3)
-abline(h=max(prawn_results_df_TrBB_imperfect$value,na.rm=T)-qchisq(0.95,1)/2,col=4,lty=3)
-abline(h=max(prawn_results_df_TrBB_imperfect$value,na.rm=T)-qchisq(0.90,1)/2,col=5,lty=6)
-abline(h=max(prawn_results_df_TrBB_imperfect$value,na.rm=T)-qchisq(0.80,1)/2,col=6,lty=6)
-abline(v=pllf.CI.estimate.cutoff.95.imperfect$mle,col=2,lty=1)
-abline(v=pllf.CI.estimate.cutoff.95.imperfect$mle.ul,col=3,lty=2)
-abline(v=pllf.CI.estimate.cutoff.95.imperfect$mle.ll,col=3,lty=2)
-#abline(v=pllf.CI.estimate.cutoff.99$mle.ul,col=3,lty=2)
-#abline(v=pllf.CI.estimate.cutoff.99$mle.ll,col=3,lty=2)
-abline(v=pllf.CI.estimate.cutoff.90.imperfect$mle.ul,col=4,lty=2)
-abline(v=pllf.CI.estimate.cutoff.90.imperfect$mle.ll,col=4,lty=2)
-abline(v=pllf.CI.estimate.cutoff.80.imperfect$mle.ul,col=6,lty=2)
-abline(v=pllf.CI.estimate.cutoff.80.imperfect$mle.ll,col=6,lty=2)
-
-legend("topright",legend=c("0.95","0.90","0.80"),col=c(3,4,6),lty=c(2,2,2),bty="n",lwd=c(2,2,2))
-
-# Identify the x-value corresponding to the maximum y-value
-max_x <- prawn_results_df_TrBB_imperfect$cutoff[which.max(prawn_results_df_TrBB_imperfect$value)]
-max_y <- max(prawn_results_df_TrBB_imperfect$value)
-
-# Add a vertical line at the max x-value
-#abline(v=max_x, col="red", lty=2)
-
-# Display the x-value on the plot
-text(x=max_x-0.0002, y=(max_y-2), labels=round(max_x, 5), pos=3, col=2, cex=0.9, srt = 90)
-text(x=max_x+0.0105, y=(max_y-2), labels=round(pllf.CI.estimate.cutoff.80.imperfect$mle.ul, 5), pos=3, col=6, cex=0.9, srt = 90)
-text(x=max_x-0.008, y=(max_y-2), labels=round(pllf.CI.estimate.cutoff.80.imperfect$mle.ll, 5), pos=3, col=6, cex=0.9, srt = 90)
-text(x=max_x+0.014, y=(max_y-2), labels=round(pllf.CI.estimate.cutoff.90.imperfect$mle.ul, 5), pos=3, col=4, cex=0.9, srt = 90)
-text(x=max_x+0.017, y=(max_y-2), labels=round(pllf.CI.estimate.cutoff.95.imperfect$mle.ul, 5), pos=3, col=3, cex=0.9, srt = 90)
-
-
-
-dev.off()
 
 

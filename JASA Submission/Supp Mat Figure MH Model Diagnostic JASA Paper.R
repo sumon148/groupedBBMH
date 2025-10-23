@@ -1,8 +1,3 @@
-# ============================================================================ #
-# Title    :  Diagnostics of MCMC outputs under Metropolis-Hastings Algorithm
-# Project  : JASA Submission
-# ============================================================================ #
-
 # --------------------------------------------------------------------------- #
 # Load Required Libraries
 # --------------------------------------------------------------------------- #
@@ -14,6 +9,14 @@ library(coda)         # MCMC diagnostics and summaries
 library(ggplot2)      # General plotting
 library(ggpubr)       # Publication-ready plots and arrangement tools
 library(MASS)         # For multivariate normal distribution functions
+
+
+# ============================================================================ #
+# Title    :  Diagnostics of MCMC outputs under Metropolis-Hastings Algorithm
+# Project  : JASA Submission
+# Supplementary Figures S3 & S4
+# ============================================================================ #
+
 
 # --------------------------------------------------------------------------- #
 # Load MCMC Results for Known and Unknown Sensitivity Models

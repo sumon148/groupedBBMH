@@ -316,25 +316,25 @@ df.pllf.sn.sp.alpha.prawn$E.L[df.pllf.sn.sp.alpha.prawn$sensitivity==0.8] <-  es
                                    Delta=0.8,approximate=TRUE)$E_Li
 
 
-pllf.CI.alpha.sn.1 <- pllf.CI.estimate(df.pllf.sn.sp.alpha.prawn$alpha[df.pllf.sn.sp.alpha.prawn$sensitivity==1],
+pllf.CI.alpha.sn.1 <- pllfCIestimate(df.pllf.sn.sp.alpha.prawn$alpha[df.pllf.sn.sp.alpha.prawn$sensitivity==1],
                                        logL=df.pllf.sn.sp.alpha.prawn$logL[df.pllf.sn.sp.alpha.prawn$sensitivity==1],conf_level = 0.95)
-pllf.CI.mu.sn.1 <- pllf.CI.estimate(df.pllf.sn.sp.mu.prawn$mu[df.pllf.sn.sp.mu.prawn$sensitivity==1],
+pllf.CI.mu.sn.1 <- pllfCIestimate(df.pllf.sn.sp.mu.prawn$mu[df.pllf.sn.sp.mu.prawn$sensitivity==1],
                                     logL=df.pllf.sn.sp.mu.prawn$logL[df.pllf.sn.sp.mu.prawn$sensitivity==1])
-pllf.CI.beta.sn.1 <- pllf.CI.estimate(df.pllf.sn.sp.mu.prawn$beta[df.pllf.sn.sp.mu.prawn$sensitivity==1],
+pllf.CI.beta.sn.1 <- pllfCIestimate(df.pllf.sn.sp.mu.prawn$beta[df.pllf.sn.sp.mu.prawn$sensitivity==1],
                                       logL=df.pllf.sn.sp.mu.prawn$logL[df.pllf.sn.sp.mu.prawn$sensitivity==1],conf_level = 0.95)
-pllf.CI.E.L.sn.1 <- pllf.CI.estimate(df.pllf.sn.sp.alpha.prawn$E.L[df.pllf.sn.sp.alpha.prawn$sensitivity==1],
+pllf.CI.E.L.sn.1 <- pllfCIestimate(df.pllf.sn.sp.alpha.prawn$E.L[df.pllf.sn.sp.alpha.prawn$sensitivity==1],
                                      logL=df.pllf.sn.sp.alpha.prawn$logL[df.pllf.sn.sp.alpha.prawn$sensitivity==1],conf_level = 0.95)
-pllf.CI.P.L.sn.1 <- pllf.CI.estimate(df.pllf.sn.sp.alpha.prawn$P.L[df.pllf.sn.sp.alpha.prawn$sensitivity==1],
+pllf.CI.P.L.sn.1 <- pllfCIestimate(df.pllf.sn.sp.alpha.prawn$P.L[df.pllf.sn.sp.alpha.prawn$sensitivity==1],
                                      logL=df.pllf.sn.sp.alpha.prawn$logL[df.pllf.sn.sp.alpha.prawn$sensitivity==1],conf_level = 0.95)
-pllf.CI.alpha.sn.0.80 <- pllf.CI.estimate(df.pllf.sn.sp.alpha.prawn$alpha[df.pllf.sn.sp.alpha.prawn$sensitivity==0.80],
+pllf.CI.alpha.sn.0.80 <- pllfCIestimate(df.pllf.sn.sp.alpha.prawn$alpha[df.pllf.sn.sp.alpha.prawn$sensitivity==0.80],
                                           logL=df.pllf.sn.sp.alpha.prawn$logL[df.pllf.sn.sp.alpha.prawn$sensitivity==0.80],conf_level = 0.95)
-pllf.CI.mu.sn.0.80 <- pllf.CI.estimate(df.pllf.sn.sp.mu.prawn$mu[df.pllf.sn.sp.mu.prawn$sensitivity==0.80],
+pllf.CI.mu.sn.0.80 <- pllfCIestimate(df.pllf.sn.sp.mu.prawn$mu[df.pllf.sn.sp.mu.prawn$sensitivity==0.80],
                                        logL=df.pllf.sn.sp.mu.prawn$logL[df.pllf.sn.sp.mu.prawn$sensitivity==0.80])
-pllf.CI.beta.sn.0.80 <- pllf.CI.estimate(df.pllf.sn.sp.mu.prawn$beta[df.pllf.sn.sp.mu.prawn$sensitivity==0.80],
+pllf.CI.beta.sn.0.80 <- pllfCIestimate(df.pllf.sn.sp.mu.prawn$beta[df.pllf.sn.sp.mu.prawn$sensitivity==0.80],
                                          logL=df.pllf.sn.sp.mu.prawn$logL[df.pllf.sn.sp.mu.prawn$sensitivity==0.80],conf_level = 0.95)
-pllf.CI.E.L.sn.0.80 <- pllf.CI.estimate(df.pllf.sn.sp.alpha.prawn$E.L[df.pllf.sn.sp.alpha.prawn$sensitivity==0.80],
+pllf.CI.E.L.sn.0.80 <- pllfCIestimate(df.pllf.sn.sp.alpha.prawn$E.L[df.pllf.sn.sp.alpha.prawn$sensitivity==0.80],
                                         logL=df.pllf.sn.sp.alpha.prawn$logL[df.pllf.sn.sp.alpha.prawn$sensitivity==0.80],conf_level = 0.95)
-pllf.CI.P.L.sn.0.80 <- pllf.CI.estimate(df.pllf.sn.sp.alpha.prawn$P.L[df.pllf.sn.sp.alpha.prawn$sensitivity==0.80],
+pllf.CI.P.L.sn.0.80 <- pllfCIestimate(df.pllf.sn.sp.alpha.prawn$P.L[df.pllf.sn.sp.alpha.prawn$sensitivity==0.80],
                                         logL=df.pllf.sn.sp.alpha.prawn$logL[df.pllf.sn.sp.alpha.prawn$sensitivity==0.80],conf_level = 0.95)
 
 
@@ -452,7 +452,7 @@ CI_mu_prawn_Delta_1.0 <- quantile(as.vector(mu_draws_prawn_Delta_1.0),probs = c(
 mu_estimate_prawn_Delta_1.0 <- c(as.numeric(summ_mu_prawn_Delta_1.0[,"mean"]),as.vector(CI_mu_prawn_Delta_1.0))
 
 # Calculation of E.L and P.L ----------#
-E.L.P.L.Draws.Lambda.0.80.prawn <- E.P.Leakge(B=8000,b=13,M=40,m=5,alpha=shape1_draws_prawn,beta=shape2_draws_prawn_Delta_0.80,sensitivity=0.80)
+E.L.P.L.Draws.Lambda.0.80.prawn <- estimate_leakage(B=8000,b=13,M=40,m=5,alpha=shape1_draws_prawn,beta=shape2_draws_prawn_Delta_0.80,sensitivity=0.80)
 summ.E.L.Draws.Lambda.0.80.prawn <- summary(E.L.P.L.Draws.Lambda.0.80.prawn$E.L)
 summ.P.L.Draws.Lambda.0.80.prawn <- summary(E.L.P.L.Draws.Lambda.0.80.prawn$P.L)
 CI.E.L.Draws.Lambda.0.80.prawn <- quantile(as.vector(E.L.P.L.Draws.Lambda.0.80.prawn$E.L),probs = c(0.0275,0.975))
@@ -461,7 +461,7 @@ E.L_estimate_prawn_Delta_0.80 <- c(as.numeric(summ.E.L.Draws.Lambda.0.80.prawn[,
 P.L_estimate_prawn_Delta_0.80 <- c(as.numeric(summ.P.L.Draws.Lambda.0.80.prawn[,"mean"]),as.vector(CI.P.L.Draws.Lambda.0.80.prawn))
 
 
-E.L.P.L.Draws.Lambda.1.prawn <- E.P.Leakge(B=8000,b=13,M=40,m=5,alpha=shape1_draws_prawn,beta=shape2_draws_prawn_Delta_1.0,sensitivity=1)  # If no clustering but 5 seeds are pooled to test
+E.L.P.L.Draws.Lambda.1.prawn <- estimate_leakage(B=8000,b=13,M=40,m=5,alpha=shape1_draws_prawn,beta=shape2_draws_prawn_Delta_1.0,sensitivity=1)  # If no clustering but 5 seeds are pooled to test
 summ.E.L.Draws.Lambda.1.prawn <- summary(E.L.P.L.Draws.Lambda.1.prawn$E.L)
 summ.P.L.Draws.Lambda.1.prawn <- summary(E.L.P.L.Draws.Lambda.1.prawn$P.L)
 CI.E.L.Draws.Lambda.1.prawn <- quantile(as.vector(E.L.P.L.Draws.Lambda.1.prawn$E.L),probs = c(0.0275,0.975))
@@ -511,7 +511,7 @@ d <- length(ty2)
 
 G=3000;R=50e3;
 par <- c(log(0.005), logit(7e-04)) ; initial <- par;
-MH.alpha.mu.sigma.20.Perfect.Prawn <- MH.Sampler.Chain(par=par,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
+MH.alpha.mu.sigma.20.Perfect.Prawn <- MH_Sampler_BB(par=par,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
                                                sigma=0.2,num_chains=4,burnin=R*0.5,thin=5,seed=c(123,456,789,135),trail=b,ty2=ty2,wt=wt,group.size=Nbar,sensitivity=FALSE,specificity=FALSE,
                                                sensitivity.range=NULL,specificity.range=NULL)
 save(MH.alpha.mu.sigma.20.Perfect.Prawn,file="MH.alpha.mu.sigma.20.Perfect.Prawn.Rdata")
@@ -523,7 +523,7 @@ save(MH.alpha.mu.sigma.20.Perfect.Prawn,file="MH.alpha.mu.sigma.20.Perfect.Prawn
 
 G=3000;R=50e3;
 par <- c(log(0.005), logit(7e-04), logit(0.75)) ; initial <- par;
-MH.alpha.mu.sigma.20.known.sn.80.Prawn <- MH.Sampler.Chain(par=par,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
+MH.alpha.mu.sigma.20.known.sn.80.Prawn <- MH_Sampler_BB(par=par,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
                                                            sigma=c(0.2,0.2),num_chains=4,burnin=R*0.5,thin=5,seed=c(123,456,789,135),trail=b,ty2=ty2,wt=wt,group.size=Nbar,sensitivity=TRUE,specificity=FALSE,
                                                            sensitivity.range=c(0.80,0.80),specificity.range=NULL)
 save(MH.alpha.mu.sigma.20.known.sn.80.Prawn,file="MH.alpha.mu.sigma.20.known.sn.80.Prawn.Rdata")
@@ -536,18 +536,16 @@ save(MH.alpha.mu.sigma.20.known.sn.80.Prawn,file="MH.alpha.mu.sigma.20.known.sn.
 
 G=3000;R=50e3;
 par <- c(log(0.005), logit(7e-04), logit(0.75)) ; initial <- par;
-MH.alpha.mu.sigma.20.unknown.sn.80.Prawn <- MH.Sampler.Chain(par=par,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
+MH.alpha.mu.sigma.20.unknown.sn.80.Prawn <- MH_Sampler_BB(par=par,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
                                                           sigma=c(0.2,0.2,2.0),num_chains=4,burnin=R*0.5,thin=5,seed=c(123,456,789,135),trail=b,ty2=ty2,wt=wt,group.size=Nbar,sensitivity=TRUE,specificity=FALSE,
                                                           sensitivity.range=c(0.75,0.85),specificity.range=NULL)
 save(MH.alpha.mu.sigma.20.unknown.sn.80.Prawn,file="MH.alpha.mu.sigma.20.unknown.sn.80.Prawn.Rdata")
 
 
-
-
-
-
-
-# Summary Statistics: Targeted Beta and Leakage Parameters---------------------
+#=====================================================#
+# Results from MH models: Perfect and imperfect Sensitivity
+# Targeted Beta and Leakage Parameters
+#=====================================================#
 
 load("MH.alpha.mu.sigma.20.Perfect.Prawn.Rdata")            # MH without cut-off k=0
 load("MH.alpha.mu.sigma.20.Perfect.Prawn.TBB.0.Rdata")       # MH with cut-off k=0
@@ -568,7 +566,7 @@ E.L.P.L.Draws.perfect.case <- estimate_leakage(B=8000,b=13,M=40,m=5,
                                                beta=MH.alpha.mu.sigma.20.Perfect.Prawn$target.parameters$beta_sample,
                                                sensitivity=1.0,
                                                cutoff = 0)
-summ.param.perfect.case <- summary.mcmc(E.L.P.L.Draws.perfect.case$alpha,
+summ.param.perfect.case <- summary_mcmc(E.L.P.L.Draws.perfect.case$alpha,
                                         E.L.P.L.Draws.perfect.case$beta,
                                         E.L.P.L.Draws.perfect.case$mu,
                                         E.L.P.L.Draws.perfect.case$E.L,
@@ -587,7 +585,7 @@ E.L.P.L.Draws.perfect.case.exact <- estimate_leakage(B=8000,b=13,M=40,m=5,
                                          beta=unlist((MH.alpha.mu.sigma.20.Perfect.Prawn$target.parameters$beta_sample)),
                                          sensitivity=1.0,
                                          cutoff = 0)
-summ.param.perfect.case <- summary.mcmc(E.L.P.L.Draws.perfect.case.exact$alpha,
+summ.param.perfect.case <- summary_mcmc(E.L.P.L.Draws.perfect.case.exact$alpha,
                                         E.L.P.L.Draws.perfect.case.exact$beta,
                                         E.L.P.L.Draws.perfect.case.exact$mu,
                                         E.L.P.L.Draws.perfect.case.exact$E.L,
@@ -620,7 +618,7 @@ E.L.P.L.Draws.perfect.case.exact <- estimate_leakage(B=8000,b=13,M=40,m=5,
                                                      cutoff = 0)
 summarise_Mean_CI(E.L.P.L.Draws.perfect.case.exact$E.L)
 summarise_Mean_CI(E.L.P.L.Draws.perfect.case.exact$P.L)
-summ.param.perfect.case <- summary.mcmc(E.L.P.L.Draws.perfect.case.exact$alpha,
+summ.param.perfect.case <- summary_mcmc(E.L.P.L.Draws.perfect.case.exact$alpha,
                                         E.L.P.L.Draws.perfect.case.exact$beta,
                                         E.L.P.L.Draws.perfect.case.exact$mu,
                                         E.L.P.L.Draws.perfect.case.exact$E.L,
@@ -645,7 +643,7 @@ E.L.P.L.Draws.imperfect.known.sn <- estimate_leakage(B=8000,b=13,M=40,m=5,
                                              beta=MH.alpha.mu.sigma.20.known.sn.80.Prawn$target.parameters$beta_sample,
                                              sensitivity=MH.alpha.mu.sigma.20.known.sn.80.Prawn$target.parameters$sensitivity_sample,
                                              cutoff = 0)
-summ.param.imperfect.known.sn <- summary.mcmc(E.L.P.L.Draws.imperfect.known.sn$alpha,
+summ.param.imperfect.known.sn <- summary_mcmc(E.L.P.L.Draws.imperfect.known.sn$alpha,
                                             E.L.P.L.Draws.imperfect.known.sn$beta,
                                             E.L.P.L.Draws.imperfect.known.sn$mu,
                                             E.L.P.L.Draws.imperfect.known.sn$E.L,
@@ -666,7 +664,7 @@ E.L.P.L.Draws.imperfect.known.sn.k.0 <- estimate_leakage(B=8000,b=13,M=40,m=5,
                                                beta=MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.0$target.parameters$beta_sample,
                                                sensitivity=MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.0$target.parameters$sensitivity_sample,
                                                cutoff = 0)
-summ.param.imperfect.known.sn.k.0 <- summary.mcmc(E.L.P.L.Draws.imperfect.known.sn.k.0$alpha,
+summ.param.imperfect.known.sn.k.0 <- summary_mcmc(E.L.P.L.Draws.imperfect.known.sn.k.0$alpha,
                                                   E.L.P.L.Draws.imperfect.known.sn.k.0$beta,
                                                   E.L.P.L.Draws.imperfect.known.sn.k.0$mu,
                                                   E.L.P.L.Draws.imperfect.known.sn.k.0$E.L,
@@ -693,7 +691,7 @@ E.L.P.L.Draws.imperfect.unknown.sn <- estimate_leakage(B=8000,b=13,M=40,m=5,
                                                beta=MH.alpha.mu.sigma.20.unknown.sn.80.Prawn$target.parameters$beta_sample,
                                                sensitivity=MH.alpha.mu.sigma.20.unknown.sn.80.Prawn$target.parameters$sensitivity_sample,
                                                cutoff=0.0)
-MH.Estimate.imperfect.unknown.sn <- summary.mcmc(E.L.P.L.Draws.imperfect.unknown.sn$alpha,
+MH.Estimate.imperfect.unknown.sn <- summary_mcmc(E.L.P.L.Draws.imperfect.unknown.sn$alpha,
                                               E.L.P.L.Draws.imperfect.unknown.sn$beta,
                                               E.L.P.L.Draws.imperfect.unknown.sn$mu,
                                               E.L.P.L.Draws.imperfect.unknown.sn$E.L,
@@ -702,7 +700,7 @@ MH.Estimate.imperfect.unknown.sn <- summary.mcmc(E.L.P.L.Draws.imperfect.unknown
 MH.Estimate.imperfect.unknown.sn$summary_mcmc[,c("Mean","2.5%","97.5%")]
 
 
-# Combined Results ---------------
+# Combined Results: MLE, BRMS & MH ---------------
 
 alpha_estimate_SN.1_MLE <- c(MLE.perfect.case[1,"alpha"],pllf.CI.alpha.sn.1$mle.ll,pllf.CI.alpha.sn.1$mle.ul)
 alpha_estimate_SN.0.80_MLE <- c(MLE.imperfect.case.sn.80[1,"alpha"],pllf.CI.alpha.sn.0.80$mle.ll,pllf.CI.alpha.sn.0.80$mle.ul)
@@ -803,7 +801,7 @@ rownames(Results.Exact.Approx) <- NULL
 write.csv(Results.Exact.Approx,file="ML.MH.BRMS.Results.Exact.Approx.JASA.csv")
 save(Results.Exact.Approx,file="ML.MH.BRMS.Results.Exact.Approx.JASA.Rdata")
 
-# Create Tables 2 and 3 ----------------
+# Create Table 3 : Main Manuscript ----------------
 
 load("ML.MH.BRMS.Results.Exact.Approx.JASA.Rdata")
 library(xtable)

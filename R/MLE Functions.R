@@ -635,3 +635,87 @@ fit_trGroupedBB <- function(ty, freq, b, m, cutoff,
   return(results)
 }
 
+
+#' Profile Likelihood Confidence Interval Estimation
+#'
+#' Computes a confidence interval for a parameter based on its profile log-likelihood.
+#' The function identifies the maximum likelihood estimate (MLE) and determines the
+#' interval bounds where the log-likelihood falls below the cutoff determined by a
+#' chi-squared distribution with one degree of freedom.
+#'
+#' @param parameter Numeric vector of parameter values corresponding to the evaluated log-likelihoods.
+#' @param logL Numeric vector of log-likelihood values for the corresponding parameters.
+#' @param level Confidence level for the interval (default = 0.95).
+#'
+#' @details
+#' The profile likelihood confidence interval is based on the likelihood ratio principle:
+#' \deqn{2(\ell(\hat{\theta}) - \ell(\theta)) \sim \chi^2_1}
+#' where \eqn{\ell(\hat{\theta})} is the maximum log-likelihood. The cutoff value for
+#' the log-likelihood is computed as:
+#' \deqn{\ell_{\text{cutoff}} = \ell(\hat{\theta}) - \frac{1}{2}\chi^2_{1, \text{level}}}
+#'
+#' The lower and upper bounds of the interval are identified as the parameter values
+#' where the log-likelihood is closest to the cutoff, on either side of the MLE.
+#'
+#' @return A list containing:
+#' \item{mle}{The maximum likelihood estimate (MLE).}
+#' \item{mle.ll}{The lower confidence limit.}
+#' \item{mle.ul}{The upper confidence limit.}
+#' \item{level}{The specified confidence level.}
+#' \item{value}{The log-likelihood cutoff value.}
+#'
+#' @examples
+#' # Example: simple quadratic log-likelihood
+#' param <- seq(0, 10, length.out = 100)
+#' logL <- -0.5 * (param - 5)^2
+#' pllfCIestimate(param, logL, level = 0.95)
+#'
+#' @export
+pllfCIestimate <- function(parameter, logL, level = 0.95) {
+  # Check input lengths
+  if (length(parameter) != length(logL)) {
+    stop("Parameter and log-likelihood vectors must be of equal length.")
+  }
+
+  # Remove NAs
+  valid_idx <- which(!is.na(logL) & !is.na(parameter))
+  parameter <- parameter[valid_idx]
+  logL <- logL[valid_idx]
+
+  # Find MLE and max log-likelihood
+  max_logL <- max(logL)
+  mle_idx <- which.max(logL)
+  mle <- parameter[mle_idx]
+
+  # Compute critical value from chi-squared
+  chi_crit <- qchisq(level, df = 1)
+  logL_cutoff <- max_logL - chi_crit / 2
+
+  # Get CI bounds by minimizing distance from cutoff on each side of MLE
+  lower_candidates <- which(parameter < mle)
+  upper_candidates <- which(parameter > mle)
+
+  # Handle edge cases
+  mle.ll <- NA
+  if (length(lower_candidates) > 0) {
+    lower_diff <- abs(logL[lower_candidates] - logL_cutoff)
+    mle.ll <- parameter[lower_candidates[which.min(lower_diff)]]
+  }
+
+  mle.ul <- NA
+  if (length(upper_candidates) > 0) {
+    upper_diff <- abs(logL[upper_candidates] - logL_cutoff)
+    mle.ul <- parameter[upper_candidates[which.min(upper_diff)]]
+  } else {
+    mle.ul <- max(parameter)
+  }
+
+  # Return results
+  list(
+    mle = mle,
+    mle.ll = mle.ll,
+    mle.ul = mle.ul,
+    level = level,
+    value = logL_cutoff
+  )
+}

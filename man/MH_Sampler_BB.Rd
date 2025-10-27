@@ -16,7 +16,7 @@ MH_Sampler_BB(
   R,
   sigma,
   num_chains = 3,
-  burnin = R * 0.5,
+  burnin,
   thin = 5,
   seed,
   trail,
@@ -32,7 +32,8 @@ MH_Sampler_BB(
 \arguments{
 \item{par}{Initial parameter values (numeric vector).}
 
-\item{cutoff}{Truncation threshold for the Beta distribution (numeric). cutoff=0 leads to the simple beta-binomial model.}
+\item{cutoff}{Truncation threshold for the Beta distribution (numeric).
+cutoff = 0 leads to the simple beta-binomial model.}
 
 \item{initial}{Starting values for the parameters (numeric vector).}
 
@@ -44,7 +45,7 @@ MH_Sampler_BB(
 
 \item{rho}{Logical. Whether to include `rho` in the model.}
 
-\item{G}{Integer. Number of quantiles from beta distribution.}
+\item{G}{Integer. Number of quantiles from the beta distribution.}
 
 \item{R}{Integer. Number of MCMC iterations.}
 
@@ -56,41 +57,47 @@ MH_Sampler_BB(
 
 \item{thin}{Thinning interval for MCMC samples (default is 5).}
 
-\item{seed}{A vector of integers for random number seed (one per chain).}
+\item{seed}{A vector of integers for random number seeds (one per chain).}
 
-\item{trail}{Integer. Number of trials (say, number of group-test conducted per batch).}
+\item{trail}{Integer. Number of trials (e.g., number of group-tests conducted per batch).}
 
-\item{ty2}{Integer. vector of observed successes (say, no. of groups tested positive).}
+\item{ty2}{Integer vector of observed successes (e.g., number of groups tested positive).}
 
-\item{wt}{Numeric vector of weights for each observation (say, no. of batches with no contamination).}
+\item{wt}{Numeric vector of weights for each observation.}
 
-\item{group.size}{Integer. Number of individuals tested per group, in another way pool size.}
+\item{group.size}{Integer. Number of individuals tested per group (pool size).}
 
-\item{sensitivity}{Logical. Whether to consider test sensitivity in model development.}
+\item{sensitivity}{Logical. Whether to consider test sensitivity in the model.}
 
-\item{specificity}{Logical. Whether to consider test specificity in model development.}
+\item{specificity}{Logical. Whether to consider test specificity in the model.}
 
-\item{sensitivity.range}{Optional numeric vector of length 2 indicating [min, max] for sensitivity. As for example, sensitivity ranges over U(0.65, 0.75)}
+\item{sensitivity.range}{Optional numeric vector of length 2 indicating [min, max] for sensitivity
+(e.g., sensitivity ranges over U(0.65, 0.75)).}
 
-\item{specificity.range}{Optional numeric vector of length 2 indicating [min, max] for specificity. As for example, specificity. ranges over U(0.90, 0.99)}
+\item{specificity.range}{Optional numeric vector of length 2 indicating [min, max] for specificity
+(e.g., specificity ranges over U(0.90, 0.99)).}
 }
 \value{
-A list containing:
-\item{target.parameters}{List of posterior samples for each parameter across chains.}
-\item{parameters}{List of MCMC samples for each chain.}
-\item{log.likelihood.values}{List of log-likelihood values for each iteration.}
-\item{log.likelihood.yi}{List of log-likelihood values for each observation at each iteration.}
+A list with four elements:
+\describe{
+  \item{target.parameters}{List of posterior samples for each parameter across chains.}
+  \item{parameters}{List of MCMC samples for each chain.}
+  \item{log.likelihood.values}{List of log-likelihood values for each iteration.}
+  \item{log.likelihood.yi}{List of log-likelihood values for each observation at each iteration.}
+}
 }
 \description{
-Runs a Metropolis-Hastings (MH) MCMC algorithm to sample from a posterior distribution involving
-a truncated Beta distribution. The function supports several parametrizations, and optionally models
-test sensitivity and specificity with prior distributions.
+Runs a Metropolis–Hastings (MH) MCMC algorithm to sample from a posterior
+distribution involving a truncated Beta distribution. The function supports
+several parameterizations, and optionally models test sensitivity and specificity
+with prior distributions.
 }
 \details{
-The function implements a flexible Bayesian MCMC sampler with support for multiple parametrizations
-(via alpha, beta, mu, and rho). It includes likelihood computation with binomial models using truncated
-Beta-distributed prevalence and allows incorporating imperfect test sensitivity/specificity using
-logit-transformed priors. The truncated beta-binomial model with cutoff $k=0$ is nothing but a standard beta-binomial model.
+Implements a flexible Bayesian MCMC sampler with support for multiple parameterizations
+(via alpha, beta, mu, and rho). It includes likelihood computation using truncated
+beta-distributed prevalence and allows modeling imperfect test sensitivity/specificity
+using logit-transformed priors. The truncated beta-binomial model with cutoff k = 0
+reduces to a standard beta-binomial model.
 }
 \examples{
 \dontrun{
@@ -99,13 +106,13 @@ result <- MH_Sampler_BB(
   cutoff = 0.2,
   initial = par,
   alpha = TRUE, beta = TRUE, mu = FALSE, rho = FALSE,
-  G = 1000, R = 1000,
+  G = 500, R = 1000,
   sigma = c(0.20, 0.20),
   num_chains = 4,
-  burnin = R*0.5, thin = 5,
+  burnin = 200, thin = 5,
   seed = c(123, 456, 789, 102),
   trail = 13,
-  ty2 = c(0:13),
+  ty2 = 0:13,
   wt = c(2815,9,10,6,1,3,2,0,1,2,1,0,0,0),
   group.size = 5,
   sensitivity = FALSE,

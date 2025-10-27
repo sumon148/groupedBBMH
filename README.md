@@ -131,11 +131,14 @@ $$
 #### Threshold-based Risk Estimation
 
 In the context of the frozen seafood biosecurity study, suppose a
-regulatory threshold is set such that contamination levels below a
-certain prevalence cut-off are considered acceptable for import. Suppose
-a regulatory cut-off $k$ is introduced, such that contamination
-prevalence below $k$ is considered acceptable. The effective prevalence
-becomes:
+regulatory threshold is defined such that contamination levels below a
+certain prevalence cut-off are considered unlikely. Because the virus in
+question is highly infectious, very small non-zero prevalence values are
+biologically implausible. If the virus is present, its prevalence is
+expected to exceed a minimum positive level, denoted by $k$. Thus, $k$
+represents a biologically meaningful threshold below which true viral
+presence is improbable. The effective prevalence can then be expressed
+as:
 
 $$
 p_i = p_i \cdot \mathbb{I}(p_i > k), \quad p_i \sim \text{Beta}(\alpha, \beta).

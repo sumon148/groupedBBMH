@@ -22,10 +22,9 @@
 #'   \item{\code{DS_QQ_norm}}{A normal Q-Q plot of the transformed residuals, stratified by observed counts.}
 #' }
 #'
-#' @importFrom statmod qnorm
 #' @importFrom VGAM pbetabinom.ab
 #' @importFrom ggplot2 ggplot aes geom_point geom_abline geom_histogram labs annotate theme_minimal theme scale_color_manual
-#' @importFrom stats ks.test pbinom runif qqnorm
+#' @importFrom stats ks.test pbinom runif qqnorm qnorm
 #' @examples
 #' \dontrun{
 #'   set.seed(123)
@@ -36,9 +35,6 @@
 #' }
 #' @export
 DunnSmythTestBB <- function(ObservedResponse, size, group_size, alpha, beta, approximate.model = TRUE) {
-  library(statmod)  # For qnorm
-  library(VGAM)     # For pbetabinom.ab
-  library(ggplot2)
 
   ObservedResponse <- sort(ObservedResponse)
   D <- length(ObservedResponse)
@@ -177,10 +173,9 @@ DunnSmythTestBB <- function(ObservedResponse, size, group_size, alpha, beta, app
 #'   \item{DS_QQ_norm}{Q-Q plot of normal Dunn-Smyth residuals, stratified by response group (no title, no annotation).}
 #' }
 #'
-#' @importFrom statmod qnorm
 #' @importFrom VGAM pbetabinom.ab
 #' @importFrom ggplot2 ggplot aes geom_point geom_abline geom_histogram labs annotate theme_minimal theme scale_color_manual
-#' @importFrom stats ks.test pbinom runif qqnorm
+#' @importFrom stats ks.test pbinom runif qqnorm qnorm
 #'
 #' @examples
 #' \dontrun{
@@ -191,9 +186,6 @@ DunnSmythTestBB <- function(ObservedResponse, size, group_size, alpha, beta, app
 #' }
 #' @export
 DunnSmythTestBB_Custom <- function(ObservedResponse, size, group_size, alpha, beta, approximate.model = TRUE) {
-  library(statmod)  # qnorm
-  library(VGAM)     # pbetabinom.ab
-  library(ggplot2)
 
   ObservedResponse <- sort(ObservedResponse)
   D <- length(ObservedResponse)

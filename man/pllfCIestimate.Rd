@@ -41,6 +41,6 @@ where the log-likelihood is closest to the cutoff, on either side of the MLE.
 # Example: simple quadratic log-likelihood
 param <- seq(0, 10, length.out = 100)
 logL <- -0.5 * (param - 5)^2
-pllf.CI.estimate(param, logL, level = 0.95)
+pllfCIestimate(param, logL, level = 0.95)
 
 }

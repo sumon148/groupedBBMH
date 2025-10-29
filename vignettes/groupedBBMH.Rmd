@@ -1,0 +1,248 @@
+---
+title: "groupedBBMH: Beta-Binomial Model with Metropolis-Hastings for Group-Testing Data"
+author: "Sumonkanti Das"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    fig_width: 8
+    fig_height: 5
+vignette: >
+  %\VignetteIndexEntry{groupedBBMH: Beta-Binomial Model with Metropolis-Hastings for Group-Testing Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+# Introduction
+
+The **groupedBBMH** R package provides tools for fitting **nested beta-binomial hierarchical models** designed for **group-testing data in biosecurity surveillance**, explicitly accounting for imperfect testing conditions. In routine inspections of imported agricultural consignments, only group-level binary outcomes—positive or negative—are observed, without information on the exact number of contaminated items. This package extends traditional beta-binomial modeling by incorporating the **nested structure of the population** as well as **imperfect test sensitivity and specificity**, offering **exact inference** via a Metropolis-Hastings (MH) algorithm and **Maximum Likelihood Estimation**. For faster computation, an approximate **beta-binomial** model can be developed using standard R packages such as `brms` (Bayesian) or `VGAM` (MLE). The `groupedBBMH` package also allows users to specify a **biologically meaningful minimum prevalence threshold** $k$, ensuring that estimates respect the lower bound of plausible contamination levels. Overall, the package supports estimation of contamination prevalence, quantification of the risk of undetected contamination, and facilitates risk-based decision-making through model-based simulations that account for test accuracy and minimum prevalence thresholds.
+
+`groupedBBMH` implements the methods developed in *Das et al. (2025)*, providing exact and approximate estimation for beta-binomial models with censored group-testing data while explicitly accounting for group-level test inaccuracy (sensitivity, $\Delta$ and specificity $\Lambda$) and biologically meaningful minimum prevalence threshold. While existing R packages such as `brms` or `VGAM` can fit approximate beta-binomial models in case of perfect test ($\Delta=\Lambda=1$ ) and zero threshold ($k=0$), `groupedBBMH` enables fitting the **exact model** according to the nested structure of the population, test inaccuracy and minimum prevalence threshold.
+
+This vignette is organized as follows:
+
+1. **Mathematical Background & Notation**  
+   Definitions of $t_{yi}$, $b$, $m$, $T_{Xi}$, $L_i$, and the beta-binomial population models in exact and approximate form under test accuracy ($\Delta$ and $\Lambda$) and minimum positive prevalence $k$.  
+2. **Case Study & Basic Usage of Package Functions**  
+   Describing a case study and then demonstration of model fitting under different scenarios    and then calculation of leakage parameters.  
+3. **Model-based simulation**  
+   Assessing community-risk based on model-based simulation using the estimated BB model        parameters from the case study.  
+4. **Session Info & References**  
+   `sessionInfo()` output and full bibliographic entries.
+
+
+# Installation
+
+You can install the development version of `groupedHG` as below.
+
+```r
+install.packages("devtools")
+devtools::install_github("sumon148/groupedBBMH")
+```
+
+
+```{r setup}
+library(groupedBBMH)
+library(ggplot2)
+library(ggpubr)
+```
+
+
+# Mathematical Background
+
+The `groupedBBMH` package provides tools for analyzing group (pooled) sampling data under both perfect and imperfect testing conditions. It supports inference on contamination prevalence, quantifies the risk of undetected contamination (leakage), and facilitates risk-based decision-making through model-based simulations. The package accounts for test imperfections and allows specifying a biologically meaningful minimum positive prevalence. Both exact and approximate beta-binomial distributions of the group-testing outcomes are implemented to calculate leakage probability and the expected number of contaminated items per batch.
+
+To illustrate the underlying nested model, consider a biosecurity scenario involving the importation of frozen seafood into a country. Suppose there are $D$ consignments imported annually, each consisting of approximately $B$ groups, with each group containing $m$ items — so that the total number of items per batch is $N = mB$.
+
+From each batch, a simple random sample of $b$ groups is selected for group testing in screening procedure. These tests, which screen for pathogens or contaminants, are typically imperfect. We assume a constant sensitivity $\Delta$ — the probability that a test correctly detects infection when it is present — and a constant specificity $\Lambda$ — the probability that a test correctly identifies no infection when it is absent.
+
+For each batch, the only observed outcome is the number of positive groups ($t_{yi}$) among the $b$ tested groups. The below notations are used to develop the nested beta-binomial models.
+
+
+## Notation
+
+- $N$: Number of units (e.g., prawns) in a consignment  
+- $B$: Number of groups (pools) in a consignment  
+- $m$: Group (pool) size, $m = N/B$  
+- $b$: Number of groups selected for testing  
+- $X_{ij\ell}$: Indicator for contamination of unit $\ell$ in group $j$ of consignment $i$  
+- $X_{ij}$: Number of contaminated units in group $j$ of consignment $i$, values $0,1,\ldots,m$  
+- $Y_{ij}$: Presence of contamination in group $j$ of consignment $i$, $Y_{ij} = I(X_{ij}>0)$  
+- $\widetilde{Y}_{ij}$: Observed test result for group $j$ of consignment $i$, accounting for measurement error  
+- $T_{Xi}$: Total number of contaminated units in consignment $i$, $T_{Xi} = \sum_{j=1}^{B} X_{ij}$  
+- $t_{xi}$: Number of contaminated units among sampled groups, $t_{xi} = \sum_{j=1}^{b} X_{ij}$  
+- $t_{yi}$: Number of positive groups among sampled groups, $t_{yi} = \sum_{j=1}^{b} Y_{ij}$  
+- $\tilde{t}_{yi}$: Number of positive tests among sampled groups, $\tilde{t}_{yi} = \sum_{j=1}^{b} \widetilde{Y}_{ij}$  
+- $L_i$: Leakage in consignment $i$, defined as $L_i = T_{Xi} \, I(\tilde{t}_{yi}=0)$  
+- $k$: Minimum biologically plausible positive prevalence  
+
+## Nested Beta-binomial models
+
+Now let $p_i$ denote the true prevalence of contamination in batch $i$, and define $\phi_{i} = 1 - (1 - p_i)^m$ as the probability that a group of $m$  items is contaminated. Assuming items are randomly distributed among bags, we have:
+
+\[
+X_{ij} \mid p_i \overset{\text{i.i.d.}}{\sim} \text{Bin}(m, p_i), \quad p_i \overset{\text{i.i.d.}}{\sim} \text{Beta}(\alpha, \beta).
+\]
+
+The group-level test outcome $\tilde{Y}_{ij}$ follows:
+
+\[
+\tilde{Y}_{ij} \mid p_i \sim \text{Bernoulli}(\tilde{\phi}_i), 
+\]
+
+and the observed number of positive groups in the sample follows:
+
+\[
+\tilde{t}_{yi} \mid p_i \sim \text{Binomial}(b, \tilde{\phi}_i).
+\]
+
+where the effective probability of a positive test is: 
+
+\[
+\tilde{\phi}_i = \Delta \phi_i + (1 - \Lambda)(1 - \phi_i) ; \quad \phi_i = 1 - (1 - p_i)^m.
+\]
+
+
+Under perfect specificity ($\Lambda = 1$), this simplifies to:
+
+\[
+\tilde{\phi}_i = \Delta \phi_i.
+\]
+
+When $\beta \gg \alpha$, the contamination prevalence $\beta p_i$ is approximately Gamma distributed, leading to:
+
+\[
+\tilde{\phi}_i \sim (1 - \Lambda) + \text{Beta} \left( \alpha, \frac{\beta}{m(\Delta + \Lambda - 1)} \right).
+\]
+
+Then two important special cases can be considered as:
+
+* **Perfect testing** ($\Delta = 1$, $\Lambda = 1$): $\tilde{\phi}_i \sim \text{Beta}(\alpha, \beta / m)$,
+* **Perfect specificity** ($\Lambda = 1$): $\tilde{\phi}_i \sim \text{Beta}(\alpha, \frac{\beta}{m \Delta})$.
+
+In either case, $\tilde{t}_{yi}$ approximately follows a Beta-Binomial distribution when the infection is rare:
+
+\[
+\tilde{t}_{yi} \sim \textbf{Beta-Binomial}\ \Bigg(b, \alpha, \frac{\beta}{m \Delta}\Bigg).
+\]
+
+When a regulatory threshold ($k$) is defined such that contamination levels below a certain prevalence cut-off are considered unlikely, the effective prevalence can then be expressed as:
+
+\[
+p_i^{*} = p_i \cdot \mathbb{I}(p_i > k), \quad p_i \sim \text{Beta}(\alpha, \beta).
+\]
+
+Consideration of the new prevalence in the above-mentioned **BB model** leads to **truncated BB model**. Using the truncated model, the **probability of leakage** can be expressed as:
+
+\[
+\Pr[L_i > 0] = \frac{B_{(k_1,1)}(\alpha, \frac{\beta}{m\Delta} + b)}{B(\alpha, \frac{\beta}{m\Delta})} - \frac{B_{(k,1)}(\alpha, \beta + MB)}{B(\alpha, \beta)},
+\]
+
+with $k_1 = \Delta(1 - (1 - k)^m)$. Under perfect testing:
+
+\[
+\Pr[L_i > 0] = \frac{B_{(k,1)}(\alpha, \beta + mb)}{B(\alpha, \beta)} - \frac{B_{(k,1)}(\alpha, \beta + MB)}{B(\alpha, \beta)}.
+\]
+
+The **expected leakage** under threshold $k$ is:
+
+\[
+\mathbb{E}(L_i) = (B - b) M \cdot \mathbb{E}\left[ (1 - p_i)^{bm\Delta} \cdot p_i \cdot \mathbb{I}(p_i > k) \right],
+\]
+
+which simplifies to:
+
+\[
+\mathbb{E}(L_i) = (B - b) M \cdot \frac{B_{(k,1)}(\alpha + 1, \beta + bm\Delta)}{B(\alpha, \beta)}.
+\]
+
+When $k = 0$, these derivations reflect cases for the standard beta-binomial case.
+
+
+## Functions Overview
+
+The **`groupedBBMH`** package provides a set of functions for fitting, simulating, and evaluating grouped beta-binomial models for group-testing data. Key functions include:
+
+- `loglik_group_bb`: Log-likelihood for grouped BB model with test error  
+- `loglik_group_trbb`: Log-likelihood for truncated (minimum positive prevalence) grouped BB model with test error
+- `fit_GroupedBB`: Fit grouped BB model using MLE  
+- `fit_trGroupedBB`: Fit truncated grouped BB model using MLE
+- `MH_Sampler_BB`: Metropolis-Hastings sampler for fitting grouped (truncated) BB models with test errors  
+- `summary_mcmc`: Summarize MCMC outcomes with diagnostics  
+- `create_mcmc_BP`: Create MCMC array for visualization using `bayesplot` R package  
+- `DunnSmythTestBB`: Dunn-Smyth residual diagnostics for BB models  
+- `estimate_leakage`: Estimate expected leakage and probability of leakage  
+- `post_pred_sn`: Posterior predictive simulation for grouped BB model with imperfect sensitivity  
+- `ppc_barplot`: Posterior predictive check (PPC) through creating barplots for observed and simulated counts and proportions  
+- `post_pred_aprox_model`: Posterior predictive simulation for grouped BB models under perfect testing
+- `simulate_infection_sampling`: Simulate infection sampling with (truncated) grouped BB models accounting sensitivity and minimum prevalence adjustments  
+- `run_infection_simulations`: Run the simulation of infection sampling using  `simulate_infection_sampling` function 
+- `compute_simulated_leakage`: Compute expected leakage and probability of leakage from model-based simulation output  
+
+These functions allow users to fit exact models by incorporating minimum prevalence thresholds, test imperfections, and perform simulation-based evaluation and visualization of group-testing data.
+
+## Correspondence to Equations in Das et al. (2025) paper
+
+The following equations from the Barnes et al. (2025) form the statistical foundation of the `groupedHG` package:
+
+- **Equation (1) & (2):** Two-level BB model for $X_{ij}$ 
+- **Equation (3), (4) & (5):** Two-level BB model for $\tilde{t}_{yi}$ under imperfect testing
+- **Equation (6):** PMF of $\tilde{t}_{yi}$ under imperfect testing  
+- **Equation (12):** Approximate distribution $\tilde{t}_{yi}$  under imperfect testing  
+- **Equation (12):** Approximate distribution $\tilde{t}_{yi}$  under imperfect sensitivity  
+- **Equation (16):** Exact distribution $\tilde{t}_{yi}$  under imperfect testing
+- **Equation (17):** Exact $\Pr[L_i>0]$ under perfect testing
+- **Equation (18):** Exact $E(L_i)$ under perfect testing
+- **Equation (19):** Approximate $\Pr[L_i>0]$ under imperfect sensitivity
+- **Equation (20):** Approximate $E(L_i)$ under imperfect sensitivity
+
+
+
+
+
+# Case Study: Frozen Seafood Importation in Australia
+
+A real Australian biosecurity data extracted from Frozen Seafood Importation motivate our modeling approach. Each year, approximately 800 consignments (batches) of frozen seafood are imported into Australia. Each batch contains roughly $B = 8000$ bags, with each bag holding $M = 40$ items, yielding a total of $N = MB$ items per batch.
+
+A simple random sample of $b = 13$ bags is selected from each batch for testing. From each selected bag, a group of $m = 5$ items (out of $M = 40$) is randomly chosen, resulting in $n = bm = 65$ sampled items per batch. Each group of $m$ items is tested using a PCR assay, which is assumed to have a sensitivity of approximately $\Delta = 0.80$ and near-perfect specificity, $\Lambda = 1.0$.
+
+The only observation recorded per batch is the number of groups testing positive, out of the $b = 13$ groups tested.
+
+These data motivate the development of models for estimating contamination prevalence, quantifying the risk of undetected contamination (leakage), and evaluating testing strategies under imperfect diagnostic accuracy.
+
+## Data
+The data used in this package for illustration and reproducibility are available publicly in.
+Simply the frequency distribution of $\tilde{t}_{yi}$ can be presented as $t_y=(0,1,2,3,4,5,6,7,8,9,10,11,12,13)$ and $f_y=(2815, 9, 10, 6, 1, 3, 2, 0, 1, 2, 1, 0, 0, 0)$. The distribution indicates around 99% batches had no positive test outcomes. However, when any batch is tested positive, there are cases with more groups tested positive. These result in sparsity of the data and also indicate when there is any positive case the risk of having positive groups is higher. This reflects the case of minimum positive prevalence.
+
+# Basic Usage of R functions
+
+## Fitting BB model using MLE
+
+## Fitting BB model using MH 
+
+## Model-diagnostics 
+
+## Model-based Community Risk assessment 
+
+
+
+# Session Info & References
+
+```{r Session}
+sessionInfo()
+```
+
+# References
+
+- Barnes, B., Parsa, M., Das, S., & Clark, R. (2025). *Hypergeometric and Binomial Group Sampling with Sensitivity and Specificity*. Submitted to *Communications in Statistics -- Theory and Methods*.
+- Arnold, M. E., Cook, A., & Davies, R. (2005). A modelling approach to estimate the sensitivity of pooled faecal samples for isolation of Salmonella in pigs. *Journal of the Royal Society Interface*, 2(4), 365–372.
+- Theobald, C. M., & Davie, A. M. (2014). Group testing, the pooled hypergeometric distribution, and estimating the number of defectives in small populations. *Communications in Statistics -- Theory and Methods*, 43(14), 3019–3026.

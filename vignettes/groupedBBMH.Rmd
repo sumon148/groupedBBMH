@@ -225,7 +225,81 @@ Simply the frequency distribution of $\tilde{t}_{yi}$ can be presented as $t_y=(
 
 # Basic Usage of R functions
 
+This vignette illustrates how to perform maximum likelihood estimation (MLE) and MH algorithm for estimating parameters of a grouped Beta-Binomial model. The illustrations are conducted using the frozen seafood data.  
+
+
+
 ## Fitting BB model using MLE
+
+For the given data, we first want to estimate parameters of a grouped Beta-Binomial (BB) model under a perfect testing scenario. This is done by maximizing the log-likelihood function that accounts for the grouped structure of the data. The likelihood function, implemented in the \texttt{loglik\_group\_bb()} function, can incorporate diagnostic test sensitivity and specificity. The maximization is carried out through the \texttt{optim()} function in R.
+
+The function can be flexibly parameterized to estimate the shape parameters of the Beta distribution, $\alpha$ and $\beta$, given known sensitivity and specificity, or to estimate one parameter (such as $\alpha$) when another (such as $\mu$) is known. In more general settings, it can be extended to jointly estimate both Beta distribution parameters along with test inaccuracy parameters, depending on the available data and assumptions.
+
+In the first example, we estimate the parameters of the grouped BB model assuming a perfect test (i.e., sensitivity and specificity both equal to 1). The optimization relies on numerical integration using $R = 10^4$ random draws from the Beta distribution. The optimization is performed on the log-scale to ensure positivity of parameters, and the resulting estimates for $\alpha$ and $\beta$ are obtained by exponentiating the optimized parameter values.
+
+
+```{r chunk 1, eval=TRUE, echo=TRUE}
+ty=c(0:13)
+freq=c(2815, 9, 10, 6, 1, 3, 2, 0, 1, 2, 1, 0, 0, 0)
+MLE.BB.m1 <- optim(c(0,0), loglik_group_bb, ty=ty, freq=freq, b=13,
+                theta=Inf, m=5, M=40, deviance=FALSE,
+                control=list(reltol=1e-12, fnscale=-1),
+                R=1e4, hessian=FALSE, sensitivity=1, specificity=1)
+MLE.BB.m1$mu <- exp(MLE.BB.m1$par[1]) / sum(exp(MLE.BB.m1$par))
+MLE.BB.m1$alpha <- exp(MLE.BB.m1$par[1])
+MLE.BB.m1$beta <- exp(MLE.BB.m1$par[2])
+MLE.BB.m1
+```
+
+In the second example, we examine whether all the beta parameters and test parameters can be estimate by maximzing the log-likelihood function. The optimization requires specification of lower and upper values for the targeted parameters. The optimization shows that maximum value of log-likelood value is obtained for $\Delta=0.74$ and $\Lambda=1$, when $\alpha=0.0045$ and $\beta=3.78$.
+
+In the second example, we fit the model to estimate all parameters simultaneously — that is, both Beta distribution parameters ($\alpha$ and $\beta$) and test inaccuracy parameters ($\Delta$ and $\Lambda$). This general case allows us to evaluate how test imperfections affect the estimated prevalence distribution.
+
+To ensure stable optimization, lower and upper bounds are specified for all parameters. The optimization process searches the parameter space within these limits to find the combination that maximizes the log-likelihood function. The results demonstrate that the maximum log-likelihood occurs when $\Delta = 0.74$ and $\Lambda = 1$, corresponding to $\alpha = 0.0045$ and $\beta = 3.78$. These results indicate moderate overdispersion in the underlying Beta-Binomial model and the test has imperfect sensitivity but near-perfect specificity.
+
+```{r chunk 2, eval=TRUE, echo=TRUE}
+MLE.BB.m6 <- optim(
+  c(0,0,0,0), loglik_group_bb,
+  ty = ty, freq = freq, b = 13,
+  theta = Inf, m = 5, M = 40,
+  deviance = FALSE,
+  control = list(factr = 1e-12, fnscale = -1, trace = TRUE),
+  R = 1e4, hessian = FALSE,
+  method = "L-BFGS-B",
+  lower = c(log(0.0001), log(0.0001), log(0.5), log(0.99)),
+  upper = c(Inf, Inf, 0, 0)
+)
+
+MLE.BB.m6$mu <- exp(MLE.BB.m6$par[1]) / sum(exp(MLE.BB.m6$par))
+MLE.BB.m6$alpha <- exp(MLE.BB.m6$par[1])
+MLE.BB.m6$beta  <- exp(MLE.BB.m6$par[2])
+MLE.BB.m6$sensitivity  <- exp(MLE.BB.m6$par[3])
+MLE.BB.m6$specificity  <- exp(MLE.BB.m6$par[4])
+MLE.BB.m6
+```
+
+Overall, these two examples illustrate how the grouped Beta-Binomial likelihood framework, implemented through the `loglik_group_bb` function, can flexibly accommodate a range of scenarios—from perfect testing conditions to fully parameterized cases that account for test inaccuracy. This approach provides a robust foundation for modeling overdispersed group testing data in the presence of measurement error.
+
+As an user-friendly option, the function `fit_GroupedBB` can be used to develop the model for given sensitivity and specificity as below. The function will provide leakages estimates if `leakage = TRUE` is called.
+
+As a user-friendly alternative to manual optimization, the function `fit_GroupedBB` provides a convenient interface for fitting the grouped Beta-Binomial model. For a given set of sensitivity and specificity, it provides beta-binomial  parameters by maximizing the likelihood function. The function `fit_GroupedBB` returns estimates of the Beta distribution parameters, along with leakage estimates if wanted through ` leakage = TRUE`. 
+
+
+As a user-friendly alternative to manual optimization, the `fit_GroupedBB` function offers a convenient interface for fitting the grouped Beta-Binomial model. For a given set of sensitivity and specificity values, it estimates the Beta-Binomial parameters by maximizing the likelihood function. The function returns the estimated Beta distribution parameters and, when `leakage = TRUE` is specified, also provides estimates of leakage parameters - expected leakage and probability of leakage per batch.
+
+
+```{r chunk 3, eval=TRUE, echo=TRUE}
+bb.m1 <- fit_GroupedBB(ty = ty, freq = freq, b = 13, m = 5, M = 40,
+                       sensitivity = 1, specificity = 1)
+bb.m1
+```
+
+```{r chunk 4, eval=TRUE, echo=TRUE}
+# Fit model with leakage (requires B)
+bb.m2 <- fit_GroupedBB(ty = ty, freq = freq, b = 13, m = 5, M = 40, B = 8000,
+                       sensitivity = 1, specificity = 1, leakage = TRUE)
+bb.m2
+```
 
 ## Fitting BB model using MH 
 

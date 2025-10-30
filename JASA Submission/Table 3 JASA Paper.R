@@ -524,7 +524,7 @@ save(MH.alpha.mu.sigma.20.Perfect.Prawn,file="MH.alpha.mu.sigma.20.Perfect.Prawn
 G=3000;R=50e3;
 par <- c(log(0.005), logit(7e-04), logit(0.75)) ; initial <- par;
 MH.alpha.mu.sigma.20.known.sn.80.Prawn <- MH_Sampler_BB(par=par,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
-                                                           sigma=c(0.2,0.2),num_chains=4,burnin=R*0.5,thin=5,seed=c(123,456,789,135),trail=b,ty2=ty2,wt=wt,group.size=Nbar,sensitivity=TRUE,specificity=FALSE,
+                                                           sigma=c(0.2,0.2,0.2),num_chains=4,burnin=R*0.5,thin=5,seed=c(123,456,789,135),trail=b,ty2=ty2,wt=wt,group.size=Nbar,sensitivity=TRUE,specificity=FALSE,
                                                            sensitivity.range=c(0.80,0.80),specificity.range=NULL)
 save(MH.alpha.mu.sigma.20.known.sn.80.Prawn,file="MH.alpha.mu.sigma.20.known.sn.80.Prawn.Rdata")
 

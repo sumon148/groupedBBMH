@@ -20,7 +20,7 @@ MH_Sampler_BB(
   thin = 5,
   seed,
   trail,
-  ty2,
+  ty,
   wt,
   group.size,
   sensitivity,
@@ -61,7 +61,7 @@ cutoff = 0 leads to the simple beta-binomial model.}
 
 \item{trail}{Integer. Number of trials (e.g., number of group-tests conducted per batch).}
 
-\item{ty2}{Integer vector of observed successes (e.g., number of groups tested positive).}
+\item{ty}{Integer vector of observed successes (e.g., number of groups tested positive).}
 
 \item{wt}{Numeric vector of weights for each observation.}
 
@@ -103,16 +103,16 @@ reduces to a standard beta-binomial model.
 \dontrun{
 result <- MH_Sampler_BB(
   par = c(log(0.005), logit(7e-04)),
-  cutoff = 0.2,
+  cutoff = 0.01,
   initial = par,
-  alpha = TRUE, beta = TRUE, mu = FALSE, rho = FALSE,
+  alpha = TRUE, beta = FALSE, mu = TRUE, rho = FALSE,
   G = 500, R = 1000,
   sigma = c(0.20, 0.20),
   num_chains = 4,
   burnin = 200, thin = 5,
   seed = c(123, 456, 789, 102),
   trail = 13,
-  ty2 = 0:13,
+  ty = 0:13,
   wt = c(2815,9,10,6,1,3,2,0,1,2,1,0,0,0),
   group.size = 5,
   sensitivity = FALSE,

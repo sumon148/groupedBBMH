@@ -90,7 +90,7 @@ inverse_logit <- function(x) {
 #' @param thin Thinning interval for MCMC samples (default is 5).
 #' @param seed A vector of integers for random number seeds (one per chain).
 #' @param trail Integer. Number of trials (e.g., number of group-tests conducted per batch).
-#' @param ty2 Integer vector of observed successes (e.g., number of groups tested positive).
+#' @param ty Integer vector of observed successes (e.g., number of groups tested positive).
 #' @param wt Numeric vector of weights for each observation.
 #' @param group.size Integer. Number of individuals tested per group (pool size).
 #' @param sensitivity Logical. Whether to consider test sensitivity in the model.
@@ -121,16 +121,16 @@ inverse_logit <- function(x) {
 #' \dontrun{
 #' result <- MH_Sampler_BB(
 #'   par = c(log(0.005), logit(7e-04)),
-#'   cutoff = 0.2,
+#'   cutoff = 0.01,
 #'   initial = par,
-#'   alpha = TRUE, beta = TRUE, mu = FALSE, rho = FALSE,
+#'   alpha = TRUE, beta = FALSE, mu = TRUE, rho = FALSE,
 #'   G = 500, R = 1000,
 #'   sigma = c(0.20, 0.20),
 #'   num_chains = 4,
 #'   burnin = 200, thin = 5,
 #'   seed = c(123, 456, 789, 102),
 #'   trail = 13,
-#'   ty2 = 0:13,
+#'   ty = 0:13,
 #'   wt = c(2815,9,10,6,1,3,2,0,1,2,1,0,0,0),
 #'   group.size = 5,
 #'   sensitivity = FALSE,
@@ -139,7 +139,7 @@ inverse_logit <- function(x) {
 #' }
 #'
 #' @export
-MH_Sampler_BB <- function(par,cutoff,initial,alpha,beta,mu,rho,G,R,sigma,num_chains=3,burnin,thin=5,seed,trail,ty2,wt,group.size,sensitivity,specificity,
+MH_Sampler_BB <- function(par,cutoff,initial,alpha,beta,mu,rho,G,R,sigma,num_chains=3,burnin,thin=5,seed,trail,ty,wt,group.size,sensitivity,specificity,
                                  sensitivity.range=NULL,specificity.range=NULL){
 
   # Provide seed number for each chain
@@ -181,7 +181,7 @@ MH_Sampler_BB <- function(par,cutoff,initial,alpha,beta,mu,rho,G,R,sigma,num_cha
 
 
 
-  b= trail; Nbar=group.size; d=length(ty2)
+  b= trail; Nbar=group.size; d=length(ty)
 
   length.par <- length(par)
 
@@ -306,9 +306,9 @@ MH_Sampler_BB <- function(par,cutoff,initial,alpha,beta,mu,rho,G,R,sigma,num_cha
       loglik.new <- 0
 
       for (i in 1:d) {
-        loglik.value.new.observation[r,i] <- wt[i] * log(mean(dbinom(x = ty2[i], size = b, prob = phi.i.vals.new)) + 1e-10)
-        loglik.old <- loglik.old + wt[i] * log(mean(dbinom(x = ty2[i], size = b, prob = phi.i.vals.old)) + 1e-10)
-        loglik.new <- loglik.new + wt[i] * log(mean(dbinom(x = ty2[i], size = b, prob = phi.i.vals.new)) + 1e-10)
+        loglik.value.new.observation[r,i] <- wt[i] * log(mean(dbinom(x = ty[i], size = b, prob = phi.i.vals.new)) + 1e-10)
+        loglik.old <- loglik.old + wt[i] * log(mean(dbinom(x = ty[i], size = b, prob = phi.i.vals.old)) + 1e-10)
+        loglik.new <- loglik.new + wt[i] * log(mean(dbinom(x = ty[i], size = b, prob = phi.i.vals.new)) + 1e-10)
       }
 
 
@@ -905,13 +905,26 @@ summary_mcmc <- function(..., varnames) {
 create_mcmc_BP <- function(mcmc.list.chain, varnames) {
   library(coda)
 
+  if (!requireNamespace("coda", quietly = TRUE)) {
+    stop("Package 'coda' is required. Please install it using install.packages('coda').")
+  }
+
+  # Check inputs
+  if (!is.list(mcmc.list.chain)) stop("mcmc.list.chain must be a list of MCMC chains.")
+  n_chains <- length(mcmc.list.chain)
+  if (n_chains == 0) stop("No MCMC chains provided.")
+
+  # Convert to mcmc.list dynamically
+  mcmc_chains <- do.call(coda::mcmc.list, lapply(mcmc.list.chain, coda::mcmc))
+
   # Convert to 'mcmc.list' object
-  mcmc_chains <- mcmc.list(
-    mcmc(mcmc.list.chain[[1]]),
-    mcmc(mcmc.list.chain[[2]]),
-    mcmc(mcmc.list.chain[[3]]),
-    mcmc(mcmc.list.chain[[4]])
-  )
+
+  # mcmc_chains <- mcmc.list(
+  #   mcmc(mcmc.list.chain[[1]]),
+  #   mcmc(mcmc.list.chain[[2]]),
+  #   mcmc(mcmc.list.chain[[3]]),
+  #   mcmc(mcmc.list.chain[[4]])
+  # )
 
   # Assign variable names
   varnames(mcmc_chains) <- varnames

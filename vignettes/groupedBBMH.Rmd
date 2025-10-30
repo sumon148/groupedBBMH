@@ -54,6 +54,8 @@ devtools::install_github("sumon148/groupedBBMH")
 library(groupedBBMH)
 library(ggplot2)
 library(ggpubr)
+library(MASS)
+library(bayesplot)
 ```
 
 
@@ -219,9 +221,20 @@ The only observation recorded per batch is the number of groups testing positive
 
 These data motivate the development of models for estimating contamination prevalence, quantifying the risk of undetected contamination (leakage), and evaluating testing strategies under imperfect diagnostic accuracy.
 
-## Data
-The data used in this package for illustration and reproducibility are available publicly in.
-Simply the frequency distribution of $\tilde{t}_{yi}$ can be presented as $t_y=(0,1,2,3,4,5,6,7,8,9,10,11,12,13)$ and $f_y=(2815, 9, 10, 6, 1, 3, 2, 0, 1, 2, 1, 0, 0, 0)$. The distribution indicates around 99% batches had no positive test outcomes. However, when any batch is tested positive, there are cases with more groups tested positive. These result in sparsity of the data and also indicate when there is any positive case the risk of having positive groups is higher. This reflects the case of minimum positive prevalence.
+The data used in this package for illustration and reproducibility are publicly available at 
+[**Zenodo**](https://zenodo.org/records/7762164). 
+
+For illustration, the frequency distribution of the number of positive test outcomes per batch, 
+$\tilde{t}_{yi}$, is summarized as 
+$t_y = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)$ and 
+$f_y = (2815, 9, 10, 6, 1, 3, 2, 0, 1, 2, 1, 0, 0, 0)$. 
+
+The distribution shows that approximately 99\% of the batches yielded no positive test results. 
+However, when a batch tested positive, additional positive outcomes within the same batch 
+were more likely to occur.
+This pattern highlights the sparsity of the data and suggests that, once present, 
+the infection tends to occur at or above a biologically meaningful minimum prevalence level, 
+rather than at very low non-zero values.
 
 # Basic Usage of R functions
 
@@ -231,7 +244,7 @@ This vignette illustrates how to perform maximum likelihood estimation (MLE) and
 
 ## Fitting BB model using MLE
 
-For the given data, we first want to estimate parameters of a grouped Beta-Binomial (BB) model under a perfect testing scenario. This is done by maximizing the log-likelihood function that accounts for the grouped structure of the data. The likelihood function, implemented in the \texttt{loglik\_group\_bb()} function, can incorporate diagnostic test sensitivity and specificity. The maximization is carried out through the \texttt{optim()} function in R.
+For the given data, we first want to estimate parameters of a grouped Beta-Binomial (BB) model under a perfect testing scenario. This is done by maximizing the log-likelihood function that accounts for the grouped structure of the data. The likelihood function, implemented in the `loglik_group_bb()` function, can incorporate diagnostic test sensitivity and specificity. The maximization is carried out through the `optim()` function in R.
 
 The function can be flexibly parameterized to estimate the shape parameters of the Beta distribution, $\alpha$ and $\beta$, given known sensitivity and specificity, or to estimate one parameter (such as $\alpha$) when another (such as $\mu$) is known. In more general settings, it can be extended to jointly estimate both Beta distribution parameters along with test inaccuracy parameters, depending on the available data and assumptions.
 
@@ -278,32 +291,202 @@ MLE.BB.m6$specificity  <- exp(MLE.BB.m6$par[4])
 MLE.BB.m6
 ```
 
-Overall, these two examples illustrate how the grouped Beta-Binomial likelihood framework, implemented through the `loglik_group_bb` function, can flexibly accommodate a range of scenarios—from perfect testing conditions to fully parameterized cases that account for test inaccuracy. This approach provides a robust foundation for modeling overdispersed group testing data in the presence of measurement error.
+Overall, these two examples illustrate how the grouped Beta-Binomial likelihood framework, implemented through the `loglik_group_bb()` function, can flexibly accommodate a range of scenarios — from perfect testing conditions to fully parameterized cases that account for test inaccuracy. This approach provides a robust foundation for modeling overdispersed group testing data in the presence of measurement error.
 
-As an user-friendly option, the function `fit_GroupedBB` can be used to develop the model for given sensitivity and specificity as below. The function will provide leakages estimates if `leakage = TRUE` is called.
-
-As a user-friendly alternative to manual optimization, the function `fit_GroupedBB` provides a convenient interface for fitting the grouped Beta-Binomial model. For a given set of sensitivity and specificity, it provides beta-binomial  parameters by maximizing the likelihood function. The function `fit_GroupedBB` returns estimates of the Beta distribution parameters, along with leakage estimates if wanted through ` leakage = TRUE`. 
-
-
-As a user-friendly alternative to manual optimization, the `fit_GroupedBB` function offers a convenient interface for fitting the grouped Beta-Binomial model. For a given set of sensitivity and specificity values, it estimates the Beta-Binomial parameters by maximizing the likelihood function. The function returns the estimated Beta distribution parameters and, when `leakage = TRUE` is specified, also provides estimates of leakage parameters - expected leakage and probability of leakage per batch.
+As a user-friendly alternative to manual optimization, the `fit_GroupedBB()` function offers a convenient interface for fitting the grouped Beta-Binomial model. For a given set of sensitivity and specificity values, it estimates the Beta-Binomial parameters by maximizing the likelihood function. The function returns the estimated Beta distribution parameters and, when `leakage = TRUE` is specified, also provides estimates of leakage parameters - expected leakage and probability of leakage per batch. It is noted that for leakage estimation, the number of groups per batch $B$ and the actual group size in the cases study ($M$) is required.  
 
 
 ```{r chunk 3, eval=TRUE, echo=TRUE}
-bb.m1 <- fit_GroupedBB(ty = ty, freq = freq, b = 13, m = 5, M = 40,
+bb.m1 <- fit_GroupedBB(ty = ty, freq = freq, b = 13, m = 5,
                        sensitivity = 1, specificity = 1)
 bb.m1
 ```
 
 ```{r chunk 4, eval=TRUE, echo=TRUE}
-# Fit model with leakage (requires B)
+# Fit model with leakage (requires B and M)
 bb.m2 <- fit_GroupedBB(ty = ty, freq = freq, b = 13, m = 5, M = 40, B = 8000,
                        sensitivity = 1, specificity = 1, leakage = TRUE)
 bb.m2
 ```
 
+When a biologically meaningful threshold is introduced for the batch-level infection prevalence ($p_i$), the model must account for the fact that values below this threshold are biologically implausible. The `groupedBBMH` package accommodates this feature through the truncated beta-binomial model, where the log-likelihood is maximized using the function `loglik_group_trbb()`.
+
+To simplify implementation, the high-level function `fit_trGroupedBB()` provides a user-friendly interface for estimating the beta distribution parameters while incorporating a specified threshold value $k$.
+
+In the first example below, we fit the truncated beta-binomial model with a threshold of $k=0$ (i.e., no truncation) under perfect test conditions using `fit_trGroupedBB()` with $R = 10^4$ for numerical integration. The results are comparable to those obtained using the standard `fit_GroupedBB()` function.
+
+In the second example, we demonstrate a model fit with a 1% minimum prevalence threshold ($k=0.01$) under imperfect test conditions, where sensitivity ($\Delta = 0.8$) and specificity ($\Lambda = 1$). This allows us to evaluate how the model responds when small non-zero prevalence values are restricted by biological constraints.
+
+
+
+```{r chunk 5, eval=TRUE, echo=TRUE}
+# Fit truncated grouped beta-binomial model with cutoff = 0 (no truncation) with perfect test
+trbb.m1 <- fit_trGroupedBB(ty, freq, b = 13, m = 5, cutoff = 0,R=10^4)
+trbb.m1
+```
+
+
+```{r chunk 6, eval=TRUE, echo=TRUE}
+# Fit truncated grouped beta-binomial model with cutoff = 0.01 and imperfect sensitivity
+trbb.m2 <- fit_trGroupedBB(ty, freq, b = 13, m = 5, cutoff = 0.01,
+                       sensitivity = 0.8, specificity = 1)
+trbb.m2
+```
+
+
 ## Fitting BB model using MH 
 
-## Model-diagnostics 
+Now, we fit the grouped beta-binomial (BB) model using the Metropolis–Hastings (MH) algorithm. The `MH_Sampler_BB()` function implements the MH sampling procedure for specified values of test sensitivity and specificity. Following the setup described in the paper, two prior specifications were considered for the test sensitivity: one with fixed $\Delta = 0.8$, and another where $\Delta$ was uniformly distributed between 0.75 and 0.85.
+
+The MH algorithm is constructed based on the frequency distribution of $\tilde{t}_{yi}$, allowing the weighted log-likelihood of the beta-binomial model to be computed exactly through numerical integration. The priors for the model parameters (e.g., $\alpha$ and $\mu$) were chosen to ensure that parameter estimates remain within expected, interpretable ranges.
+
+The MH algorithm was run on the parameter set $\theta_1$, $\theta_2$, and, when $\Delta$ was not fixed, $\theta_3$. Specifically, we defined $\theta_1 = \log(\alpha)$ with prior $\theta_1 \sim U(-A, A)$, and $\mu = \text{expit}(\theta_2)$. When $\Delta$ was not fixed, it was parameterized as $\Delta = 0.75 + 0.1 \times \text{expit}(\theta_3)$. These definitions yield induced priors of $\mu \sim U(0,1)$ and $\Delta \sim U(0.75, 0.85)$.
+
+For proposal distributions, each parameter ($\theta_1$, $\theta_2$, $\theta_3$) was updated as the previous value plus a normal perturbation with mean zero. A proposal standard deviation of $\sigma = 0.2$ provided satisfactory convergence, with low autocorrelation and stable parameter estimates. The model was fitted using $5 \times 10^4$ iterations, with the first half discarded as burn-in. From the remaining samples, every fifth draw (`thin = 5`) was retained to reduce autocorrelation in the MCMC chains.
+
+Convergence was evaluated using trace plots and posterior density plots. For demonstration purposes, an example model was also fitted using a smaller number of iterations ($R = 1000$) to illustrate the structure of the MCMC output. Here, $R$ denotes the number of MCMC iterations, while $G$ represents the number of quantiles used in the numerical integration.
+
+We fit the first model using the R code shown below for the fixed sensitivity $\Delta = 0.8$ and examined the summary statistics of the target parameters of the beta distribution. These summaries provide insight into the posterior location and variability of the parameters, helping to assess the model’s fit and stability. Additionally, the estimated posterior means and credible intervals can be compared with the maximum likelihood estimates obtained earlier to evaluate the consistency and robustness of the inference.
+
+```{r chunk 7, eval=TRUE, echo=TRUE}
+MH.trbb.m1 <- MH_Sampler_BB(par = c(log(0.005), logit(7e-04), logit(0.75)),
+  cutoff = 0.01,
+  alpha = TRUE, beta = FALSE, mu = TRUE, rho = FALSE,
+  G = 500, R = 1000,
+  sigma = c(0.20, 0.20, 0.20),
+  num_chains = 3,
+  burnin = 500, thin = 2,
+  seed = c(123, 456, 789, 102),
+  trail = 13,
+  ty = ty,
+  wt = freq,
+  group.size = 5,
+  sensitivity = TRUE,
+  specificity = FALSE,
+  sensitivity.range=c(0.80,0.80),
+  specificity.range=NULL)
+```
+
+Summary statistics of the target parameters, obtained using the `summary_mcmc()` function, provide a comprehensive overview of the posterior distributions, including measures such as the mean, standard deviation, and credible intervals. In addition, the function reports key MCMC diagnostics — such as effective sample size and potential scale reduction factor (R-hat) — which help assess convergence and sampling efficiency. Together, these outputs offer valuable insights into the stability and reliability of the parameter estimates derived from the Metropolis–Hastings algorithm.
+
+```{r chunk 8, eval=TRUE, echo=TRUE}
+summ.MH.m1 <- summary_mcmc(MH.trbb.m1$target.parameters$alpha_sample,
+                           MH.trbb.m1$target.parameters$beta_sample,
+                           MH.trbb.m1$target.parameters$mu_sample,
+                           varnames = c("alpha", "beta", "mu"))
+(summ.MH.m1$summary_mcmc)
+```
+We now fit the second MH-based BB model using the R code below, assuming the sensitivity parameter follows a uniform distribution on $(0.75, 0.85)$. In this setup, we set a proposal standard deviation of $\sigma = 2$ for the sensitivity parameter, while retaining $\sigma = 0.2$ for the $\alpha$ and $\mu$ parameters.
+
+```{r chunk 9, eval=TRUE, echo=TRUE}
+MH.trbb.m2 <- MH_Sampler_BB(par = c(log(0.005), logit(7e-04), logit(0.75)),
+  cutoff = 0.01,
+  alpha = TRUE, beta = FALSE, mu = TRUE, rho = FALSE,
+  G = 500, R = 1000,
+  sigma = c(0.20, 0.20, 2),
+  num_chains = 3,
+  burnin = 500, thin = 2,
+  seed = c(123, 456, 789, 102),
+  trail = 13,
+  ty = ty,
+  wt = freq,
+  group.size = 5,
+  sensitivity = TRUE,
+  specificity = FALSE,
+  sensitivity.range=c(0.75,0.85),
+  specificity.range=NULL)
+```
+
+The `summary_mcmc` function provides summary statistics for the MCMC simulations of all targeted parameters, including $\alpha$, $\mu$, and $\Delta$.
+
+```{r chunk 10, eval=TRUE, echo=TRUE}
+summ.MH.m2 <- summary_mcmc(MH.trbb.m2$target.parameters$alpha_sample,
+                           MH.trbb.m2$target.parameters$beta_sample,
+                           MH.trbb.m2$target.parameters$sensitivity_sample,
+                           varnames = c("alpha", "beta", "sensitivity"))
+(summ.MH.m2$summary_mcmc)
+```
+
+MCMC diagnostics can be conveniently performed using the `bayesplot` R package, which provides a rich set of visualization tools for assessing convergence, autocorrelation, and distribution of MCMC samples. To use `bayesplot`, the MCMC simulations must first be converted into a format compatible with the package. The `create_mcmc_BP()` function in `groupedBBMH` facilitates this conversion by transforming the MCMC output into a three-dimensional array of shape (iterations × chains × parameters). Once the array is prepared, `bayesplot` functions can be applied to visualize the posterior distributions, trace plots, and other diagnostics for the transformed parameters across different chains. The R code below illustrates how to convert the MCMC output and generate diagnostic plots to assess convergence and parameter behavior across chains.
+
+```{r chunk 11, eval=TRUE, echo=TRUE}
+MCMC.MH.m2 <- lapply(MH.trbb.m2$parameters, function(mat) mat[, 1:3])
+var.names <- c("log(alpha)","logit(mu)","logit(sensitivity)")
+MCMC.MH.m2 <- create_mcmc_BP(MCMC.MH.m2,var.names)
+color_scheme_set("viridis")
+p1_mcmc_trace <- bayesplot::mcmc_trace(MCMC.MH.m2)  # Density overlay for known sensitivity
+p2_dens_overlay <- bayesplot::mcmc_dens_overlay(MCMC.MH.m2) # Density overlay for unknown sensitivity
+ggarrange(p1_mcmc_trace,p2_dens_overlay,nrow = 2)
+```
+
+The trace plots and overlay density plots provide visual diagnostics of MCMC convergence, allowing us to assess whether the chains have mixed well and stabilized around the posterior distributions for the considered parameters under `varnames`.
+
+
+## Model Checking 
+
+For illustration, we evaluated the MH-fitted BB model with fixed sensitivity $\Delta=0.8$ using Dunn-Smyth randomized quantile residuals (Dunn and Smyth, 1996) and posterior predictive checks against the observed frequency data. Although similar diagnostics could be applied to ML- or HMC-fitted models, or for positive thresholds $k$, we focus here on the MH fit with $k=0$ for simplicity. Posterior uncertainty is incorporated in the Dunn-Smyth residuals through the empirical cumulative distribution of simulated counts, and the residuals are subsequently transformed to a standard normal scale for Q-Q plot evaluation. Further details are provided in Das et al. (2025).
+
+```{r chunk 12, eval=TRUE, echo=TRUE}
+# Expand frequency table into a vector of observed responses
+ObservedResponse <- rep(ty, times = freq)
+
+# Run Dunn-Smyth residual diagnostic using posterior samples
+set.seed(123456)
+DSTest_MH_Imperfect <- DunnSmythTestBB_Custom(
+  ObservedResponse = ObservedResponse,
+  size = 13,
+  group_size = 5,
+  approximate.model = FALSE,
+  alpha = unlist(MH.trbb.m1$target.parameters$alpha_sample),
+  beta  = unlist(MH.trbb.m1$target.parameters$beta_sample)
+)
+
+# Display diagnostic plots
+DSTest_MH_Imperfect$DS_hist       # Histogram of Dunn-Smyth residuals
+DSTest_MH_Imperfect$DS_QQ_norm    # Normal Q-Q plot of scaled residuals
+
+# Print KS test result for Uniformity
+DSTest_MH_Imperfect$KS
+
+```
+
+For doing Posterior predictive check of the fitted model, we use the posterior distribution of $\alpha$ and $\beta$ obatined from the fitted model `MH.trbb.m1` considering $k=0.01$ and $\Delta=0.8$. The comparison of counts and their proportions from the observed outcomes are compared with simulated counts. In the below two bar-plots, the shaded areas represent the observed counts (proportions), while the error bars indicate the 95\% credible interval of simulated counts (proportions). For the plot of counts, the left y-axis is scaled from 0 to 3000 for zero value of $\tilde{t}_{yi}$, while the right y-axis is scaled from 0 to 30 for non-zero values of $\tilde{t}_{yi}$.
+
+
+```{r chunk 13, eval=TRUE, echo=TRUE,warning=FALSE,message=FALSE}
+
+# Observed outcomes from D batches
+ObservedResponse <- rep(ty, times = freq)
+
+# Generate posterior predictive draws using the 'post_pred_sn' function
+predicted.counts.imperfect.case <- post_pred_sn(
+  D = length(ObservedResponse),   # Number of batches (observed outcomes)
+  n = 13,                 # Number of group tests per batch
+  m = 5,                  # Pool size in group test
+  alpha = unlist(MH.trbb.m1$target.parameters$alpha_sample),
+  beta = unlist(MH.trbb.m1$target.parameters$beta_sample),
+  sensitivity = 0.8
+)
+
+# Check proportions of observed vs simulated counts (for model diagnostics)
+prop.table(table(ObservedResponse))                      # Observed data distribution
+prop.table(table(predicted.counts.imperfect.case$ty_rep))   # Simulated data distribution
+
+# ----------------------------------------------------------------------------------#
+# Posterior Predictive Check Visualization
+# ----------------------------------------------------------------------------------#
+
+# Generate barplots comparing observed and replicated counts
+ppc.barplot.imperfect.case <- ppc_barplot(
+  ty = ObservedResponse,
+  yrep = predicted.counts.imperfect.case$ty_rep,
+  trial = 13
+)
+ppc.barplot.imperfect.case$p.zero.non.zero     # Combined plot
+ppc.barplot.imperfect.case$prop.zero.non.zero  # Zero vs non-zero proportion values
+
+```
+
 
 ## Model-based Community Risk assessment 
 

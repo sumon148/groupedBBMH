@@ -7,15 +7,15 @@
 post_pred_sn(n, alpha, beta, D, m, sensitivity)
 }
 \arguments{
-\item{n}{Integer. Number of trials per group (e.g., pool size).}
+\item{n}{Integer. Number of group tests per batch.}
 
-\item{alpha}{Numeric vector. Posterior samples of the alpha parameter (length = number of MCMC draws).}
+\item{alpha}{Numeric vector. Posterior samples of the alpha parameter (length equal to number of MCMC draws).}
 
 \item{beta}{Numeric vector. Posterior samples of the beta parameter (same length as \code{alpha}).}
 
-\item{D}{Integer. Number of groups or domains (e.g., villages, pools).}
+\item{D}{Integer. Number of batches (observed outcomes).}
 
-\item{m}{Integer. Number of individuals per pool (used in the transformation of prevalence).}
+\item{m}{Integer. Number of individuals per group (used for group-test).}
 
 \item{sensitivity}{Numeric vector. Posterior samples of test sensitivity (same length as \code{alpha}).}
 }

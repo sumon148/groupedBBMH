@@ -4,11 +4,11 @@
 #' using either the approximate model (e.g., HMC-style with Beta(alpha, beta/m)) or
 #' the exact model (e.g., MH-style with transformation via group pooling).
 #'
-#' @param n Integer. Number of trials per group (e.g., pool size).
+#' @param n Integer. Number of group tests per batch.
 #' @param alpha Numeric vector. Posterior samples of the alpha parameter (length equal to number of MCMC draws).
 #' @param beta Numeric vector. Posterior samples of the beta parameter (same length as \code{alpha}).
-#' @param D Integer. Number of distinct pools or groups (e.g., villages, domains).
-#' @param m Integer. Number of individuals per group (used for transformation under exact model).
+#' @param D Integer. Number of batches (observed outcomes).
+#' @param m Integer. Number of individuals per group (used for group-test).
 #' @param approximate.model Logical. If \code{TRUE}, use the approximate model (assumes prevalence ~ Beta(alpha, beta/m));
 #'                          if \code{FALSE}, use the exact model with transformation \code{1 - (1 - p)^m}.
 #'
@@ -61,11 +61,11 @@ post_pred_aprox_model <- function(n, alpha, beta, D, m, approximate.model = TRUE
 #' with known test sensitivity applied to group-level prevalence estimates.
 #' The model includes a transformation to account for pooling and imperfect test sensitivity.
 #'
-#' @param n Integer. Number of trials per group (e.g., pool size).
-#' @param alpha Numeric vector. Posterior samples of the alpha parameter (length = number of MCMC draws).
+#' @param n Integer. Number of group tests per batch.
+#' @param alpha Numeric vector. Posterior samples of the alpha parameter (length equal to number of MCMC draws).
 #' @param beta Numeric vector. Posterior samples of the beta parameter (same length as \code{alpha}).
-#' @param D Integer. Number of groups or domains (e.g., villages, pools).
-#' @param m Integer. Number of individuals per pool (used in the transformation of prevalence).
+#' @param D Integer. Number of batches (observed outcomes).
+#' @param m Integer. Number of individuals per group (used for group-test).
 #' @param sensitivity Numeric vector. Posterior samples of test sensitivity (same length as \code{alpha}).
 #'
 #' @return A list containing:
@@ -93,8 +93,13 @@ post_pred_aprox_model <- function(n, alpha, beta, D, m, approximate.model = TRUE
 #'
 #' @export
 post_pred_sn <- function(n, alpha, beta, D, m, sensitivity) {
-  # alpha, beta and sensitivity are vectors
-  no.sim <- length(alpha)  # Number of simulations (rows)
+  # alpha, beta and sensitivity are vectors (or sensitivity may be scalar)
+  no.sim <- length(alpha)  # Number of posterior simulations
+
+  # If sensitivity is a single value, expand it to match the length of alpha
+  if (length(sensitivity) == 1) {
+    sensitivity <- rep(sensitivity, no.sim)
+  }
 
   # Initialize matrices
   p_matrix <- matrix(NA, nrow = no.sim, ncol = D)
@@ -113,7 +118,12 @@ post_pred_sn <- function(n, alpha, beta, D, m, sensitivity) {
     ty_matrix[i, ] <- rbinom(D, n, phi_i_matrix[i, ])
   }
 
-  list(p_rep = p_matrix, phi_i_matrix = phi_i_matrix, ty_rep = ty_matrix)
+  # Return all simulated results
+  list(
+    p_rep = p_matrix,
+    phi_i_matrix = phi_i_matrix,
+    ty_rep = ty_matrix
+  )
 }
 
 

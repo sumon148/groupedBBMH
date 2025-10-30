@@ -7,15 +7,15 @@
 post_pred_aprox_model(n, alpha, beta, D, m, approximate.model = TRUE)
 }
 \arguments{
-\item{n}{Integer. Number of trials per group (e.g., pool size).}
+\item{n}{Integer. Number of group tests per batch.}
 
 \item{alpha}{Numeric vector. Posterior samples of the alpha parameter (length equal to number of MCMC draws).}
 
 \item{beta}{Numeric vector. Posterior samples of the beta parameter (same length as \code{alpha}).}
 
-\item{D}{Integer. Number of distinct pools or groups (e.g., villages, domains).}
+\item{D}{Integer. Number of batches (observed outcomes).}
 
-\item{m}{Integer. Number of individuals per group (used for transformation under exact model).}
+\item{m}{Integer. Number of individuals per group (used for group-test).}
 
 \item{approximate.model}{Logical. If \code{TRUE}, use the approximate model (assumes prevalence ~ Beta(alpha, beta/m));
 if \code{FALSE}, use the exact model with transformation \code{1 - (1 - p)^m}.}

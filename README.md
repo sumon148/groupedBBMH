@@ -21,9 +21,9 @@ The methodology is described in detail in the accompanying paper and supplementa
 
 The **groupedBBMH** R package provides statistical tools for modeling 
 **group-testing data in biosecurity surveillance** using a 
-**nested beta-binomial hierarchical framework**. 
+**nested beta-binomial framework**. 
 It explicitly accounts for **imperfect diagnostic accuracy** and the 
-**hierarchical population structure** typical of inspection and screening studies.
+**biologically meaningful minimum prevalence threshold**.
 
 ## Key Highlights
 
@@ -34,10 +34,9 @@ It explicitly accounts for **imperfect diagnostic accuracy** and the
   approximate estimation via *Maximum Likelihood Estimation (MLE)*.
 
 - **Flexible Integration with Standard R Packages**  
-  Enables approximate modeling using familiar tools such as 
-  **`brms`** (Bayesian framework) and **`VGAM`** (MLE framework), 
-  facilitating rapid prototyping and comparison with simpler beta-binomial formulations.
-
+  Supports Bayesian modeling and diagnostic visualization using familiar tools such as  
+  **`coda`** for MCMC diagnostics and **`bayesplot`** for posterior summaries and convergence assessment.
+  
 - **Risk and Decision Support for Biosecurity Surveillance**  
   Provides methods to estimate contamination prevalence, quantify 
   **leakage risk** (undetected contamination), and evaluate sampling strategies.  

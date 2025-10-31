@@ -1,5 +1,5 @@
 ---
-title: "groupedBBMH: Beta-Binomial Model with Metropolis-Hastings for Group-Testing Data"
+title: "groupedBBMH: Grouped Beta-Binomial Model with Metropolis-Hastings"
 author: "Sumonkanti Das"
 date: "`r Sys.Date()`"
 output:
@@ -7,7 +7,7 @@ output:
     fig_width: 8
     fig_height: 5
 vignette: >
-  %\VignetteIndexEntry{groupedBBMH: Beta-Binomial Model with Metropolis-Hastings for Group-Testing Data}
+  %\VignetteIndexEntry{groupedBBMH}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

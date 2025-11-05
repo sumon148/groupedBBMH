@@ -16,7 +16,7 @@ DunnSmythTestBB(
 \arguments{
 \item{ObservedResponse}{A numeric vector of observed counts (length \eqn{D}).}
 
-\item{size}{Integer. The number of trials in the binomial distribution (e.g., pool size).}
+\item{size}{Integer. The number of trials in the binomial distribution (e.g., number of group tests per batch).}
 
 \item{group_size}{Integer. The size of the pooling group (used to adjust \code{beta}).}
 

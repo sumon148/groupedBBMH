@@ -6,7 +6,7 @@
 #' Useful for diagnosing model fit in pooled testing or overdispersed count models.
 #'
 #' @param ObservedResponse A numeric vector of observed counts (length \eqn{D}).
-#' @param size Integer. The number of trials in the binomial distribution (e.g., pool size).
+#' @param size Integer. The number of trials in the binomial distribution (e.g., number of group tests per batch).
 #' @param group_size Integer. The size of the pooling group (used to adjust \code{beta}).
 #' @param alpha A scalar or vector of \eqn{\alpha} values. If scalar, assumed fixed; if vector, assumed posterior samples.
 #' @param beta A scalar or vector of \eqn{\beta} values. Same behavior as \code{alpha}.

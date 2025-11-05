@@ -77,12 +77,12 @@ inverse_logit <- function(x) {
 #' @param par Initial parameter values (numeric vector).
 #' @param cutoff Truncation threshold for the Beta distribution (numeric).
 #'   cutoff = 0 leads to the simple beta-binomial model.
-#' @param initial Starting values for the parameters (numeric vector).
+#' @param initial Optional. Starting values for the parameters (numeric vector).
 #' @param alpha Logical. Whether to include `alpha` in the model.
 #' @param beta Logical. Whether to include `beta` in the model.
 #' @param mu Logical. Whether to include `mu` in the model.
 #' @param rho Logical. Whether to include `rho` in the model.
-#' @param G Integer. Number of quantiles from the beta distribution.
+#' @param G Integer. Number of quantiles from the beta distribution required for integration.
 #' @param R Integer. Number of MCMC iterations.
 #' @param sigma Proposal standard deviation for each parameter (numeric vector).
 #' @param num_chains Number of MCMC chains to run (default is 3).
@@ -90,14 +90,16 @@ inverse_logit <- function(x) {
 #' @param thin Thinning interval for MCMC samples (default is 5).
 #' @param seed A vector of integers for random number seeds (one per chain).
 #' @param trail Integer. Number of trials (e.g., number of group-tests conducted per batch).
-#' @param ty Integer vector of observed successes (e.g., number of groups tested positive).
-#' @param wt Numeric vector of weights for each observation.
+#' @param ty Integer vector of observed successes (e.g., number of groups tested positive per replicate).
+#' @param wt Numeric vector. Frequencies corresponding to each count in `ty`.
 #' @param group.size Integer. Number of individuals tested per group (pool size).
+#' @param M Integer, optional. Required if leakage = TRUE. Total number of individuals in the larger group.
+#'   The value of `m` can be equal to M if all the group members are used for testing.
 #' @param sensitivity Logical. Whether to consider test sensitivity in the model.
 #' @param specificity Logical. Whether to consider test specificity in the model.
-#' @param sensitivity.range Optional numeric vector of length 2 indicating [min, max] for sensitivity
+#' @param sensitivity.range Optional, numeric vector. If sensitivity=TRUE, a numeric vector of length 2 indicating [min, max] for sensitivity
 #'   (e.g., sensitivity ranges over U(0.65, 0.75)).
-#' @param specificity.range Optional numeric vector of length 2 indicating [min, max] for specificity
+#' @param specificity.range Optional, numeric vector. If specificity=TRUE, a numeric vector of length 2 indicating [min, max] for specificity
 #'   (e.g., specificity ranges over U(0.90, 0.99)).
 #'
 #' @importFrom MASS mvrnorm
@@ -105,16 +107,16 @@ inverse_logit <- function(x) {
 #' @return A list with four elements:
 #' \describe{
 #'   \item{target.parameters}{List of posterior samples for each parameter across chains.}
-#'   \item{parameters}{List of MCMC samples for each chain.}
+#'   \item{parameters}{List of MCMC samples for each parameter under the transformed scale using in the sampler across each chain.}
 #'   \item{log.likelihood.values}{List of log-likelihood values for each iteration.}
-#'   \item{log.likelihood.yi}{List of log-likelihood values for each observation at each iteration.}
+#'   \item{log.likelihood.yi}{List of log-likelihood values for each observation of `ty` at each iteration.}
 #' }
 #'
 #' @details
 #' Implements a flexible Bayesian MCMC sampler with support for multiple parameterizations
 #' (via alpha, beta, mu, and rho). It includes likelihood computation using truncated
 #' beta-distributed prevalence and allows modeling imperfect test sensitivity/specificity
-#' using logit-transformed priors. The truncated beta-binomial model with cutoff k = 0
+#' using them in logit scales. The truncated beta-binomial model with cutoff k = 0
 #' reduces to a standard beta-binomial model.
 #'
 #' @examples
@@ -122,7 +124,6 @@ inverse_logit <- function(x) {
 #' result <- MH_Sampler_BB(
 #'   par = c(log(0.005), logit(7e-04)),
 #'   cutoff = 0.01,
-#'   initial = par,
 #'   alpha = TRUE, beta = FALSE, mu = TRUE, rho = FALSE,
 #'   G = 500, R = 1000,
 #'   sigma = c(0.20, 0.20),
@@ -139,7 +140,7 @@ inverse_logit <- function(x) {
 #' }
 #'
 #' @export
-MH_Sampler_BB <- function(par,cutoff,initial,alpha,beta,mu,rho,G,R,sigma,num_chains=3,burnin,thin=5,seed,trail,ty,wt,group.size,sensitivity,specificity,
+MH_Sampler_BB <- function(par,initial,ty,wt,trail,group.size,cutoff,G,R,sigma,alpha,beta,mu,rho,num_chains=3,burnin,thin=5,seed,sensitivity,specificity,
                                  sensitivity.range=NULL,specificity.range=NULL){
 
   # Provide seed number for each chain
@@ -162,7 +163,7 @@ MH_Sampler_BB <- function(par,cutoff,initial,alpha,beta,mu,rho,G,R,sigma,num_cha
   }
 
   # Handle burnin
-  if (is.null(burnin)) {
+  if (missing(burnin) || is.null(burnin)) {
     burnin <- floor(R * 0.5)  # Default to 50% of R
   }
 
@@ -500,20 +501,21 @@ MH_Sampler_BB <- function(par,cutoff,initial,alpha,beta,mu,rho,G,R,sigma,num_cha
 #'
 #' @param alpha Numeric vector or list of posterior chains for alpha (Beta distribution shape1).
 #' @param beta Numeric vector or list of posterior chains for beta (Beta distribution shape2).
-#' @param B Numeric scalar. Upper bound on leakage parameter.
-#' @param b Numeric scalar. Lower bound on leakage parameter.
-#' @param M Numeric scalar. Total number of items/entities.
-#' @param m Numeric scalar. Number of items/entities considered in partial leakage.
+#' @param b Integer. Number of groups tested per replicate (i.e., binomial trials).
+#' @param B Integer, optional. Required if leakage = TRUE. Total number of groups in a replicate (e.g., batch).
+#' @param m Integer. Number of individuals included in each pooled group test.
+#' @param M Integer, optional. Required if leakage = TRUE. Total number of individuals in the larger group.
+#'   The value of `m` can be equal to M if all the group members are used for testing.
 #' @param sensitivity Numeric scalar, vector, or list of sensitivities. If list, treated as posterior samples. If sensitivity=1, exact formula will be used for probability of leakage.
 #' @param cutoff Numeric scalar in [0, 1) or NULL. If specified, truncates calculations to [cutoff, 1] interval.
 #'
 #' @return A list containing inputs and computed quantities:
 #' \describe{
-#'   \item{B}{Upper leakage bound (input).}
-#'   \item{b}{Lower leakage bound (input).}
+#'   \item{B}{Total number of groups per replicate.}
+#'   \item{b}{Sampled number of groups for group test per replicate.}
 #'   \item{cutoff}{Cutoff threshold for truncation, or NULL.}
-#'   \item{M}{Total number of items (input).}
-#'   \item{m}{Number of items considered in partial leakage (input).}
+#'   \item{M}{Total number of items in a (large) group.}
+#'   \item{m}{Number of items considered in group testing.}
 #'   \item{alpha}{Input alpha parameter(s).}
 #'   \item{beta}{Input beta parameter(s).}
 #'   \item{mu}{Mean of Beta distribution(s), alpha / (alpha + beta).}
@@ -529,7 +531,7 @@ MH_Sampler_BB <- function(par,cutoff,initial,alpha,beta,mu,rho,G,R,sigma,num_cha
 #' The expected leakage is calculated as a
 #' ratio of incomplete Beta integrals, weighted by group sizes.
 #' Two formulations for probability of leakage are used depending
-#' on whether `sensitivity` equals 1 (exact) or differs from 1 (approximation).
+#' on whether `sensitivity` equals 1 (exact) or differs from 1 (then approximation).
 
 #' @examples
 #' # Scalar/vector input example
@@ -740,6 +742,7 @@ estimate_leakage <- function(alpha, beta, B, b, M, m, sensitivity, cutoff = NULL
 #' This function provides a summary of MCMC output, including mean, standard deviation,
 #' quantiles, Gelman-Rubin diagnostics (R-hat), effective sample size (n_eff), and
 #' efficiency ratios for multiple chain inputs. It supports both single-chain and multiple-chain (chained) inputs.
+#' For multiple chain, convergence related statistics are calculated.
 #'
 #' @param ... One or more MCMC outputs. For multiple chains, each parameter should be
 #'   passed as a list of numeric vectors (one per chain). For a single chain, pass each

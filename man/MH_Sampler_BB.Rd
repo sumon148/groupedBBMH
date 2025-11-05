@@ -6,23 +6,23 @@
 \usage{
 MH_Sampler_BB(
   par,
-  cutoff,
   initial,
+  ty,
+  wt,
+  trail,
+  group.size,
+  cutoff,
+  G,
+  R,
+  sigma,
   alpha,
   beta,
   mu,
   rho,
-  G,
-  R,
-  sigma,
   num_chains = 3,
   burnin,
   thin = 5,
   seed,
-  trail,
-  ty,
-  wt,
-  group.size,
   sensitivity,
   specificity,
   sensitivity.range = NULL,
@@ -32,10 +32,24 @@ MH_Sampler_BB(
 \arguments{
 \item{par}{Initial parameter values (numeric vector).}
 
+\item{initial}{Optional. Starting values for the parameters (numeric vector).}
+
+\item{ty}{Integer vector of observed successes (e.g., number of groups tested positive per replicate).}
+
+\item{wt}{Numeric vector. Frequencies corresponding to each count in `ty`.}
+
+\item{trail}{Integer. Number of trials (e.g., number of group-tests conducted per batch).}
+
+\item{group.size}{Integer. Number of individuals tested per group (pool size).}
+
 \item{cutoff}{Truncation threshold for the Beta distribution (numeric).
 cutoff = 0 leads to the simple beta-binomial model.}
 
-\item{initial}{Starting values for the parameters (numeric vector).}
+\item{G}{Integer. Number of quantiles from the beta distribution required for integration.}
+
+\item{R}{Integer. Number of MCMC iterations.}
+
+\item{sigma}{Proposal standard deviation for each parameter (numeric vector).}
 
 \item{alpha}{Logical. Whether to include `alpha` in the model.}
 
@@ -45,12 +59,6 @@ cutoff = 0 leads to the simple beta-binomial model.}
 
 \item{rho}{Logical. Whether to include `rho` in the model.}
 
-\item{G}{Integer. Number of quantiles from the beta distribution.}
-
-\item{R}{Integer. Number of MCMC iterations.}
-
-\item{sigma}{Proposal standard deviation for each parameter (numeric vector).}
-
 \item{num_chains}{Number of MCMC chains to run (default is 3).}
 
 \item{burnin}{Number of initial iterations to discard (default is `R * 0.5`).}
@@ -59,31 +67,26 @@ cutoff = 0 leads to the simple beta-binomial model.}
 
 \item{seed}{A vector of integers for random number seeds (one per chain).}
 
-\item{trail}{Integer. Number of trials (e.g., number of group-tests conducted per batch).}
-
-\item{ty}{Integer vector of observed successes (e.g., number of groups tested positive).}
-
-\item{wt}{Numeric vector of weights for each observation.}
-
-\item{group.size}{Integer. Number of individuals tested per group (pool size).}
-
 \item{sensitivity}{Logical. Whether to consider test sensitivity in the model.}
 
 \item{specificity}{Logical. Whether to consider test specificity in the model.}
 
-\item{sensitivity.range}{Optional numeric vector of length 2 indicating [min, max] for sensitivity
+\item{sensitivity.range}{Optional, numeric vector. If sensitivity=TRUE, a numeric vector of length 2 indicating [min, max] for sensitivity
 (e.g., sensitivity ranges over U(0.65, 0.75)).}
 
-\item{specificity.range}{Optional numeric vector of length 2 indicating [min, max] for specificity
+\item{specificity.range}{Optional, numeric vector. If specificity=TRUE, a numeric vector of length 2 indicating [min, max] for specificity
 (e.g., specificity ranges over U(0.90, 0.99)).}
+
+\item{M}{Integer, optional. Required if leakage = TRUE. Total number of individuals in the larger group.
+The value of `m` can be equal to M if all the group members are used for testing.}
 }
 \value{
 A list with four elements:
 \describe{
   \item{target.parameters}{List of posterior samples for each parameter across chains.}
-  \item{parameters}{List of MCMC samples for each chain.}
+  \item{parameters}{List of MCMC samples for each parameter under the transformed scale using in the sampler across each chain.}
   \item{log.likelihood.values}{List of log-likelihood values for each iteration.}
-  \item{log.likelihood.yi}{List of log-likelihood values for each observation at each iteration.}
+  \item{log.likelihood.yi}{List of log-likelihood values for each observation of `ty` at each iteration.}
 }
 }
 \description{
@@ -96,7 +99,7 @@ with prior distributions.
 Implements a flexible Bayesian MCMC sampler with support for multiple parameterizations
 (via alpha, beta, mu, and rho). It includes likelihood computation using truncated
 beta-distributed prevalence and allows modeling imperfect test sensitivity/specificity
-using logit-transformed priors. The truncated beta-binomial model with cutoff k = 0
+using them in logit scales. The truncated beta-binomial model with cutoff k = 0
 reduces to a standard beta-binomial model.
 }
 \examples{
@@ -104,7 +107,6 @@ reduces to a standard beta-binomial model.
 result <- MH_Sampler_BB(
   par = c(log(0.005), logit(7e-04)),
   cutoff = 0.01,
-  initial = par,
   alpha = TRUE, beta = FALSE, mu = TRUE, rho = FALSE,
   G = 500, R = 1000,
   sigma = c(0.20, 0.20),

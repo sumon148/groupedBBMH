@@ -9,43 +9,44 @@ fit_GroupedBB(
   freq,
   b,
   m,
+  G = 10000,
+  M = NULL,
+  B = NULL,
   sensitivity = 1,
   specificity = 1,
   theta = Inf,
-  R = 10000,
   control = list(reltol = 1e-12, fnscale = -1),
   hessian = FALSE,
-  leakage = FALSE,
-  M = NULL,
-  B = NULL
+  leakage = FALSE
 )
 }
 \arguments{
-\item{ty}{Numeric vector. The observed counts of "successes" in grouped data.}
+\item{ty}{Numeric vector. A numeric vector of grouped test outcomes (e.g., number of test positive groups).}
 
 \item{freq}{Numeric vector. Frequencies corresponding to each count in `ty`.}
 
-\item{b}{Integer. Number of trials per group.}
+\item{b}{Integer. Number of groups tested per replicate (i.e., binomial trials).}
 
-\item{m}{Integer. Minimum group size or related parameter used in likelihood calculation.}
+\item{m}{Integer. Number of individuals included in each pooled group test.}
+
+\item{G}{Integer. Number of grid points from the beta distribution used to approximate the integral (default = 1000).}
+
+\item{M}{Integer, optional. Required if leakage = TRUE. Total number of individuals in the larger group.
+The value of `m` can be equal to M if all the group members are used for testing.}
+
+\item{B}{Integer, optional. Required if leakage = TRUE. Total number of groups in a replicate (e.g., batch).}
 
 \item{sensitivity}{Numeric, default 1. Sensitivity parameter for misclassification or detection.}
 
 \item{specificity}{Numeric, default 1. Specificity parameter for misclassification or detection.}
 
-\item{theta}{Numeric, default `Inf`. Overdispersion or shape parameter.}
-
-\item{R}{Integer, default 10000. Number of repetitions or simulations used in likelihood approximation.}
+\item{theta}{Clustering parameter. Use `Inf` for considering random groups.}
 
 \item{control}{List. Control parameters passed to `optim()`.}
 
 \item{hessian}{Logical, default FALSE. Whether to return the Hessian matrix from optimization.}
 
-\item{leakage}{Logical, default FALSE. Whether to include leakage in the model. Requires `M` and `B` if TRUE.}
-
-\item{M}{Integer, optional. Maximum group size or related parameter used in likelihood calculation. Required if `leakage = TRUE`.}
-
-\item{B}{Integer, optional. Number of bootstrap or simulation iterations required if `leakage = TRUE`.}
+\item{leakage}{Logical, default FALSE. If TRUE (requires `M` and `B`), compute leakage quantities such as probability (`P.L`) and expected leakage (`E.L`) assuming perfect specificity.}
 }
 \value{
 A list containing estimated parameters `alpha`, `beta`, `mu` (mean parameter),

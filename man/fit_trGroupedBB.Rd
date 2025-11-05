@@ -10,45 +10,46 @@ fit_trGroupedBB(
   b,
   m,
   cutoff,
+  G = 1000,
+  M = NULL,
+  B = NULL,
   sensitivity = 1,
   specificity = 1,
   theta = Inf,
-  R = 1000,
   control = list(reltol = 1e-12, fnscale = -1),
   return_hessian = FALSE,
-  leakage = FALSE,
-  M = NULL,
-  B = NULL
+  leakage = FALSE
 )
 }
 \arguments{
-\item{ty}{Numeric vector. Observed counts.}
+\item{ty}{Numeric vector. A numeric vector of grouped test outcomes (e.g., number of test positive groups).}
 
-\item{freq}{Numeric vector. Frequencies for each count.}
+\item{freq}{Numeric vector. Frequencies corresponding to each count in `ty`.}
 
-\item{b}{Integer. Number of trials per group.}
+\item{b}{Integer. Number of groups tested per replicate (i.e., binomial trials).}
 
-\item{m}{Integer. Minimum group size or related parameter.}
+\item{m}{Integer. Number of individuals included in each pooled group test.}
 
 \item{cutoff}{Numeric. Truncation cutoff value.}
+
+\item{G}{Integer, default 1000. Number of quantiles for numerical integration.}
+
+\item{M}{Integer, optional. Required if leakage = TRUE. Total number of individuals in the larger group.
+The value of `m` can be equal to M if all the group members are used for testing.}
+
+\item{B}{Integer, optional. Required if leakage = TRUE. Total number of groups in a replicate (e.g., batch).}
 
 \item{sensitivity}{Numeric, default 1. Sensitivity parameter.}
 
 \item{specificity}{Numeric, default 1. Specificity parameter.}
 
-\item{theta}{Numeric, default Inf. Overdispersion or shape parameter.}
-
-\item{R}{Integer, default 1000. Number of quantiles for numerical integration.}
+\item{theta}{Clustering parameter. Use `Inf` for considering random groups.}
 
 \item{control}{List. Control parameters passed to optim.}
 
 \item{return_hessian}{Logical, default FALSE. Return Hessian matrix if TRUE.}
 
-\item{leakage}{Logical, default FALSE. Whether to model leakage. Requires M and B if TRUE.}
-
-\item{M}{Integer, optional. Required if leakage = TRUE.}
-
-\item{B}{Integer, optional. Required if leakage = TRUE.}
+\item{leakage}{Logical, default FALSE. If TRUE (requires `M` and `B`), compute leakage quantities such as probability (`P.L`) and expected leakage (`E.L`) assuming perfect specificity.}
 }
 \value{
 A list containing estimated parameters `alpha`, `beta`, `mu` (mean parameter),

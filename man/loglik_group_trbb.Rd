@@ -8,6 +8,11 @@ loglik_group_trbb(
   par,
   ty,
   freq,
+  b,
+  B,
+  m,
+  M,
+  G = 1000,
   theta,
   mu,
   alpha,
@@ -15,13 +20,8 @@ loglik_group_trbb(
   cutoff,
   sensitivity = NULL,
   specificity = NULL,
-  b,
-  R = 1000,
-  m,
-  M,
   deviance = FALSE,
   subtract = 0,
-  B,
   mushape = FALSE,
   alpha.mu = FALSE,
   leakage = FALSE
@@ -30,17 +30,28 @@ loglik_group_trbb(
 \arguments{
 \item{par}{A numeric vector of parameters (on log or logit scale) depending on what is fixed or estimated.}
 
-\item{ty}{Observed number of positive group tests per replicate.}
+\item{ty}{Numeric vector. A numeric vector of grouped test outcomes (e.g., number of test positive groups).}
 
-\item{freq}{Frequency of each ty value.}
+\item{freq}{Numeric vector. Frequencies corresponding to each count in `ty`.}
+
+\item{b}{Integer. Number of groups tested per replicate (i.e., binomial trials).}
+
+\item{B}{Integer, optional. Required if leakage = TRUE. Total number of groups in a replicate (e.g., batch).}
+
+\item{m}{Integer. Number of individuals included in each pooled group test.}
+
+\item{M}{Integer, optional. Required if leakage = TRUE. Total number of individuals in the larger group.
+The value of `m` can be equal to M if all the group members are used for testing.}
+
+\item{G}{Integer. Number of grid points from the beta distribution used to approximate the integral (default = 1000).}
 
 \item{theta}{Clustering parameter. Use `Inf` for considering random groups.}
 
-\item{mu}{Optional; mean of the Beta prior for contamination probability.}
+\item{mu}{Optional. Mean parameter of the Beta distribution. If supplied, `beta` is derived as `(1 - mu) / mu * alpha`.}
 
-\item{alpha}{Optional; shape parameter of the Beta prior.}
+\item{alpha}{Optional. Shape parameter of the Beta distribution.}
 
-\item{beta}{Optional; shape parameter of the Beta prior.}
+\item{beta}{Optional. Shape parameter of the Beta distribution}
 
 \item{cutoff}{Truncation cutoff for the Beta distribution. `cutoff=0` indicates standard BB model.}
 
@@ -48,25 +59,15 @@ loglik_group_trbb(
 
 \item{specificity}{Test specificity.}
 
-\item{b}{Number of groups per replicate.}
-
-\item{R}{Number of integration points for numerical approximation.}
-
-\item{m}{Pool-size used for group testing. This can be equal to M if all the group members are used for testing.}
-
-\item{M}{Group size.}
-
 \item{deviance}{Logical. If TRUE, returns deviance (-2 * log-likelihood).}
 
 \item{subtract}{A constant to subtract from the log-likelihood.}
 
-\item{B}{Reference number of groups per batch / replicate for leakage modeling.}
+\item{mushape}{Logical. If `TRUE`, uses a parameterization where `mu` and `shape` are estimated instead of `alpha` and `beta`. Not applied in the package.}
 
-\item{mushape}{Logical. If TRUE, parameterize using mu and shape.}
+\item{alpha.mu}{Logical. If `TRUE`, uses a parameterization with `alpha` and `mu` as parameters. Not applied in the package.}
 
-\item{alpha.mu}{Logical. If TRUE, parameterize using alpha and mu.}
-
-\item{leakage}{Logical. If TRUE, compute expected leakage quantities assuming imperfect sensitivity.}
+\item{leakage}{Logical, default FALSE. If TRUE (requires `M` and `B`), compute leakage quantities such as probability (`P.L`) and expected leakage (`E.L`) assuming perfect specificity.}
 }
 \value{
 Depending on arguments:
@@ -123,26 +124,26 @@ Leakage quantities (\code{E.L}, \code{P.L}) are calculated under the assumption 
 freq = c(2815,9,10,6,1,3,2,0,1,2,1,0,0,0)
 ty = c(0:13)
 # For estimating log(alpha) and log(beta) for a cutoff=0, which reflects standard BB model
-mle.est.cutoff.0 <- optim(c(0, 0), loglik_group_trbb,ty = ty,freq = freq,b=13,m=5,R = 1e4,theta = Inf,cutoff = 0,control = list(reltol = 1e-12, fnscale = -1))
+mle.est.cutoff.0 <- optim(c(0, 0), loglik_group_trbb,ty = ty,freq = freq,b=13,m=5,G = 1e4,theta = Inf,cutoff = 0,control = list(reltol = 1e-12, fnscale = -1))
 exp(mle.est.cutoff.0$par)
 # For estimating log(alpha) and log(beta) for a given cutt-off of 1\%, which reflects truncated BB model
-mle.est.cutoff.01 <- optim(c(0, 0), loglik_group_trbb,ty = ty,freq = freq,b=13,m=5,theta = Inf,R = 1e4,sensitivity = 1, specificity = 1,cutoff = 0.01,deviance = FALSE,control = list(reltol = 1e-12, fnscale = -1),hessian = FALSE)
+mle.est.cutoff.01 <- optim(c(0, 0), loglik_group_trbb,ty = ty,freq = freq,b=13,m=5,theta = Inf,G = 1e4,sensitivity = 1, specificity = 1,cutoff = 0.01,deviance = FALSE,control = list(reltol = 1e-12, fnscale = -1),hessian = FALSE)
 exp(mle.est.cutoff.01$par)
 # For estimating log(beta) for a given alpha and cutoff greater than 0, which reflects truncated BB model
-beta.est.cutoff.01 <- optim(c(0),loglik_group_trbb,ty=ty,freq=freq,b=13,m=5,theta=Inf,R=1e4,alpha=0.005,cutoff = 0.01,sensitivity=1,specificity=1,
+beta.est.cutoff.01 <- optim(c(0),loglik_group_trbb,ty=ty,freq=freq,b=13,m=5,theta=Inf,G=1e4,alpha=0.005,cutoff = 0.01,sensitivity=1,specificity=1,
 deviance=FALSE,method="Brent", control=list(reltol=1e-12,fnscale=-1), hessian=FALSE,lower = c(log(0.05)),upper = c(log(100)))
 exp(beta.est.cutoff.01$par)
 # For estimating log(alpha) for a given beta and cutoff greater than 0, which reflects truncated BB model
-alpha.est.cutoff.01 <- optim(c(0),loglik_group_trbb,ty=ty,freq=freq,b=13,m=5,theta=Inf,R=1e4,beta=4.5,cutoff = 0.01,sensitivity=1,specificity=1,
+alpha.est.cutoff.01 <- optim(c(0),loglik_group_trbb,ty=ty,freq=freq,b=13,m=5,theta=Inf,G=1e4,beta=4.5,cutoff = 0.01,sensitivity=1,specificity=1,
 deviance=FALSE,method="Brent", control=list(reltol=1e-12,fnscale=-1), hessian=FALSE,lower = c(log(0.0005)),upper = c(log(0.5)))
 exp(alpha.est.cutoff.01$par)
 # For estimating log(alpha) for a given mu and cutoff greater than 0, which reflects truncated BB model
 # alpha missing but mu available
-alpha.est.cutoff.01 <- optim(c(0),loglik_group_trbb,ty=ty,freq=freq,b=13,m=5,theta=Inf,R=1e4,mu=0.0005,cutoff = 0.01,sensitivity=1,specificity=1,
+alpha.est.cutoff.01 <- optim(c(0),loglik_group_trbb,ty=ty,freq=freq,b=13,m=5,theta=Inf,G=1e4,mu=0.0005,cutoff = 0.01,sensitivity=1,specificity=1,
 deviance=FALSE,method="Brent", control=list(reltol=1e-12,fnscale=-1), hessian=FALSE,lower = c(log(0.00005)),upper = c(log(0.05)))
 exp(alpha.est.cutoff.01$par)
 # For estimating leakage for a given alpha, beta, sensitivity and cutoff greater than 0, which reflects truncated BB model
  leakage.estimate <- loglik_group_trbb(c(log(0.005),log(4.5)),ty=ty,freq=freq,b=13,B=8000,m=5,M=40,cutoff=0.01,
- theta=Inf,leakage=TRUE,R=1e4,sensitivity=1.0,specificity=1.0)
+ theta=Inf,leakage=TRUE,G=1e4,sensitivity=1.0,specificity=1.0)
 leakage.estimate
 }

@@ -8,19 +8,19 @@ loglik_group_bb(
   par,
   ty,
   freq,
+  b,
+  m,
+  M,
+  B,
+  G = 1000,
   theta,
   mu,
   alpha,
   beta,
   sensitivity,
   specificity,
-  b,
-  R = 1000,
-  m,
-  M,
   deviance = FALSE,
   subtract = 0,
-  B,
   mushape = FALSE,
   alpha.mu = FALSE,
   leakage = FALSE
@@ -30,39 +30,42 @@ loglik_group_bb(
 \item{par}{A numeric vector of log-parameters to estimate. The interpretation depends on which parameters are fixed or missing:
 - Typically includes `log(alpha)`, `log(beta)`, `log(sensitivity)`, and `log(specificity)` as needed.}
 
-\item{ty}{A numeric vector of grouped test outcomes (e.g., number of positives in each group).}
+\item{ty}{Numeric vector. A numeric vector of grouped test outcomes (e.g., number of test positive groups).}
 
-\item{freq}{A numeric vector of frequencies (how many times each group outcome occurred).}
+\item{freq}{Numeric vector. Frequencies corresponding to each count in `ty`.}
 
-\item{theta}{Truncation parameter. Use `Inf` for the standard truncated Beta distribution.}
+\item{b}{Integer. Number of groups tested per replicate (i.e., binomial trials).}
+
+\item{m}{Integer. Number of individuals included in each pooled group test.}
+
+\item{M}{Integer, optional. Required if leakage = TRUE. Total number of individuals in the larger group.
+The value of `m` can be equal to M if all the group members are used for testing.}
+
+\item{B}{Integer, optional. Required if leakage = TRUE. Total number of groups in a replicate (e.g., batch).}
+
+\item{G}{Integer. Number of grid points from the beta distribution used to approximate the integral (default = 1000).}
+
+\item{theta}{Clustering parameter. Use `Inf` for considering random groups.}
 
 \item{mu}{Optional. Mean parameter of the Beta distribution. If supplied, `beta` is derived as `(1 - mu) / mu * alpha`.}
 
-\item{alpha}{Optional. Alpha shape parameter of the Beta distribution.}
+\item{alpha}{Optional. Shape parameter of the Beta distribution.}
+
+\item{beta}{Optional. Shape parameter of the Beta distribution.}
 
 \item{sensitivity}{Optional. Test sensitivity. If missing, it is estimated via `par`.}
 
 \item{specificity}{Optional. Test specificity. If missing, it is estimated via `par`.}
 
-\item{b}{Integer. Number of individuals tested in each group (binomial trials).}
-
-\item{R}{Integer. Number of grid points used to approximate the truncated integral (default 1000).}
-
-\item{m}{Integer. Number of subsampled individuals per pool.}
-
-\item{M}{Integer. Number of individuals per super-pool (used for leakage calculation).}
-
 \item{deviance}{Logical. If `TRUE`, returns deviance (i.e., `-2 * loglikelihood`); otherwise returns log-likelihood.}
 
 \item{subtract}{Numeric. A constant to subtract from the likelihood (useful for nested model comparison).}
 
-\item{B}{Integer. Total number of positive individuals in super-pooling (for leakage calculation).}
+\item{mushape}{Logical. If `TRUE`, uses a parameterization where `mu` and `shape` are estimated instead of `alpha` and `beta`. Not applied in the package.}
 
-\item{mushape}{Logical. If `TRUE`, uses a parameterization where `mu` and `shape` are estimated instead of `alpha` and `beta`.}
+\item{alpha.mu}{Logical. If `TRUE`, uses a parameterization with `alpha` and `mu` as parameters. Not applied in the package.}
 
-\item{alpha.mu}{Logical. If `TRUE`, uses a parameterization with `alpha` and `mu` as parameters.}
-
-\item{leakage}{Logical. If `TRUE`, returns a named vector including leakage probability (`P.L`) and expected leakage (`E.L`).}
+\item{leakage}{Logical, default FALSE. If TRUE (requires `M` and `B`), compute leakage quantities such as probability (`P.L`) and expected leakage (`E.L`) assuming perfect specificity.}
 }
 \value{
 A numeric value representing the log-likelihood (or deviance) of the model. If `leakage = TRUE`, a named numeric vector is returned:
@@ -83,7 +86,7 @@ assumptions about which parameters are missing and need to be estimated.
 MLE.BB.m1 <- optim(c(0,0), loglik_group_bb, ty=ty, freq=freq, b=13,
                 theta=Inf, m=5, M=40, deviance=FALSE,
                 control=list(reltol=1e-12, fnscale=-1),
-                R=1e4, hessian=FALSE, sensitivity=1, specificity=1)
+                G=1e4, hessian=FALSE, sensitivity=1, specificity=1)
 MLE.BB.m1$mu <- exp(MLE.BB.m1$par[1]) / sum(exp(MLE.BB.m1$par))
 MLE.BB.m1$alpha <- exp(MLE.BB.m1$par[1])
 MLE.BB.m1$beta <- exp(MLE.BB.m1$par[2])
@@ -93,7 +96,7 @@ MLE.BB.m2 <- optim(c(0.005), loglik_group_bb, ty=ty, freq=freq, b=13,
                       theta=Inf, mu=0.0007, sensitivity=1, specificity=1,
                       m=5, M=40, deviance=FALSE,
                       control=list(factr=1e-12, fnscale=-1, trace=TRUE),
-                      R=1e4, hessian=FALSE, method="L-BFGS-B",
+                      G=1e4, hessian=FALSE, method="L-BFGS-B",
                       lower=c(-Inf), upper=c(Inf))
 MLE.BB.m2$alpha <- exp(MLE.BB.m2$par[1])
 MLE.BB.m2$beta <- MLE.BB.m2$alpha * (1 - 0.0007) / 0.0007
@@ -102,7 +105,7 @@ MLE.BB.m3 <- optim(c(0.0007), loglik_group_bb, ty=ty, freq=freq, b=13,
                       theta=Inf, alpha=0.005, sensitivity=1, specificity=1,
                       m=5, M=40, deviance=FALSE,
                       control=list(factr=1e-12, fnscale=-1, trace=TRUE),
-                      R=1e4, hessian=FALSE, method="L-BFGS-B",
+                      G=1e4, hessian=FALSE, method="L-BFGS-B",
                       lower=c(-Inf), upper=c(Inf))
 MLE.BB.m3$beta <- exp(MLE.BB.m3$par[1])
 
@@ -110,7 +113,7 @@ MLE.BB.m3$beta <- exp(MLE.BB.m3$par[1])
 MLE.BB.m4 <- optim(c(0,0,0), loglik_group_bb, ty=ty, freq=freq, b=13,
                       theta=Inf, m=5, M=40, specificity=1, deviance=FALSE,
                       control=list(factr=1e-12, fnscale=-1, trace=TRUE),
-                      R=1e4, hessian=FALSE, method="L-BFGS-B",
+                      G=1e4, hessian=FALSE, method="L-BFGS-B",
                       lower=c(log(0.0001), log(0.0001), log(0.50)),
                       upper=c(Inf, Inf, 0))
 MLE.BB.m4$mu <- exp(MLE.BB.m4$par[1]) / sum(exp(MLE.BB.m4$par))
@@ -123,7 +126,7 @@ MLE.BB.m5 <- optim(c(log(0.005), log(3.0), log(0.5)), loglik_group_bb,
                       ty=ty, freq=freq, b=13, theta=Inf, m=5, M=40,
                       sensitivity=1, deviance=FALSE,
                       control=list(factr=1e-12, fnscale=-1, trace=TRUE),
-                      R=1e4, hessian=FALSE, method="L-BFGS-B",
+                      G=1e4, hessian=FALSE, method="L-BFGS-B",
                       lower=c(log(0.0001), log(0.0001), log(0.99)),
                       upper=c(Inf, Inf, 0))
 MLE.BB.m5$mu <- exp(MLE.BB.m5$par[1]) / sum(exp(MLE.BB.m5$par))
@@ -136,7 +139,7 @@ MLE.BB.m6 <- optim(c(0,0,0,0), loglik_group_bb,
                       ty=ty, freq=freq, b=13, theta=Inf, m=5, M=40,
                       deviance=FALSE,
                       control=list(factr=1e-12, fnscale=-1, trace=TRUE),
-                      R=1e4, hessian=FALSE, method="L-BFGS-B",
+                      G=1e4, hessian=FALSE, method="L-BFGS-B",
                       lower=c(log(0.0001), log(0.0001), log(0.5), log(0.99)),
                       upper=c(Inf, Inf, 0, 0))
 MLE.BB.m6$mu <- exp(MLE.BB.m6$par[1]) / sum(exp(MLE.BB.m6$par))

@@ -7,18 +7,18 @@
 post_pred_aprox_model(n, alpha, beta, D, m, approximate.model = TRUE)
 }
 \arguments{
-\item{n}{Integer. Number of group tests per batch.}
+\item{n}{Integer. Number of group tests per replicate, i.e., number of trials per replicate.}
 
 \item{alpha}{Numeric vector. Posterior samples of the alpha parameter (length equal to number of MCMC draws).}
 
 \item{beta}{Numeric vector. Posterior samples of the beta parameter (same length as \code{alpha}).}
 
-\item{D}{Integer. Number of batches (observed outcomes).}
+\item{D}{Integer. Number of observed outcomes (outcomes from the batches of case study).}
 
 \item{m}{Integer. Number of individuals per group (used for group-test).}
 
-\item{approximate.model}{Logical. If \code{TRUE}, use the approximate model (assumes prevalence ~ Beta(alpha, beta/m));
-if \code{FALSE}, use the exact model with transformation \code{1 - (1 - p)^m}.}
+\item{approximate.model}{Logical. If \code{TRUE}, use the approximate model (assumes group prevalence ~ Beta(alpha, beta/m));
+if \code{FALSE}, use the exact model with transformation \code{1 - (1 - p)^m} for group prevalence.}
 }
 \value{
 A list with two elements:

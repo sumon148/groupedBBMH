@@ -4,13 +4,13 @@
 #' using either the approximate model (e.g., HMC-style with Beta(alpha, beta/m)) or
 #' the exact model (e.g., MH-style with transformation via group pooling).
 #'
-#' @param n Integer. Number of group tests per batch.
+#' @param n Integer. Number of group tests per replicate, i.e., number of trials per replicate.
 #' @param alpha Numeric vector. Posterior samples of the alpha parameter (length equal to number of MCMC draws).
 #' @param beta Numeric vector. Posterior samples of the beta parameter (same length as \code{alpha}).
-#' @param D Integer. Number of batches (observed outcomes).
+#' @param D Integer. Number of observed outcomes (outcomes from the batches of case study).
 #' @param m Integer. Number of individuals per group (used for group-test).
-#' @param approximate.model Logical. If \code{TRUE}, use the approximate model (assumes prevalence ~ Beta(alpha, beta/m));
-#'                          if \code{FALSE}, use the exact model with transformation \code{1 - (1 - p)^m}.
+#' @param approximate.model Logical. If \code{TRUE}, use the approximate model (assumes group prevalence ~ Beta(alpha, beta/m));
+#'                          if \code{FALSE}, use the exact model with transformation \code{1 - (1 - p)^m} for group prevalence.
 #'
 #' @return A list with two elements:
 #' \describe{
@@ -66,7 +66,7 @@ post_pred_aprox_model <- function(n, alpha, beta, D, m, approximate.model = TRUE
 #' @param beta Numeric vector. Posterior samples of the beta parameter (same length as \code{alpha}).
 #' @param D Integer. Number of batches (observed outcomes).
 #' @param m Integer. Number of individuals per group (used for group-test).
-#' @param sensitivity Numeric vector. Posterior samples of test sensitivity (same length as \code{alpha}).
+#' @param sensitivity Scalar or Numeric vector. Posterior samples of test sensitivity (same length as \code{alpha}).
 #'
 #' @return A list containing:
 #' \describe{
@@ -133,7 +133,7 @@ post_pred_sn <- function(n, alpha, beta, D, m, sensitivity) {
 #' Generates diagnostic barplots for observed vs. posterior predictive simulated counts
 #' and proportions in grouped binomial models, tailored for considered import case study.
 #' Includes plots with 95% credible intervals, observed values, and side-by-side
-#' comparisons of zero and non-zero group outcomes.
+#' comparisons of zero and non-zero group outcomes. Various types of plots are examined through this function.
 #'
 #' @param ty Integer vector. Observed counts (e.g., number of infected bags per batch).
 #' @param yrep Matrix. Simulated count outcomes from the posterior predictive distribution.

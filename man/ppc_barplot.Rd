@@ -21,7 +21,7 @@ Each row corresponds to one posterior draw, and columns to group-level outcomes.
 Generates diagnostic barplots for observed vs. posterior predictive simulated counts
 and proportions in grouped binomial models, tailored for considered import case study.
 Includes plots with 95% credible intervals, observed values, and side-by-side
-comparisons of zero and non-zero group outcomes.
+comparisons of zero and non-zero group outcomes. Various types of plots are examined through this function.
 }
 \details{
 The function is designed for posterior predictive checking in models with grouped data,

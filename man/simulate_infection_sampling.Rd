@@ -2,7 +2,7 @@
 % Please edit documentation in R/Simulation Infection Sampling.R
 \name{simulate_infection_sampling}
 \alias{simulate_infection_sampling}
-\title{Simulate Infection Sampling with (Truncated) Beta-binomial and Sensitivity Adjustments}
+\title{Simulate Infection Sampling with (Truncated) Beta-binomial adjusting Sensitivity and Minimum Positive Propensity}
 \usage{
 simulate_infection_sampling(
   alpha,
@@ -21,15 +21,15 @@ simulate_infection_sampling(
 
 \item{beta}{Numeric. Shape parameter \eqn{\beta} of the beta distribution for prevalence.}
 
-\item{cutoff}{Numeric (0 < cutoff ≤ 1). Upper bound for the truncated beta distribution.}
+\item{cutoff}{Numeric (0 < cutoff ≤ 1). Lower bound for the truncated beta distribution.}
 
-\item{D}{Integer. Number of batches (i.e., number of simulated production units).}
+\item{D}{Integer. Number of targeted batches/replicates (i.e., number of simulated production units).}
 
 \item{B}{Integer. Number of groups per batch.}
 
 \item{M}{Integer. Number of items in each group.}
 
-\item{m}{Integer. Number of items sampled from each group (for testing).}
+\item{m}{Integer. Number of items sampled from each group (for testing). If all of group items are tested, m=M.}
 
 \item{b}{Integer. Number of groups sampled per batch.}
 
@@ -53,7 +53,7 @@ A named list of results, one element per sensitivity value. Each element is itse
 }
 \description{
 Simulates contamination prevalence in batches using a (truncated) beta distribution,
-generates infected item counts per group, and models the effect of sample-based testing
+generates counts of infected items per group, and models the effect of sample-based testing
 under varying group sensitivities. Sampling within groups is done using hypergeometric draws,
 reflecting real-world testing practices.
 }
@@ -74,6 +74,7 @@ The function simulates contamination as follows:
 
 Sensitivity values allow modeling of test performance degradation. The comparisons
 (comparison_tx and comparison_ty) help quantify misclassification rates in sample-based testing.
+Since the case study is based on the group-testing, comparison_ty is used for the case study.
 }
 \examples{
 \dontrun{

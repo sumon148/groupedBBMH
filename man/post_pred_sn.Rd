@@ -17,7 +17,7 @@ post_pred_sn(n, alpha, beta, D, m, sensitivity)
 
 \item{m}{Integer. Number of individuals per group (used for group-test).}
 
-\item{sensitivity}{Numeric vector. Posterior samples of test sensitivity (same length as \code{alpha}).}
+\item{sensitivity}{Scalar or Numeric vector. Posterior samples of test sensitivity (same length as \code{alpha}).}
 }
 \value{
 A list containing:

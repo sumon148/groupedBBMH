@@ -257,7 +257,7 @@ freq=c(2815, 9, 10, 6, 1, 3, 2, 0, 1, 2, 1, 0, 0, 0)
 MLE.BB.m1 <- optim(c(0,0), loglik_group_bb, ty=ty, freq=freq, b=13,
                 theta=Inf, m=5, M=40, deviance=FALSE,
                 control=list(reltol=1e-12, fnscale=-1),
-                R=1e4, hessian=FALSE, sensitivity=1, specificity=1)
+                G=1e4, hessian=FALSE, sensitivity=1, specificity=1)
 MLE.BB.m1$mu <- exp(MLE.BB.m1$par[1]) / sum(exp(MLE.BB.m1$par))
 MLE.BB.m1$alpha <- exp(MLE.BB.m1$par[1])
 MLE.BB.m1$beta <- exp(MLE.BB.m1$par[2])
@@ -277,7 +277,7 @@ MLE.BB.m6 <- optim(
   theta = Inf, m = 5, M = 40,
   deviance = FALSE,
   control = list(factr = 1e-12, fnscale = -1, trace = TRUE),
-  R = 1e4, hessian = FALSE,
+  G=1e4, hessian = FALSE,
   method = "L-BFGS-B",
   lower = c(log(0.0001), log(0.0001), log(0.5), log(0.99)),
   upper = c(Inf, Inf, 0, 0)
@@ -321,7 +321,7 @@ In the second example, we demonstrate a model fit with a 1% minimum prevalence t
 
 ```{r chunk 5, eval=TRUE, echo=TRUE}
 # Fit truncated grouped beta-binomial model with cutoff = 0 (no truncation) with perfect test
-trbb.m1 <- fit_trGroupedBB(ty, freq, b = 13, m = 5, cutoff = 0,R=10^4)
+trbb.m1 <- fit_trGroupedBB(ty, freq, b = 13, m = 5, cutoff = 0,G=1e4)
 trbb.m1
 ```
 
@@ -487,9 +487,89 @@ ppc.barplot.imperfect.case$prop.zero.non.zero  # Zero vs non-zero proportion val
 
 ```
 
+## Leakage Calculation
 
-## Model-based Community Risk assessment 
+Using the derived formulas presented in **Equations (17)–(20)** of the manuscript, the leakage quantities $E(L_i)$ and $\Pr(L_i > 0)$ can be estimated from the posterior distributions of the model parameters $\alpha$ and $\beta$. These quantities are computed for specified values of the minimum positive propensity ($k$) and test sensitivity ($\Delta$), which together determine the expected rate and probability of undetected infection (leakage) in consignments.
 
+For example, the posterior samples obtained from the fitted model `MH.trbb.m1` can be used to estimate leakage parameters via the function `estimate_leakage()`. This function integrates over the posterior distribution to produce summaries of both the **expected leakage** — the average number of infected items that escape detection per consignment — and the **probability of leakage**, representing the likelihood that at least one infected item remains undetected.
+
+Using the Bayesian algorithm allows us to explore the full posterior distribution of the leakage parameters, rather than relying only on point estimates. This approach captures the uncertainty around both the expected leakage, $E(L_i)$, and the probability of leakage, $\Pr(L_i > 0)$, providing a richer understanding of potential biosecurity risks.
+
+In the below example, the function `estimate_leakage()` is applied using posterior samples of $\alpha$ and $\beta$ from the model `MH.trbb.m1`. Two scenarios are compared: one assuming perfect test sensitivity $\Delta = 1$ and another assuming imperfect sensitivity $\Delta = 0.8$. The summaries below present the posterior estimates for both the expected leakage and the probability of leakage under each scenario.
+
+
+```{r chunk 14, eval=TRUE, echo=TRUE,warning=FALSE,message=FALSE}
+estimate_leakage_01_perf <- estimate_leakage(B=8000,b=13,M=40,m=5,
+                                    alpha=unlist(MH.trbb.m1$target.parameters$alpha_sample),
+                                    beta=unlist(MH.trbb.m1$target.parameters$beta_sample),
+                                    cutoff = 0.01,
+                                    sensitivity = 1)
+estimate_leakage_01_imperf <- estimate_leakage(B=8000,b=13,M=40,m=5,
+                                    alpha=unlist(MH.trbb.m1$target.parameters$alpha_sample),
+                                    beta=unlist(MH.trbb.m1$target.parameters$beta_sample),
+                                    cutoff = 0.01,
+                                    sensitivity = 0.8)
+summary(estimate_leakage_01_perf$E.L)
+summary(estimate_leakage_01_perf$P.L)
+summary(estimate_leakage_01_imperf$E.L)
+summary(estimate_leakage_01_imperf$P.L)
+```
+The following histograms illustrate the posterior distributions of the leakage quantities under imperfect sensitivity. These distributions highlight the variability in the model-based leakage estimates, demonstrating how imperfect detection increases both the mean and uncertainty of leakage outcomes. Such results emphasize the importance of accounting for test performance when evaluating biosecurity risks and setting inspection thresholds.
+
+
+```{r chunk 14 Hist, eval=TRUE, echo=TRUE,warning=FALSE,message=FALSE}
+hist(estimate_leakage_01_imperf$E.L,breaks=30,main="Distribution of expected leakage")
+hist(estimate_leakage_01_imperf$P.L,breaks=30,main="Distribution of probability of leakage")
+```
+
+These leakage estimates, derived through approximate analytical formulas for a given set of beta distribution parameters, provide a direct link between statistical inference and its practical implications for biosecurity management. By quantifying both the magnitude and likelihood of undetected infection, they help decision-makers assess inspection performance and refine testing strategies to reduce leakage risk.
+
+
+## Model-based Communicating Risk Assessment
+
+The R package provides a framework for model-based simulation to support the communication and interpretation of biosecurity risk. In many biosecurity applications, the practical implications of the assumed model and parameter estimates for policy and risk management are not always straightforward to interpret. While quantities such as the expected leakage rate per consignment, $E(L_i)$, and the probability that a consignment contains undetected infection, $\Pr(L_i > 0)$, have clear meanings, they are simplified summaries that do not fully describe the distribution of $L_i$. The leakage rate $E(L_i)$, in particular, may be difficult to interpret when $L_i$ is zero with high probability.
+
+To provide a more intuitive and visual representation of leakage, we summarize the simulated number of infected items in a consignment, $T_{Xi}$, classified by detection status: true positives (infection correctly detected), false negatives (infection undetected), and true negatives (no infection). Leakage arises in consignments that are false negatives, where infection is present but not detected.
+
+To make these results more tangible, the package allows users to simulate expected outcomes for a notional set of 1,000 consignments, representing approximately one year of import activity. Outcomes are generated by simulating both $T_{Xi}$ and $\tilde{t}_{yi}$ from the assumed model, using parameters drawn from their Metropolis–Hastings posterior distributions, with test sensitivity fixed at $\Delta = 0.8$. Users can explore alternative values of the minimum positive propensity, $k$ (e.g., 0%, 1%, or 2%). These simulation capabilities help translate statistical inference into interpretable measures of risk, improving how uncertainty and leakage potential are communicated in biosecurity decision-making.
+
+For illustration, we use posterior samples of the parameters $\alpha$ and $\beta$ estimated from the frozen seafood data, assuming a 1% minimum positive propensity. These posterior samples are used to generate infection outcomes $X_{ij}$ and group test results $Y_{ij}$ for $D = 10000$ batches, each containing $B = 8000$ groups. Following the case study, we also consider $m = 5$, $M = 40$, and $b = 13$. The function `run_infection_simulations()` can be used to generate the population and perform sampling while adjusting the test sensitivity (e.g., $\Delta = 0.80$). This function compares sampled group test outcomes with the true infection or contamination status and classifies batches into three categories: true negatives (TN), true positives (TP), and false negatives (FN). The simulated outcomes are then used to estimate (i) the **expected leakage** — the average number of infected items missed due to undetected infection — and (ii) the **probability of leakage**, defined as the proportion of batches resulting in FN outcomes.
+
+
+
+```{r chunk 15 MB simulation, eval=TRUE, echo=TRUE,warning=FALSE,message=FALSE}
+alpha_TrBB <- sample(unlist(MH.trbb.m1$target.parameters$alpha_sample),500)
+beta_TrBB <- sample(unlist(MH.trbb.m1$target.parameters$beta_sample),500)
+cut_off <- 0.01
+summary(alpha_TrBB)
+summary(beta_TrBB)
+Sim_Tx_TrBB <- run_infection_simulations(alpha=alpha_TrBB,beta=beta_TrBB, cutoff = cut_off, D = 10000,B = 8000, M = 40,m = 5,b = 13,sensitivity_values = c(0.8,1.0),NSim = length(alpha_TrBB),seed = 2015)
+prop.table(table(Sim_Tx_TrBB$`0.8`$Simulation_Infection_Ty_Results)) # Proportion of batches with TP, TN and FN
+
+```
+
+
+We can calculate **leakage estimates** based on the simulated observations using the function `compute_simulated_leakage`. This function produces both the expected leakage and the probability of leakage per batch, summarizing the outcomes of the simulation under different assumptions of test sensitivity. From the model-based simulations, additional leakage summaries, including the median of non-zero leakage, $Q_2(L_i > 0)$, and the pseudo-expected leakage, $\E_p(L_i) = P(L_i > 0) \times Q_2(L_i > 0)$ can be computed using `compute_simulated_leakage` function. These measures provide complementary insights by quantifying the typical size of leakage events when they occur and the combined effect of their frequency and magnitude, offering a more nuanced view of leakage behavior beyond the mean-based summaries.
+
+
+```{r chunk 16 MB simulation Leakage, eval=TRUE, echo=TRUE,warning=FALSE,message=FALSE}
+leakage_01_perf <- compute_simulated_leakage(Sim_Tx_TrBB$`1`)
+leakage_01_imperf <- compute_simulated_leakage(Sim_Tx_TrBB$`0.8`)
+mean(leakage_01_perf$E.Li)
+summary(leakage_01_perf$P.Li)
+summary(leakage_01_imperf$E.Li)
+summary(leakage_01_imperf$P.Li)
+```
+
+The posterior distributions of the model-based leakage quantities can also be explored visually to assess uncertainty and distributional behavior.
+
+
+```{r chunk 16 Hist, eval=TRUE, echo=TRUE,warning=FALSE,message=FALSE}
+hist(leakage_01_imperf$E.Li,breaks=30,main="Distribution of expected leakage: Simulation")
+hist(leakage_01_imperf$P.Li,breaks=30,main="Distribution of probability of leakage: Simulation")
+```
+
+The estimated leakage values ($E(L_i)$ and $\Pr(L_i > 0)$), derived from the posterior distributions of $\alpha$ and $\beta$ through analytic formulas (17) - (20), are generally consistent with those obtained from the model-based simulation. Under the assumption of perfect test sensitivity, the approximate analytic formula provides estimates that closely align with the simulated values, confirming the robustness of the analytic approach for practical applications. Minor deviations between the analytic and simulation-based estimates primarily reflect stochastic variability introduced through simulation and posterior sampling, as well as approximations in the analytical expressions under imperfect sensitivity.
 
 
 # Session Info & References
@@ -500,6 +580,6 @@ sessionInfo()
 
 # References
 
-- Barnes, B., Parsa, M., Das, S., & Clark, R. (2025). *Hypergeometric and Binomial Group Sampling with Sensitivity and Specificity*. Submitted to *Communications in Statistics -- Theory and Methods*.
-- Arnold, M. E., Cook, A., & Davies, R. (2005). A modelling approach to estimate the sensitivity of pooled faecal samples for isolation of Salmonella in pigs. *Journal of the Royal Society Interface*, 2(4), 365–372.
-- Theobald, C. M., & Davie, A. M. (2014). Group testing, the pooled hypergeometric distribution, and estimating the number of defectives in small populations. *Communications in Statistics -- Theory and Methods*, 43(14), 3019–3026.
+- Das, S., Clark, R., Parsa, M.,  &  Barnes, B. (2025). *Inferring Leakage in Imports of Frozen Seafood allowing for Censoring, Testing Accuracy and a Minimum Positive Prevalence*. Submitted to *Journal of the American Statistical Association*.
+- Clark, R. G., Barnes, B., & Parsa, M. (2024). Clustered and unclustered group testing for biosecurity. *Journal of Agricultural, Biological and Environmental Statistics*, 29(2), 193-211.
+- Clark, R. G. (2023). *Deidentified Frozen Seafood Dataset* (1.0) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.7762164

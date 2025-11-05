@@ -20,6 +20,7 @@ parameter as a single numeric vector.}
 This function provides a summary of MCMC output, including mean, standard deviation,
 quantiles, Gelman-Rubin diagnostics (R-hat), effective sample size (n_eff), and
 efficiency ratios for multiple chain inputs. It supports both single-chain and multiple-chain (chained) inputs.
+For multiple chain, convergence related statistics are calculated.
 }
 \examples{
 # --- Example 1: Single-chain input (vectors for alpha and beta) ---

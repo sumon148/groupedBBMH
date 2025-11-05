@@ -1,7 +1,7 @@
-#' Simulate Infection Sampling with (Truncated) Beta-binomial and Sensitivity Adjustments
+#' Simulate Infection Sampling with (Truncated) Beta-binomial adjusting Sensitivity and Minimum Positive Propensity
 #'
 #' Simulates contamination prevalence in batches using a (truncated) beta distribution,
-#' generates infected item counts per group, and models the effect of sample-based testing
+#' generates counts of infected items per group, and models the effect of sample-based testing
 #' under varying group sensitivities. Sampling within groups is done using hypergeometric draws,
 #' reflecting real-world testing practices.
 #'
@@ -10,11 +10,11 @@
 #'
 #' @param alpha Numeric. Shape parameter \eqn{\alpha} of the beta distribution for prevalence.
 #' @param beta Numeric. Shape parameter \eqn{\beta} of the beta distribution for prevalence.
-#' @param cutoff Numeric (0 < cutoff ≤ 1). Upper bound for the truncated beta distribution.
-#' @param D Integer. Number of batches (i.e., number of simulated production units).
+#' @param cutoff Numeric (0 < cutoff ≤ 1). Lower bound for the truncated beta distribution.
+#' @param D Integer. Number of targeted batches/replicates (i.e., number of simulated production units).
 #' @param B Integer. Number of groups per batch.
 #' @param M Integer. Number of items in each group.
-#' @param m Integer. Number of items sampled from each group (for testing).
+#' @param m Integer. Number of items sampled from each group (for testing). If all of group items are tested, m=M.
 #' @param b Integer. Number of groups sampled per batch.
 #' @param sensitivity_values Numeric vector. A vector of sensitivity values (from 0 to 1)
 #'        representing the probability that an infected group will be correctly identified.
@@ -46,6 +46,7 @@
 #'
 #' Sensitivity values allow modeling of test performance degradation. The comparisons
 #' (comparison_tx and comparison_ty) help quantify misclassification rates in sample-based testing.
+#' Since the case study is based on the group-testing, comparison_ty is used for the case study.
 #'
 #' @examples
 #' \dontrun{

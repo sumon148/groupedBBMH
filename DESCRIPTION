@@ -1,23 +1,41 @@
 Package: groupedBBMH
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Grouped Beta-Binomial Model Using Metropolis-Hastings Estimation
 Version: 0.1.0
 Authors@R: c(
     person(
-      "Jane", "Doe",
-      email = "jane@example.com",
-      role = c("aut", "cre")
+      given = "Sumon",
+      family = "Das",
+      email = "sumon148@gmail.com",
+      role = c("aut", "cre"),
+      comment = c(ORCID = "0000-0000-0000-0000")
     )
   )
-Description: More about what it does (maybe more than one line).
-    Continuation lines should be indented.
-License: What license is it under?
+Description: Provides tools for analyzing group testing data using 
+    a truncated beta-binomial model with Metropolis-Hastings (MH) 
+    and maximum-likelihood estimation (MLE) methods. The package 
+    supports modeling imperfect test sensitivity and specificity, 
+    estimating prevalence from grouped samples, and visualizing 
+    posterior distributions.
+License: CC0-1.0
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.3
-Suggests: 
+Depends: R (>= 4.1.0)
+Imports:
+    stats,
+    utils,
+    coda,
+    bayesplot,
+    stats4
+Suggests:
     knitr,
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    devtools,
+    pkgdown
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+URL: https://github.com/sumon148/groupedBBMH
+BugReports: https://github.com/sumon148/groupedBBMH/issues

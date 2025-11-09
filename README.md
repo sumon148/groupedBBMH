@@ -112,7 +112,7 @@ Below is a minimal illustration. For detailed use cases, refer to the vignette.
 
 ```r
 # Load library
-library(groupedBB)
+library(groupedBBMH)
 
 # Develop Beta-binomial model using MLE method
 ty=c(0:13)

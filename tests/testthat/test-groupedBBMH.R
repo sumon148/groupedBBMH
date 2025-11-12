@@ -97,23 +97,27 @@ test_that("GroupedBB and truncated BB fitting works", {
   expect_true(!is.null(trbb.m2))
 })
 
+
 # -----------------------------------------------------------------------------
 # Example MLE optimization tests
 # -----------------------------------------------------------------------------
 test_that("MLE optimization runs without error", {
 
+  ty <- 0:13
+  freq <- c(2815,9,10,6,1,3,2,0,1,2,1,0,0,0)
+
   MLE.BB.m5 <- optim(c(log(0.005), log(3.0), log(0.5)), loglik_group_bb,
                      ty = ty, freq = freq, b = 13, theta = Inf, m = 5, M = 40,
                      sensitivity = 1, deviance = FALSE,
                      control = list(factr = 1e-12, fnscale = -1, trace = FALSE),
-                      hessian = FALSE, method = "L-BFGS-B",
+                     hessian = FALSE, method = "L-BFGS-B",
                      lower = c(log(0.0001), log(0.0001), log(0.99)),
                      upper = c(Inf, Inf, 0))
 
   expect_true(!is.null(MLE.BB.m5$par))
 
   beta.est.cutoff.01 <- optim(c(0), loglik_group_trbb,
-                              ty = ty, freq = freq, b = 13, m = 5, theta = Inf, R = 1e4,
+                              ty = ty, freq = freq, b = 13, m = 5, theta = Inf,
                               alpha = 0.005, cutoff = 0.01, sensitivity = 1, specificity = 1,
                               deviance = FALSE, method = "Brent",
                               control = list(reltol = 1e-12, fnscale = -1),
@@ -121,3 +125,4 @@ test_that("MLE optimization runs without error", {
 
   expect_true(!is.null(beta.est.cutoff.01$par))
 })
+

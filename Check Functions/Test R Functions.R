@@ -7,7 +7,7 @@ library(groupedBBMH)  # Custom package for grouped beta-binomial MH modeling
 # Deidentified Frozen Seafood Data
 #-------------------------------------------------------------@
 
-df.seafood <- read.csv("JASA Submission//deidentified_frozen_seafood.csv")
+df.seafood <- read.csv("submission//deidentified_frozen_seafood.csv")
 df.seafood$Yfac <- factor(df.seafood$numPos,levels=c(0:13))
 x <- as.numeric(names(table(df.seafood$Yfac)))
 freq <- as.numeric(table(df.seafood$Yfac))

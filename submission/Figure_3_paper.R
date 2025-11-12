@@ -327,7 +327,7 @@ DunnSmythTestBB_Custom <- function(ObservedResponse,size,group_size,alpha,beta,a
 # Seafood Data
 #-------------------------------------------------------------@
 
-df.seafood <- read.csv("JASA Submission/deidentified_frozen_seafood.csv",header = T)
+df.seafood <- read.csv("submission/deidentified_frozen_seafood.csv",header = T)
 df.seafood$Yfac <- factor(df.seafood$numPos,levels=c(0:13))
 x <- as.numeric(names(table(df.seafood$Yfac)))
 freq <- as.numeric(table(df.seafood$Yfac))
@@ -343,7 +343,7 @@ seafood.data <- seafood.data[order(seafood.data$ty),]
 # ------------------------------------------------------------------#
 
 # Load MH-fitted model output (imperfect test sensitivity = 0.80)
-load("JASA Submission/MH.alpha.mu.sigma.20.known.sn.80.Prawn.Rdata")
+load("submission/MH.alpha.mu.sigma.20.known.sn.80.Prawn.Rdata")
 
 # Extract observed response (sorted)
 ObservedResponse <- sort(seafood.data$ty)
@@ -389,7 +389,7 @@ ggsave("Dunn_Smyth_Test_MH_Estimator_imperfect_Case_sn_0.80.png", height = 4, wi
 # ------------------------------------------------------------------#
 
 # Load MH-fitted model output with sensitivity ~ Uniform(0.75, 0.80)
-load("JASA Submission/MH.alpha.mu.sigma.20.unknown.sn.80.Prawn.Rdata")
+load("submission/MH.alpha.mu.sigma.20.unknown.sn.80.Prawn.Rdata")
 
 # Extract observed response (sorted)
 ObservedResponse <- sort(seafood.data$ty)

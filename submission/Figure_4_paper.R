@@ -294,7 +294,7 @@ ppc_barplot_fixed_y_scale <- function(ty,yrep,trial){
 # Seafood Data
 #-------------------------------------------------------------@
 
-df.seafood <- read.csv("JASA Submission/deidentified_frozen_seafood.csv")
+df.seafood <- read.csv("submission/deidentified_frozen_seafood.csv")
 df.seafood$Yfac <- factor(df.seafood$numPos,levels=c(0:13))
 x <- as.numeric(names(table(df.seafood$Yfac)))
 freq <- as.numeric(table(df.seafood$Yfac))
@@ -316,7 +316,7 @@ summ.seafood.data$ty <- as.numeric(paste(summ.seafood.data$ty))
 # ----------------------------------------------------------------------------------
 
 # Load posterior samples from MCMC output (Metropolis-Hastings)
-load("JASA Submission/MH.alpha.mu.sigma.20.known.sn.80.Prawn.Rdata")
+load("submission/MH.alpha.mu.sigma.20.known.sn.80.Prawn.Rdata")
 
 # Number of test groups (D) from observed data
 D <- length(seafood.data$ty)

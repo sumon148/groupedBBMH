@@ -91,9 +91,9 @@ prop.table(table(Sim_Tx_TrBB_Prawn_m5_b26_MH_01_Imperfect_Sn_80$`1`$Simulation_I
 # Define parameter values for Figure 2: Community Risk under varying b=13,20,26 values
 # Using model m=5 with Metropolis-Hastings (MH), imperfect sensitivity (Sn = 80%)
 
-load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80.Rdata")
-load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b20_MH_01_Imperfect_Sn_80.Rdata")
-load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b26_MH_01_Imperfect_Sn_80.Rdata")
+load("submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80.Rdata")
+load("submission\\Sim_Tx_TrBB_Prawn_m5_b20_MH_01_Imperfect_Sn_80.Rdata")
+load("submission\\Sim_Tx_TrBB_Prawn_m5_b26_MH_01_Imperfect_Sn_80.Rdata")
 
 Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80
 Sim_Tx_TrBB_Prawn_m5_b20_MH_01_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b20_MH_01_Imperfect_Sn_80
@@ -319,13 +319,13 @@ ggsave("Test_Outcome_m5_b13_20_26_Imperfect_Manuscript.png",width = 10,height = 
 # Leakage parameters: By Sampled bag size - b=13,20,26: k=0
 # --------------------------------------------------------------------------------
 
-load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80.Rdata")
+load("submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80.Rdata")
 Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80
 Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80 <- NULL
-load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b20_MH_00_Imperfect_Sn_80.Rdata")
+load("submission\\Sim_Tx_TrBB_Prawn_m5_b20_MH_00_Imperfect_Sn_80.Rdata")
 Sim_Tx_TrBB_Prawn_m5_b20_MH_00_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b20_MH_00_Imperfect_Sn_80
 Sim_Tx_TrBB_Prawn_m5_b20_MH_00_Imperfect_Sn_80 <- NULL
-load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b26_MH_00_Imperfect_Sn_80.Rdata")
+load("submission\\Sim_Tx_TrBB_Prawn_m5_b26_MH_00_Imperfect_Sn_80.Rdata")
 Sim_Tx_TrBB_Prawn_m5_b26_MH_00_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b26_MH_00_Imperfect_Sn_80
 Sim_Tx_TrBB_Prawn_m5_b26_MH_00_Imperfect_Sn_80 <- NULL
 
@@ -483,13 +483,13 @@ print(xtable(P_E_Li_13_20_26_MH_00),rownames=FALSE)
 # --------------------------------------------------------------------------------
 
 
-load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80.Rdata")
+load("submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80.Rdata")
 Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80
 Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80 <- NULL
-load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b20_MH_01_Imperfect_Sn_80.Rdata")
+load("submission\\Sim_Tx_TrBB_Prawn_m5_b20_MH_01_Imperfect_Sn_80.Rdata")
 Sim_Tx_TrBB_Prawn_m5_b20_MH_01_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b20_MH_01_Imperfect_Sn_80
 Sim_Tx_TrBB_Prawn_m5_b20_MH_01_Imperfect_Sn_80 <- NULL
-load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b26_MH_01_Imperfect_Sn_80.Rdata")
+load("submission\\Sim_Tx_TrBB_Prawn_m5_b26_MH_01_Imperfect_Sn_80.Rdata")
 Sim_Tx_TrBB_Prawn_m5_b26_MH_01_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b26_MH_01_Imperfect_Sn_80
 Sim_Tx_TrBB_Prawn_m5_b26_MH_01_Imperfect_Sn_80 <- NULL
 
@@ -650,9 +650,9 @@ print(xtable(P_E_Li_13_20_26_MH_01),rownames=FALSE)
 # Leakage parameters: By Sampled bag size - b=13,20,26: k=0.02
 # --------------------------------------------------------------------------------
 
-load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80.Rdata")
-load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b20_MH_02_Imperfect_Sn_80.Rdata")
-load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b26_MH_02_Imperfect_Sn_80.Rdata")
+load("submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80.Rdata")
+load("submission\\Sim_Tx_TrBB_Prawn_m5_b20_MH_02_Imperfect_Sn_80.Rdata")
+load("submission\\Sim_Tx_TrBB_Prawn_m5_b26_MH_02_Imperfect_Sn_80.Rdata")
 
 Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80
 Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80 <- NULL

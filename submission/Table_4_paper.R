@@ -17,7 +17,7 @@ library(MASS)         # For multivariate normal distribution functions
 # ----------------------------------------------------------
 
 # Read the cleaned and de-identified dataset
-df_prawn <- read.csv("JASA Submission/deidentified_frozen_seafood.csv")
+df_prawn <- read.csv("submission/deidentified_frozen_seafood.csv")
 
 # Define outcome as a factor based on number of positive samples (0 to 13)
 df_prawn$Yfac <- factor(df_prawn$numPos, levels = 0:13)
@@ -77,7 +77,7 @@ par <- c(log(0.005), logit(7e-04), logit(0.70)) ; initial <- par; k <- 0.0000
 MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.0 <- MH.Sampler.Chain.TBB(par=par,cutoff=k,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
                                                                       sigma=0.2,num_chains=4,burnin=R*0.5,thin=5,seed=c(123,456,789,135),trail=b,ty2=ty2,wt=wt,group.size=Nbar,sensitivity=TRUE,specificity=FALSE,
                                                                       sensitivity.range=c(0.80,0.80),specificity.range=NULL)
-save(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.0,file="JASA Submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.0.Rdata")
+save(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.0,file="submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.0.Rdata")
 
 
 # k=0.0025
@@ -87,7 +87,7 @@ par <- c(log(0.005), logit(7e-04), logit(0.70)) ; initial <- par; k <- 0.0025
 MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.a <- MH.Sampler.Chain.TBB(par=par,cutoff=k,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
                                                                       sigma=0.2,num_chains=4,burnin=R*0.5,thin=5,seed=c(123,456,789,135),trail=b,ty2=ty2,wt=wt,group.size=Nbar,sensitivity=TRUE,specificity=FALSE,
                                                                       sensitivity.range=c(0.80,0.80),specificity.range=NULL)
-save(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.a,file="JASA Submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.a.Rdata")
+save(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.a,file="submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.a.Rdata")
 
 
 # k=0.005
@@ -96,7 +96,7 @@ par <- c(log(0.005), logit(7e-04), logit(0.70)) ; initial <- par; k <- 0.005
 MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.b <- MH.Sampler.Chain.TBB(par=par,cutoff=k,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
                                                                       sigma=0.2,num_chains=4,burnin=R*0.5,thin=5,seed=c(123,456,789,135),trail=b,ty2=ty2,wt=wt,group.size=Nbar,sensitivity=TRUE,specificity=FALSE,
                                                                       sensitivity.range=c(0.80,0.80),specificity.range=NULL)
-save(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.b,file="JASA Submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.b.Rdata")
+save(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.b,file="submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.b.Rdata")
 
 # k=0.01
 G=5000;R=50e3;
@@ -104,7 +104,7 @@ par <- c(log(0.005), logit(7e-04), logit(0.70)) ; initial <- par; k <- 0.010
 MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c <- MH.Sampler.Chain.TBB(par=par,cutoff=k,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
                                                                       sigma=0.2,num_chains=4,burnin=R*0.5,thin=5,seed=c(123,456,789,135),trail=b,ty2=ty2,wt=wt,group.size=Nbar,sensitivity=TRUE,specificity=FALSE,
                                                                       sensitivity.range=c(0.80,0.80),specificity.range=NULL)
-save(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c,file="JASA Submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c.Rdata")
+save(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c,file="submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c.Rdata")
 
 # k=0.02
 G=5000;R=50e3;
@@ -112,7 +112,7 @@ par <- c(log(0.005), logit(7e-04), logit(0.70)) ; initial <- par; k <- 0.020
 MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.d <- MH.Sampler.Chain.TBB(par=par,cutoff=k,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
                                                                       sigma=0.2,num_chains=4,burnin=R*0.5,thin=5,seed=c(123,456,789,135),trail=b,ty2=ty2,wt=wt,group.size=Nbar,sensitivity=TRUE,specificity=FALSE,
                                                                       sensitivity.range=c(0.80,0.80),specificity.range=NULL)
-save(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.d,file="JASA Submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.d.Rdata")
+save(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.d,file="submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.d.Rdata")
 
 
 
@@ -122,11 +122,11 @@ save(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.d,file="JASA Submission/MH.alph
 # k=0.0025, 0.0050, 0.01, 0.02
 # -------------------------------------------------#
 
-load("JASA Submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.0.Rdata") # k=0
-load("JASA Submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.a.Rdata") # k=0.0025
-load("JASA Submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.b.Rdata") # k=0.0050
-load("JASA Submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c.Rdata") # k=0.0100
-load("JASA Submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.d.Rdata") # k=0.0200
+load("submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.0.Rdata") # k=0
+load("submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.a.Rdata") # k=0.0025
+load("submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.b.Rdata") # k=0.0050
+load("submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c.Rdata") # k=0.0100
+load("submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.d.Rdata") # k=0.0200
 MH.alpha.mu.sigma.20.Imperfect.Prawn.TBB.0 <- MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.0
 MH.alpha.mu.sigma.20.Imperfect.Prawn.TBB.a <- MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.a
 MH.alpha.mu.sigma.20.Imperfect.Prawn.TBB.b <- MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.b

@@ -62,7 +62,7 @@ Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80 <- run_infection_simulations(alph
 save(Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80,file="Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80.Rdata")
 
 
-load("JASA Submission\\MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.a.Rdata")
+load("submission\\MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.a.Rdata")
 
 alpha_TrBB <- sample(unlist(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.a$target.parameters$alpha_sample),5000)
 beta_TrBB <- sample(unlist(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.a$target.parameters$beta_sample),5000)
@@ -79,7 +79,7 @@ save(Sim_Tx_TrBB_Prawn_m5_b13_MH_0025_Imperfect_Sn_80,file="Sim_Tx_TrBB_Prawn_m5
 
 
 
-load("JASA Submission\\MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.b.Rdata")
+load("submission\\MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.b.Rdata")
 
 alpha_TrBB <- sample(unlist(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.b$target.parameters$alpha_sample),5000)
 beta_TrBB <- sample(unlist(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.b$target.parameters$beta_sample),5000)
@@ -95,7 +95,7 @@ Sim_Tx_TrBB_Prawn_m5_b13_MH_005_Imperfect_Sn_80 <- run_infection_simulations(alp
 save(Sim_Tx_TrBB_Prawn_m5_b13_MH_005_Imperfect_Sn_80,file="Sim_Tx_TrBB_Prawn_m5_b13_MH_005_Imperfect_Sn_80.Rdata")
 
 
-load("JASA Submission\\MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c.Rdata")
+load("submission\\MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c.Rdata")
 
 alpha_TrBB <- sample(unlist(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c$target.parameters$alpha_sample),5000)
 beta_TrBB <- sample(unlist(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c$target.parameters$beta_sample),5000)
@@ -112,7 +112,7 @@ save(Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80,file="Sim_Tx_TrBB_Prawn_m5_b
 
 
 
-load("JASA Submission\\MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.d.Rdata")
+load("submission\\MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.d.Rdata")
 
 alpha_TrBB <- sample(unlist(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.d$target.parameters$alpha_sample),5000)
 beta_TrBB <- sample(unlist(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.d$target.parameters$beta_sample),5000)
@@ -137,35 +137,35 @@ save(Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80,file="Sim_Tx_TrBB_Prawn_m5_b
 # infection types under each scenario.
 # -------------------------------------------------------------------#
 
-load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80.Rdata")
+load("submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80.Rdata")
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80$`0.7`$Simulation_Infection_Ty_Results))
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80$`0.8`$Simulation_Infection_Ty_Results))
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80$`0.9`$Simulation_Infection_Ty_Results))
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80$`0.95`$Simulation_Infection_Ty_Results))
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80$`1`$Simulation_Infection_Ty_Results))
 
-load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_0025_Imperfect_Sn_80.Rdata")
+load("submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_0025_Imperfect_Sn_80.Rdata")
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_0025_Imperfect_Sn_80$`0.7`$Simulation_Infection_Ty_Results))
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_0025_Imperfect_Sn_80$`0.8`$Simulation_Infection_Ty_Results))
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_0025_Imperfect_Sn_80$`0.9`$Simulation_Infection_Ty_Results))
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_0025_Imperfect_Sn_80$`0.95`$Simulation_Infection_Ty_Results))
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_0025_Imperfect_Sn_80$`1`$Simulation_Infection_Ty_Results))
 
-load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_005_Imperfect_Sn_80.Rdata")
+load("submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_005_Imperfect_Sn_80.Rdata")
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_005_Imperfect_Sn_80$`0.7`$Simulation_Infection_Ty_Results))
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_005_Imperfect_Sn_80$`0.8`$Simulation_Infection_Ty_Results))
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_005_Imperfect_Sn_80$`0.9`$Simulation_Infection_Ty_Results))
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_005_Imperfect_Sn_80$`0.95`$Simulation_Infection_Ty_Results))
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_005_Imperfect_Sn_80$`1`$Simulation_Infection_Ty_Results))
 
-load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80.Rdata")
+load("submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80.Rdata")
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80$`0.7`$Simulation_Infection_Ty_Results))
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80$`0.8`$Simulation_Infection_Ty_Results))
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80$`0.9`$Simulation_Infection_Ty_Results))
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80$`0.95`$Simulation_Infection_Ty_Results))
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80$`1`$Simulation_Infection_Ty_Results))
 
-load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80.Rdata")
+load("submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80.Rdata")
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80$`0.7`$Simulation_Infection_Ty_Results))
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80$`0.8`$Simulation_Infection_Ty_Results))
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80$`0.9`$Simulation_Infection_Ty_Results))
@@ -435,7 +435,7 @@ save(df_combined, file = "df_combined_Model_Based_Simulation_Sn.0.80_varying_k.R
 library(ggplot2)
 library(ggpubr)
 
-load("JASA Submission\\df_combined_Model_Based_Simulation_Sn.0.80_varying_k.Rdata")
+load("submission\\df_combined_Model_Based_Simulation_Sn.0.80_varying_k.Rdata")
 
 m_values <- c(5)
 b_values <- c(13)
@@ -538,20 +538,20 @@ ggsave("Test_Outcome_m5_b13_Imperfect_Manuscript_SupMat.png",width = 10,height =
 
 # Supplementary Table for Community Risk - Supplementary Material --------------
 
-load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80.Rdata")
+load("submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80.Rdata")
 Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80
 Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80 <- NULL
 
-load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_0025_Imperfect_Sn_80.Rdata")
+load("submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_0025_Imperfect_Sn_80.Rdata")
 Sim_Tx_TrBB_Prawn_m5_b13_MH_0025_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b13_MH_0025_Imperfect_Sn_80
 Sim_Tx_TrBB_Prawn_m5_b13_MH_0025_Imperfect_Sn_80 <- NULL
-load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_005_Imperfect_Sn_80.Rdata")
+load("submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_005_Imperfect_Sn_80.Rdata")
 Sim_Tx_TrBB_Prawn_m5_b13_MH_005_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b13_MH_005_Imperfect_Sn_80
 Sim_Tx_TrBB_Prawn_m5_b13_MH_005_Imperfect_Sn_80 <- NULL
-load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80.Rdata")
+load("submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80.Rdata")
 Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80
 Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80 <- NULL
-load("JASA Submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80.Rdata")
+load("submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80.Rdata")
 Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80
 Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80 <- NULL
 

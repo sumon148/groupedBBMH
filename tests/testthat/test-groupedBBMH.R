@@ -62,7 +62,7 @@ test_that("MH_Sampler_BB and summary_mcmc run without errors", {
                                      G = G, R = R, sigma = 0.2,
                                      num_chains = 4, burnin = R * 0.5, thin = 5,
                                      seed = c(123, 456, 789, 135),
-                                     trail = b, ty2 = ty2, wt = wt, group.size = Nbar,
+                                     trail = b, ty = ty2, wt = wt, group.size = Nbar,
                                      sensitivity = FALSE, specificity = FALSE,
                                      sensitivity.range = NULL, specificity.range = NULL)
 
@@ -89,7 +89,7 @@ test_that("GroupedBB and truncated BB fitting works", {
                          sensitivity = 1, specificity = 1, leakage = TRUE)
   expect_true(!is.null(bb.m2))
 
-  trbb.m1 <- fit_trGroupedBB(ty = ty, freq = freq, b = 13, m = 5, cutoff = 0, R = 10000)
+  trbb.m1 <- fit_trGroupedBB(ty = ty, freq = freq, b = 13, m = 5, cutoff = 0)
   expect_true(!is.null(trbb.m1))
 
   trbb.m2 <- fit_trGroupedBB(ty, freq, b = 13, m = 5, cutoff = 0.01, sensitivity = 0.8,

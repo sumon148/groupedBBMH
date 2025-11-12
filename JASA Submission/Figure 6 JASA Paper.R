@@ -41,7 +41,7 @@ library(xtable)
 #
 # ------------------------------------------------------------------- #
 
-load("JASA Submission\\MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c.Rdata")
+load("submission\\MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c.Rdata")
 
 alpha_TrBB <- sample(unlist(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c$target.parameters$alpha_sample),5000)
 beta_TrBB <- sample(unlist(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c$target.parameters$beta_sample),5000)

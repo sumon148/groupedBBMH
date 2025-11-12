@@ -21,8 +21,8 @@ library(MASS)         # For multivariate normal distribution functions
 # --------------------------------------------------------------------------- #
 # Load MCMC Results for Known and Unknown Sensitivity Models
 # --------------------------------------------------------------------------- #
-load("JASA Submission/MH.alpha.mu.sigma.20.known.sn.80.Prawn.Rdata")
-load("JASA Submission/MH.alpha.mu.sigma.20.unknown.sn.80.Prawn.Rdata")
+load("submission/MH.alpha.mu.sigma.20.known.sn.80.Prawn.Rdata")
+load("submission/MH.alpha.mu.sigma.20.unknown.sn.80.Prawn.Rdata")
 
 # --------------------------------------------------------------------------- #
 # Extract and Prepare Parameters for Diagnostic Plots

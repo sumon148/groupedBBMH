@@ -20,6 +20,7 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+This vignette demonstrates the use of the `groupedBBMH` package for analyzing group-testing data using hierarchical Beta-Binomial models with imperfect test accuracy. We illustrate both maximum likelihood and Bayesian estimation approaches with a real biosecurity dataset. The vignette provides examples, diagnostics, and practical guidance for applying these models to pooled or grouped testing scenarios in biosecurity and surveillance.
 
 
 # Introduction
@@ -42,7 +43,7 @@ This vignette is organized as follows:
 
 # Installation
 
-You can install the development version of `groupedHG` as below.
+You can install the development version of `groupedBBMH` as below.
 
 ```r
 install.packages("devtools")

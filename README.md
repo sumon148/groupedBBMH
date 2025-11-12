@@ -2,8 +2,6 @@
 
 **Grouped Beta-Binomial Model with Metropolis-Hastings**
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-
 `groupedBBMH` is an R package for analyzing group-testing biosecurity surveillance data using a nested beta-binomial model. 
 It implements maximum likelihood estimation (MLE) and a Metropolis-Hastings (MH) algorithm to handle censored data from group tests, where only batch-level or group-level outcomes are observed rather than individual item contamination.
 

@@ -93,7 +93,7 @@ test_that("GroupedBB and truncated BB fitting works", {
   expect_true(!is.null(trbb.m1))
 
   trbb.m2 <- fit_trGroupedBB(ty, freq, b = 13, m = 5, cutoff = 0.01, sensitivity = 0.8,
-                             specificity = 1, R = 10000)
+                             specificity = 1)
   expect_true(!is.null(trbb.m2))
 })
 
@@ -106,7 +106,7 @@ test_that("MLE optimization runs without error", {
                      ty = ty, freq = freq, b = 13, theta = Inf, m = 5, M = 40,
                      sensitivity = 1, deviance = FALSE,
                      control = list(factr = 1e-12, fnscale = -1, trace = FALSE),
-                     R = 1e4, hessian = FALSE, method = "L-BFGS-B",
+                      hessian = FALSE, method = "L-BFGS-B",
                      lower = c(log(0.0001), log(0.0001), log(0.99)),
                      upper = c(Inf, Inf, 0))
 

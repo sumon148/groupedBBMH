@@ -4,25 +4,43 @@ library(groupedBBMH)  #
 # -----------------------------------------------------------------------------
 # Load and preprocess test data
 # -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# Shared test data setup
+# -----------------------------------------------------------------------------
+library(testthat)
+library(groupedBBMH)
+
+# Load the frozen seafood dataset shipped with the package
+seafood_csv <- system.file("extdata", "deidentified_frozen_seafood.csv", package = "groupedBBMH")
+df.seafood <- read.csv(seafood_csv)
+
+# Convert the number of positive counts to a factor
+df.seafood$Yfac <- factor(df.seafood$numPos, levels = 0:13)
+
+# Counts of each unique value
+x <- as.numeric(names(table(df.seafood$Yfac)))     # unique ty values
+freq <- as.numeric(table(df.seafood$Yfac))        # frequency of each ty
+
+# Prepare seafood.data for MH sampler tests
+size <- 13  # number of bags
+seafood.data <- data.frame(
+  ty = as.numeric(as.character(df.seafood$Yfac)),
+  n = rep(size, nrow(df.seafood)),
+  ID = seq_len(nrow(df.seafood))
+)
+seafood.data <- seafood.data[order(seafood.data$ty), ]
+
+# Summarized frequency table for tests
+summ.seafood.data <- data.frame(
+  ty = x,
+  freq = freq
+)
+
 test_that("Data preprocessing works correctly", {
-
-  df.seafood <- read.csv(system.file("extdata", "deidentified_frozen_seafood.csv", package = "groupedBBMH"))
-  df.seafood$Yfac <- factor(df.seafood$numPos, levels = 0:13)
-  x <- as.numeric(names(table(df.seafood$Yfac)))
-  freq <- as.numeric(table(df.seafood$Yfac))
-  size <- 13
-  seafood.data <- data.frame(ty = df.seafood$Yfac, n = rep(size, length(df.seafood$Yfac)))
-  seafood.data$ID <- seq_len(nrow(seafood.data))
-  seafood.data$ty <- as.numeric(as.character(seafood.data$ty))
-  seafood.data <- seafood.data[order(seafood.data$ty), ]
-
-  summ.seafood.data <- as.data.frame(table(seafood.data$ty))
-  colnames(summ.seafood.data) <- c("ty", "freq")
-  summ.seafood.data$ty <- as.numeric(as.character(summ.seafood.data$ty))
-
   expect_equal(length(seafood.data$ty), nrow(df.seafood))
   expect_equal(sum(summ.seafood.data$freq), nrow(seafood.data))
 })
+
 
 # -----------------------------------------------------------------------------
 # MCMC / MH algorithm tests

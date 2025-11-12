@@ -6,7 +6,7 @@ library(groupedBBMH)  #
 # -----------------------------------------------------------------------------
 test_that("Data preprocessing works correctly", {
 
-  df.seafood <- read.csv("submission/deidentified_frozen_seafood.csv")
+  df.seafood <- read.csv(system.file("extdata", "deidentified_frozen_seafood.csv", package = "groupedBBMH"))
   df.seafood$Yfac <- factor(df.seafood$numPos, levels = 0:13)
   x <- as.numeric(names(table(df.seafood$Yfac)))
   freq <- as.numeric(table(df.seafood$Yfac))

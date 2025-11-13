@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
-This vignette demonstrates the use of the `groupedBBMH` package for analyzing group-testing data using hierarchical Beta-Binomial models with imperfect test accuracy. We illustrate both maximum likelihood and Bayesian estimation approaches with a real biosecurity dataset. The vignette provides examples, diagnostics, and practical guidance for applying these models to pooled or grouped testing scenarios in biosecurity and surveillance.
+This vignette introduces the `groupedBBMH` package, which implements hierarchical Beta-Binomial models for group-testing data under imperfect test accuracy. We demonstrate both MLE and Bayesian inference using a real biosecurity dataset, with emphasis on leakage risk estimation and model-based simulations.
 
 
 # Introduction
@@ -265,7 +265,7 @@ MLE.BB.m1$beta <- exp(MLE.BB.m1$par[2])
 MLE.BB.m1
 ```
 
-In the second example, we examine whether all the beta parameters and test parameters can be estimate by maximzing the log-likelihood function. The optimization requires specification of lower and upper values for the targeted parameters. The optimization shows that maximum value of log-likelood value is obtained for $\Delta=0.74$ and $\Lambda=1$, when $\alpha=0.0045$ and $\beta=3.78$.
+In the second example, we examine whether all the beta parameters and test parameters can be estimate by maximizing the log-likelihood function. The optimization requires specification of lower and upper values for the targeted parameters. The optimization shows that maximum value of log-likelood value is obtained for $\Delta=0.74$ and $\Lambda=1$, when $\alpha=0.0045$ and $\beta=3.78$.
 
 In the second example, we fit the model to estimate all parameters simultaneously — that is, both Beta distribution parameters ($\alpha$ and $\beta$) and test inaccuracy parameters ($\Delta$ and $\Lambda$). This general case allows us to evaluate how test imperfections affect the estimated prevalence distribution.
 
@@ -300,7 +300,7 @@ As a user-friendly alternative to manual optimization, the `fit_GroupedBB()` fun
 ```{r chunk 3, eval=TRUE, echo=TRUE}
 bb.m1 <- fit_GroupedBB(ty = ty, freq = freq, b = 13, m = 5,
                        sensitivity = 1, specificity = 1)
-bb.m1
+summary(bb.m1)
 ```
 
 ```{r chunk 4, eval=TRUE, echo=TRUE}
@@ -451,7 +451,7 @@ DSTest_MH_Imperfect$KS
 
 ```
 
-For doing Posterior predictive check of the fitted model, we use the posterior distribution of $\alpha$ and $\beta$ obatined from the fitted model `MH.trbb.m1` considering $k=0.01$ and $\Delta=0.8$. The comparison of counts and their proportions from the observed outcomes are compared with simulated counts. In the below two bar-plots, the shaded areas represent the observed counts (proportions), while the error bars indicate the 95\% credible interval of simulated counts (proportions). For the plot of counts, the left y-axis is scaled from 0 to 3000 for zero value of $\tilde{t}_{yi}$, while the right y-axis is scaled from 0 to 30 for non-zero values of $\tilde{t}_{yi}$.
+For doing Posterior predictive check of the fitted model, we use the posterior distribution of $\alpha$ and $\beta$ obtained from the fitted model `MH.trbb.m1` considering $k=0.01$ and $\Delta=0.8$. The comparison of counts and their proportions from the observed outcomes are compared with simulated counts. In the below two bar-plots, the shaded areas represent the observed counts (proportions), while the error bars indicate the 95\% credible interval of simulated counts (proportions). For the plot of counts, the left y-axis is scaled from 0 to 3000 for zero value of $\tilde{t}_{yi}$, while the right y-axis is scaled from 0 to 30 for non-zero values of $\tilde{t}_{yi}$.
 
 
 ```{r chunk 13, eval=TRUE, echo=TRUE,warning=FALSE,message=FALSE}

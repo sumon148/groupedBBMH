@@ -55,7 +55,7 @@ store_specificity_values_prawn_imperfect <- function(specificity) {
     m = 5,                             # Number of items per group
     M = 40,                            # Total number of items per consignment
     theta = Inf,                       # Overdispersion parameter to consider No clustering
-    R = 1e4,                           # Number of static quantile from Beta distribution
+    #R = 1e4,                           # Number of static quantile from Beta distribution
     sensitivity = 0.8,                 # Fixed test sensitivity
     specificity = specificity,         # Input test specificity
     cutoff = 0,                        # Detection cutoff

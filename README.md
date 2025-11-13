@@ -108,6 +108,7 @@ vignette("groupedBBMH")
 
 Below is a minimal illustration. For detailed use cases, refer to the vignette.
 
+
 ```r
 # Load library
 library(groupedBBMH)
@@ -120,6 +121,15 @@ trbb <- fit_trGroupedBB(ty, freq, b = 13, m = 5, cutoff = 0.01,
 trbb
 ```
 
+# Access the example dataset
+```r
+data("deidentified_frozen_seafood")
+```
+# View the first few rows
+
+```r
+head(deidentified_frozen_seafood)
+```
 
 ## Methods
 

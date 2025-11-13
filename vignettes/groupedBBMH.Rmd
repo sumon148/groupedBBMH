@@ -307,7 +307,7 @@ summary(bb.m1)
 # Fit model with leakage (requires B and M)
 bb.m2 <- fit_GroupedBB(ty = ty, freq = freq, b = 13, m = 5, M = 40, B = 8000,
                        sensitivity = 1, specificity = 1, leakage = TRUE)
-bb.m2
+summary(bb.m2)
 ```
 
 When a biologically meaningful threshold is introduced for the batch-level infection prevalence ($p_i$), the model must account for the fact that values below this threshold are biologically implausible. The `groupedBBMH` package accommodates this feature through the truncated beta-binomial model, where the log-likelihood is maximized using the function `loglik_group_trbb()`.
@@ -331,7 +331,7 @@ trbb.m1
 # Fit truncated grouped beta-binomial model with cutoff = 0.01 and imperfect sensitivity
 trbb.m2 <- fit_trGroupedBB(ty, freq, b = 13, m = 5, cutoff = 0.01,
                        sensitivity = 0.8, specificity = 1)
-trbb.m2
+summary(trbb.m2)
 ```
 
 

@@ -5,15 +5,8 @@
 `groupedBBMH` is an R package for analyzing group-testing biosecurity surveillance data using a nested beta-binomial model. 
 It implements maximum likelihood estimation (MLE) and a Metropolis-Hastings (MH) algorithm to handle censored data from group tests, where only batch-level or group-level outcomes are observed rather than individual item contamination.
 
-
-
-> **Das, S., Clark, R., Parsa, M., &  Barnes, B. (2025). Inferring Leakage in Imports of Frozen Seafood allowing for Censoring, Testing Accuracy and a Minimum Positive Prevalence.**
-> *Journal of the American Statistical Association*, 
-
 The methodology is described in detail in the accompanying paper and supplementary material.
 
-> 📘 **Repository:**
-> [https://github.com/sumon148/groupedBBMH](https://github.com/sumon148/groupedBBMH)
 
 ## Overview
 
@@ -44,15 +37,21 @@ It explicitly accounts for **imperfect diagnostic accuracy** and the
 
 ## Installation
 
-The package is **not** available on CRAN. You can install it directly from GitHub.
+The package is **not** available on CRAN. You can install it directly from `groupedBBMH_0.1.0.zip` file.
 
 ### Install without vignettes
 
 This is faster if you do not need the tutorial vignette:
 
 ```r
-# install.packages("devtools") if needed
-devtools::install_github("sumon148/groupedBBMH",dependencies=TRUE)
+# Install devtools if not already installed
+install.packages("devtools")
+
+# Install from local zip (Windows)
+devtools::install_local("path/to/groupedBBMH_0.1.0.zip", dependencies = TRUE)
+
+# OR install from local tar.gz (Mac/Linux)
+devtools::install_local("path/to/groupedBBMH_0.1.0.tar.gz", dependencies = TRUE)
 ```
 
 ### Install with vignette (recommended)
@@ -60,7 +59,7 @@ devtools::install_github("sumon148/groupedBBMH",dependencies=TRUE)
 To install **and build the vignette**, use:
 
 ```r
-devtools::install_github("sumon148/groupedBBMH", build_vignettes = TRUE)
+devtools::install_local("path/to/groupedBBMH_0.1.0.zip", build_vignettes = TRUE, dependencies = TRUE)
 ```
 
 > **Note:** Building vignettes requires `rmarkdown` and `knitr`:
@@ -133,22 +132,12 @@ head(deidentified_frozen_seafood)
 
 ## Methods
 
-The package implements the analytical results described in:
-
-* Das, S., Clark, R., Parsa, M., & Barnes, B. (2025). Inferring Leakage in Imports of Frozen Seafood allowing for Censoring, Testing Accuracy and a Minimum Positive Prevalence. *Journal of the American Statistical Association* (under review).
-
-
-
-## Citation
-
-If you use this package in publications, please cite:
-
-* Das, S., Clark, R., Parsa, M., & Barnes, B. (2025). *groupedBBMH*: R package implementing Beta-binomial model to group-testing biosecurity data with imperfect tests. Version 0.1.0. https://github.com/sumon148/groupedBBMH
+The package implements the analytical results described in the submitted manuscript.
 
 
 ## License
 
-This package is released under the [Creative Commons CC0 1.0 Universal Public Domain Dedication](https://creativecommons.org/publicdomain/zero/1.0/).
+This package is released under the MIT License. See the LICENSE file for details.
 
-[![License: CC0-1.0](https://img.shields.io/badge/License-CC0%201.0-lightgrey.svg)](https://creativecommons.org/publicdomain/zero/1.0/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 

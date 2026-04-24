@@ -46,13 +46,13 @@ summ.seafood.data$ty <- as.numeric(paste(summ.seafood.data$ty))
 store_theta_values_prawn <- function(cut_off) {
   # Run the optimization
   optim_result <- optim(c(0, 0), loglik_group_trbb,
-                        ty = summ.prawn.data$ty,
-                        freq = summ.prawn.data$freq,
+                        ty = summ.seafood.data$ty,
+                        freq = summ.seafood.data$freq,
                         b = 13,
                         m = 5,
                         M = 40,
                         theta = Inf,
-                        R = 1e5, # R = 3e4
+                        G= 1e5, # G= 3e4
                         sensitivity = 1,
                         specificity = 1,
                         cutoff = cut_off,
@@ -85,14 +85,14 @@ prawn_results_list <- lapply(cutoff_values, store_theta_values_prawn)
 # Combine the list of dataframes into a single dataframe
 prawn_results_df_TrBB <- do.call(rbind, prawn_results_list)
 
-save(prawn_results_df_TrBB,file="prawn_results_df_TrBB_upto_3_percent_Re5.Rdata")
+save(prawn_results_df_TrBB,file="submission/prawn_results_df_TrBB_upto_3_percent_Re5.Rdata")
 
 
-load("prawn_results_df_TrBB_upto_3_percent_Re5.Rdata")
-pllf.CI.estimate.cutoff.99 <- pllf.CI.estimate(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB$value,level=0.99)
-pllf.CI.estimate.cutoff.95 <- pllf.CI.estimate(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB$value,level=0.95)
-pllf.CI.estimate.cutoff.90 <- pllf.CI.estimate(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB$value,level=0.90)
-pllf.CI.estimate.cutoff.80 <- pllf.CI.estimate(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB$value,level=0.80)
+load("submission/prawn_results_df_TrBB_upto_3_percent_Re5.Rdata")
+pllf.CI.estimate.cutoff.99 <- pllfCIestimate(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB$value,level=0.99)
+pllf.CI.estimate.cutoff.95 <- pllfCIestimate(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB$value,level=0.95)
+pllf.CI.estimate.cutoff.90 <- pllfCIestimate(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB$value,level=0.90)
+pllf.CI.estimate.cutoff.80 <- pllfCIestimate(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB$value,level=0.80)
 
 
 png("pllf CI cutoff Prawn.png",width = 6,height = 6,units = "in",res=300)
@@ -145,14 +145,14 @@ dev.off()
 store_theta_values_prawn_imperfect <- function(cut_off) {
   # Run the optimization
   optim_result <- optim(c(0, 0), loglik_group_trbb,
-                        ty = summ.prawn.data$ty,
-                        freq = summ.prawn.data$freq,
+                        ty = summ.seafood.data$ty,
+                        freq = summ.seafood.data$freq,
                         b = 13,
                         m = 5,
                         M = 40,
                         theta = Inf,
-                        R = 1e5,
-                        # R = 3e4,
+                        G= 1e5,
+                        # G= 3e4,
                         sensitivity = 0.8,
                         specificity = 1,
                         cutoff = cut_off,
@@ -186,7 +186,7 @@ prawn_results_list_imperfect <- lapply(cutoff_values, store_theta_values_prawn_i
 # Combine the list of dataframes into a single dataframe
 prawn_results_df_TrBB_imperfect <- do.call(rbind, prawn_results_list_imperfect)
 
-save(prawn_results_df_TrBB_imperfect,file="prawn_results_df_TrBB_imperfect_upto_3_percent_Re5.Rdata")
+save(prawn_results_df_TrBB_imperfect,file="submission/prawn_results_df_TrBB_imperfect_upto_3_percent_Re5.Rdata")
 
 
 
@@ -196,12 +196,12 @@ save(prawn_results_df_TrBB_imperfect,file="prawn_results_df_TrBB_imperfect_upto_
 # Under perfect sensitivity
 # -----------------------------------------------------------
 
-load("prawn_results_df_TrBB_upto_3_percent_Re5.Rdata")
+load("submission/prawn_results_df_TrBB_upto_3_percent_Re5.Rdata")
 
-pllf.CI.estimate.cutoff.99 <- pllf.CI.estimate(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB$value,level=0.99)
-pllf.CI.estimate.cutoff.95 <- pllf.CI.estimate(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB$value,level=0.95)
-pllf.CI.estimate.cutoff.90 <- pllf.CI.estimate(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB$value,level=0.90)
-pllf.CI.estimate.cutoff.80 <- pllf.CI.estimate(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB$value,level=0.80)
+pllf.CI.estimate.cutoff.99 <- pllfCIestimate(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB$value,level=0.99)
+pllf.CI.estimate.cutoff.95 <- pllfCIestimate(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB$value,level=0.95)
+pllf.CI.estimate.cutoff.90 <- pllfCIestimate(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB$value,level=0.90)
+pllf.CI.estimate.cutoff.80 <- pllfCIestimate(prawn_results_df_TrBB$cutoff,prawn_results_df_TrBB$value,level=0.80)
 
 
 png("pllf CI cutoff Prawn.png",width = 6,height = 6,units = "in",res=300)
@@ -259,11 +259,11 @@ dev.off()
 # Under imperfect sensitivity
 # -----------------------------------------------------------
 
-load("prawn_results_df_TrBB_imperfect_upto_3_percent_Re5.Rdata")
-pllf.CI.estimate.cutoff.99.imperfect <- pllf.CI.estimate(prawn_results_df_TrBB_imperfect$cutoff,prawn_results_df_TrBB_imperfect$value,level=0.99)
-pllf.CI.estimate.cutoff.95.imperfect <- pllf.CI.estimate(prawn_results_df_TrBB_imperfect$cutoff,prawn_results_df_TrBB_imperfect$value,level=0.95)
-pllf.CI.estimate.cutoff.90.imperfect <- pllf.CI.estimate(prawn_results_df_TrBB_imperfect$cutoff,prawn_results_df_TrBB_imperfect$value,level=0.90)
-pllf.CI.estimate.cutoff.80.imperfect <- pllf.CI.estimate(prawn_results_df_TrBB_imperfect$cutoff,prawn_results_df_TrBB_imperfect$value,level=0.80)
+load("submission/prawn_results_df_TrBB_imperfect_upto_3_percent_Re5.Rdata")
+pllf.CI.estimate.cutoff.99.imperfect <- pllfCIestimate(prawn_results_df_TrBB_imperfect$cutoff,prawn_results_df_TrBB_imperfect$value,level=0.99)
+pllf.CI.estimate.cutoff.95.imperfect <- pllfCIestimate(prawn_results_df_TrBB_imperfect$cutoff,prawn_results_df_TrBB_imperfect$value,level=0.95)
+pllf.CI.estimate.cutoff.90.imperfect <- pllfCIestimate(prawn_results_df_TrBB_imperfect$cutoff,prawn_results_df_TrBB_imperfect$value,level=0.90)
+pllf.CI.estimate.cutoff.80.imperfect <- pllfCIestimate(prawn_results_df_TrBB_imperfect$cutoff,prawn_results_df_TrBB_imperfect$value,level=0.80)
 
 dim(prawn_results_df_TrBB_imperfect)
 
@@ -350,11 +350,11 @@ dev.off()
 # Under imperfect sensitivity
 # -----------------------------------------------------------
 
-load("prawn_results_df_TrBB_imperfect_upto_3_percent_Re5.Rdata")
-pllf.CI.estimate.cutoff.99.imperfect <- pllf.CI.estimate(prawn_results_df_TrBB_imperfect$cutoff,prawn_results_df_TrBB_imperfect$value,level=0.99)
-pllf.CI.estimate.cutoff.95.imperfect <- pllf.CI.estimate(prawn_results_df_TrBB_imperfect$cutoff,prawn_results_df_TrBB_imperfect$value,level=0.95)
-pllf.CI.estimate.cutoff.90.imperfect <- pllf.CI.estimate(prawn_results_df_TrBB_imperfect$cutoff,prawn_results_df_TrBB_imperfect$value,level=0.90)
-pllf.CI.estimate.cutoff.80.imperfect <- pllf.CI.estimate(prawn_results_df_TrBB_imperfect$cutoff,prawn_results_df_TrBB_imperfect$value,level=0.80)
+load("submission/prawn_results_df_TrBB_imperfect_upto_3_percent_Re5.Rdata")
+pllf.CI.estimate.cutoff.99.imperfect <- pllfCIestimate(prawn_results_df_TrBB_imperfect$cutoff,prawn_results_df_TrBB_imperfect$value,level=0.99)
+pllf.CI.estimate.cutoff.95.imperfect <- pllfCIestimate(prawn_results_df_TrBB_imperfect$cutoff,prawn_results_df_TrBB_imperfect$value,level=0.95)
+pllf.CI.estimate.cutoff.90.imperfect <- pllfCIestimate(prawn_results_df_TrBB_imperfect$cutoff,prawn_results_df_TrBB_imperfect$value,level=0.90)
+pllf.CI.estimate.cutoff.80.imperfect <- pllfCIestimate(prawn_results_df_TrBB_imperfect$cutoff,prawn_results_df_TrBB_imperfect$value,level=0.80)
 
 
 prawn_results_df_TrBB_imperfect$value_rescaled <- prawn_results_df_TrBB_imperfect$value - max(prawn_results_df_TrBB_imperfect$value,na.rm=TRUE)

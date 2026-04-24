@@ -314,6 +314,12 @@ loglik_group_bb <- function(par,ty,freq,b,m,M,B,G=1000,theta,mu,alpha,beta,sensi
 loglik_group_trbb <- function(par,ty,freq,b,B,m,M,G=1000,theta,mu,alpha,beta,cutoff,sensitivity=NULL, specificity=NULL,deviance=FALSE,
                                       subtract=0,mushape=FALSE,alpha.mu=FALSE,leakage=FALSE){
 
+  incomplete_lbeta_k1 <- function(alpha, beta, k) {
+    log_B <- lbeta(alpha, beta)
+    log_tail <- log(1 - pbeta(k, alpha, beta))
+    log_B + log_tail
+  }
+
   keep <- freq != 0
   ty <- ty[keep]
   freq <- freq[keep]
@@ -415,21 +421,89 @@ loglik_group_trbb <- function(par,ty,freq,b,B,m,M,G=1000,theta,mu,alpha,beta,cut
     }
   }
 
-  if(leakage){
-    if(theta==Inf){
-      # P.L <- exp(lbeta(alpha,beta/(Nbar*sensitivity)+b)-lbeta(alpha,beta/(Nbar*sensitivity)))-
-      #   exp(lbeta(alpha,beta/(M*sensitivity)+B)-lbeta(alpha,beta/(M*sensitivity)))
-      # P.L <- exp(lbeta(alpha,beta/(Nbar*sensitivity)+b)-lbeta(alpha,beta/(Nbar*sensitivity)))-
-      #   exp(lbeta(alpha,beta/(M)+B)-lbeta(alpha,beta/(M)))
-      # E.L <- (B-b)*M*exp(lbeta(alpha+1,beta+b*Nbar*sensitivity)-lbeta(alpha,beta))
-      E.L <- (B - b) * M * exp(lbeta(alpha + 1, beta + b * Nbar * sensitivity) - lbeta(alpha, beta))
-      if(sensitivity==1){P.L <- exp(lbeta(alpha, beta + Nbar * b) - lbeta(alpha, beta)) -
-        exp(lbeta(alpha, beta + B*M) - lbeta(alpha, beta))} else
-      {P.L <- exp(lbeta(alpha, beta / (Nbar * sensitivity) + b) - lbeta(alpha, beta / (Nbar * sensitivity))) -
-        exp(lbeta(alpha, beta + B*M) - lbeta(alpha, beta))}
+  # if(leakage){
+  #   if(theta==Inf){
+  #     # P.L <- exp(lbeta(alpha,beta/(Nbar*sensitivity)+b)-lbeta(alpha,beta/(Nbar*sensitivity)))-
+  #     #   exp(lbeta(alpha,beta/(M*sensitivity)+B)-lbeta(alpha,beta/(M*sensitivity)))
+  #     # P.L <- exp(lbeta(alpha,beta/(Nbar*sensitivity)+b)-lbeta(alpha,beta/(Nbar*sensitivity)))-
+  #     #   exp(lbeta(alpha,beta/(M)+B)-lbeta(alpha,beta/(M)))
+  #     # E.L <- (B-b)*M*exp(lbeta(alpha+1,beta+b*Nbar*sensitivity)-lbeta(alpha,beta))
+  #     E.L <- (B - b) * M * exp(lbeta(alpha + 1, beta + b * Nbar * sensitivity) - lbeta(alpha, beta))
+  #     if(sensitivity==1){P.L <- exp(lbeta(alpha, beta + Nbar * b) - lbeta(alpha, beta)) -
+  #       exp(lbeta(alpha, beta + B*M) - lbeta(alpha, beta))} else
+  #     {P.L <- exp(lbeta(alpha, beta / (Nbar * sensitivity) + b) - lbeta(alpha, beta / (Nbar * sensitivity))) -
+  #       exp(lbeta(alpha, beta + B*M) - lbeta(alpha, beta))}
+  #
+  #   }
+  # }
+  #
 
+# Leakage calculation updated on 24th April to acount for cutoff issue.
+
+  if (leakage) {
+    if (theta == Inf) {
+
+      if (!is.null(cutoff) && cutoff > 0) {
+
+        # ----- Truncated case -----
+
+        # Expected Leakage
+        num <- exp(incomplete_lbeta_k1(alpha + 1,
+                                       beta + b * Nbar * sensitivity,
+                                       k=cutoff))
+        den <- exp(incomplete_lbeta_k1(alpha, beta, k=0))
+        E.L <- (B - b) * M * (num / den)
+
+        # Probability of Leakage
+        if (sensitivity == 1) {
+          term1 <- exp(incomplete_lbeta_k1(alpha,
+                                           beta + Nbar * b,
+                                           k=cutoff)) /
+            exp(incomplete_lbeta_k1(alpha, beta, k=0))
+        } else {
+
+          min_phi_m <- sensitivity * (1 - (1 - cutoff)^Nbar) # k1 of the paper
+
+          term1 <- exp(incomplete_lbeta_k1(alpha,
+                                           beta / (Nbar * sensitivity) + b,
+                                           k=min_phi_m)) /
+            exp(incomplete_lbeta_k1(alpha,
+                                    beta / (Nbar * sensitivity),
+                                    k=0))
+        }
+
+        term2 <- exp(incomplete_lbeta_k1(alpha,
+                                         beta + B * M,
+                                         k=cutoff)) /
+          exp(incomplete_lbeta_k1(alpha, beta, k=0))
+
+        P.L <- term1 - term2
+
+      } else {
+
+        # ----- Original (non-truncated) case -----
+
+        E.L <- (B - b) * M *
+          exp(lbeta(alpha + 1,
+                    beta + b * Nbar * sensitivity) -
+                lbeta(alpha, beta))
+
+        if (sensitivity == 1) {
+          P.L <- exp(lbeta(alpha, beta + Nbar * b) - lbeta(alpha, beta)) -
+            exp(lbeta(alpha, beta + B * M) - lbeta(alpha, beta))
+        } else {
+          P.L <- exp(lbeta(alpha,
+                           beta / (Nbar * sensitivity) + b) -
+                       lbeta(alpha,
+                             beta / (Nbar * sensitivity))) -
+            exp(lbeta(alpha,
+                      beta + B * M) -
+                  lbeta(alpha, beta))
+        }
+      }
     }
   }
+
   if((!leakage)&deviance) return(-2*out-subtract)
   if((!leakage)&(!deviance)) return(out-subtract)
   if(leakage) return(c(deviance=-2*out,P.L=P.L,E.L=E.L))

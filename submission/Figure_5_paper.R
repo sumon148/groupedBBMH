@@ -40,6 +40,8 @@ library(xtable)
 #     "MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.b.Rdata"
 #     "MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c.Rdata"
 #     "MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.d.Rdata"
+#
+# These models are available in "Table_4_paper.R" file
 # -----------------------------------------------------------------------------#
 
 load("submission\\MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.0.Rdata")
@@ -59,7 +61,7 @@ summary(beta_TrBB)
 
 Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80 <- run_infection_simulations(alpha=alpha_TrBB,beta=beta_TrBB, cutoff = cut_off, D = 10000,B = 8000,M = 40,m = 5,b = 13,sensitivity_values = c(0.7,0.8,0.9,0.95,1.0),NSim = length(alpha_TrBB),seed = 2015)
 # Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80 <- run_infection_simulations(alpha=alpha_TrBB,beta=beta_TrBB, cutoff = cut_off, D = 100,B = 8000,M = 40,m = 5,b = 13,sensitivity_values = c(0.8,1.0),NSim = length(alpha_TrBB),seed = 2015)
-save(Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80,file="Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80.Rdata")
+save(Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80,file="submission/Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80.Rdata")
 
 
 load("submission\\MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.a.Rdata")
@@ -75,7 +77,7 @@ summary(beta_TrBB)
 
 set.seed(2015)
 Sim_Tx_TrBB_Prawn_m5_b13_MH_0025_Imperfect_Sn_80 <- run_infection_simulations(alpha=alpha_TrBB,beta=beta_TrBB, cutoff = cut_off, D = 10000,B = 8000,M = 40,m = 5,b = 13,sensitivity_values = c(0.7,0.8,0.9,0.95,1.0),NSim = length(alpha_TrBB),seed = 2015)
-save(Sim_Tx_TrBB_Prawn_m5_b13_MH_0025_Imperfect_Sn_80,file="Sim_Tx_TrBB_Prawn_m5_b13_MH_0025_Imperfect_Sn_80.Rdata")
+save(Sim_Tx_TrBB_Prawn_m5_b13_MH_0025_Imperfect_Sn_80,file="submission/Sim_Tx_TrBB_Prawn_m5_b13_MH_0025_Imperfect_Sn_80.Rdata")
 
 
 
@@ -92,7 +94,7 @@ summary(beta_TrBB)
 
 set.seed(2015)
 Sim_Tx_TrBB_Prawn_m5_b13_MH_005_Imperfect_Sn_80 <- run_infection_simulations(alpha=alpha_TrBB,beta=beta_TrBB, cutoff = cut_off, D = 10000,B = 8000,M = 40,m = 5,b = 13,sensitivity_values = c(0.7,0.8,0.9,0.95,1.0),NSim = length(alpha_TrBB),seed = 2015)
-save(Sim_Tx_TrBB_Prawn_m5_b13_MH_005_Imperfect_Sn_80,file="Sim_Tx_TrBB_Prawn_m5_b13_MH_005_Imperfect_Sn_80.Rdata")
+save(Sim_Tx_TrBB_Prawn_m5_b13_MH_005_Imperfect_Sn_80,file="submission/Sim_Tx_TrBB_Prawn_m5_b13_MH_005_Imperfect_Sn_80.Rdata")
 
 
 load("submission\\MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c.Rdata")
@@ -108,7 +110,7 @@ summary(beta_TrBB)
 
 set.seed(2015)
 Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80 <- run_infection_simulations(alpha=alpha_TrBB,beta=beta_TrBB, cutoff = cut_off, D = 10000,B = 8000,M = 40,m = 5,b = 13,sensitivity_values = c(0.7,0.8,0.9,0.95,1.0),NSim = length(alpha_TrBB),seed = 2015)
-save(Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80,file="Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80.Rdata")
+save(Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80,file="submission/Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80.Rdata")
 
 
 
@@ -125,7 +127,7 @@ summary(beta_TrBB)
 
 set.seed(2015)
 Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80 <- run_infection_simulations(alpha=alpha_TrBB,beta=beta_TrBB, cutoff = cut_off, D = 10000,B = 8000,M = 40,m = 5,b = 13,sensitivity_values = c(0.7,0.8,0.9,0.95,1.0),NSim = length(alpha_TrBB),seed = 2015)
-save(Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80,file="Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80.Rdata")
+save(Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80,file="submission/Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80.Rdata")
 
 
 # Load the Model-based Simulation results ----------------------------
@@ -427,7 +429,7 @@ df_combined$Perc <- (df_combined$Freq / 1000) * 100
 # -------------------------------------------------------------------
 # Save the final combined dataset for future analyses
 # -------------------------------------------------------------------
-save(df_combined, file = "df_combined_Model_Based_Simulation_Sn.0.80_varying_k.Rdata")
+save(df_combined, file = "submission/df_combined_Model_Based_Simulation_Sn.0.80_varying_k.Rdata")
 
 
 # Figures for Community Risk - Main Manuscript and Supplementary Material --------------
@@ -523,7 +525,7 @@ ggarrange(plot_list_imperfect$plot_m_5_b_13__MH_00,
           plot_list_imperfect$plot_m_5_b_13__MH_02,
           nrow=3,ncol=1,common.legend = TRUE)
 
-ggsave("Test_Outcome_m5_b13_Imperfect_Manuscript.png",width = 10,height = 10,units = "in")
+ggsave("submission/Test_Outcome_m5_b13_Imperfect_Manuscript.png",width = 10,height = 10,units = "in")
 
 ggarrange(plot_list_imperfect$plot_m_5_b_13__MH_00,
           plot_list_imperfect$plot_m_5_b_13__MH_0025,
@@ -532,7 +534,7 @@ ggarrange(plot_list_imperfect$plot_m_5_b_13__MH_00,
           plot_list_imperfect$plot_m_5_b_13__MH_02,
           nrow=5,ncol=1,common.legend = TRUE)
 
-ggsave("Test_Outcome_m5_b13_Imperfect_Manuscript_SupMat.png",width = 10,height = 16,units = "in")
+ggsave("submission/Test_Outcome_m5_b13_Imperfect_Manuscript_SupMat.png",width = 10,height = 16,units = "in")
 
 
 
@@ -896,8 +898,8 @@ E.P.Li.Community.Risk <- E.P.Li.Community.Risk %>%
 
 digits_vec <- c(
   0,    # row names
-  0,    # cutoff (factor — no decimals)
-  0,    # inspection (character — no decimals)
+  0,    # X
+  0,    # cutoff
   2,    # E.Li
   2,    # E.Li.ll
   2,    # E.Li.ul
@@ -909,9 +911,12 @@ digits_vec <- c(
   2,    # Median.Li.ul
   2,    # Pseudo.E.Li.median
   2,    # Pseudo.E.Li.median.ll
-  2     # Pseudo.E.Li.median.ul
+  2,    # Pseudo.E.Li.median.ul
+  2     # last column
 )
 
+
+library(xtable)
 print(xtable(E.P.Li.Community.Risk,digits = digits_vec),include.rownames=FALSE)
 
 

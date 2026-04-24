@@ -73,45 +73,45 @@ d <- length(ty2)            # Number of unique outcome groups
 # k=0.0000
 
 G=5000;R=50e3;
-par <- c(log(0.005), logit(7e-04), logit(0.70)) ; initial <- par; k <- 0.0000
-MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.0 <- MH.Sampler.Chain.TBB(par=par,cutoff=k,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
-                                                                      sigma=0.2,num_chains=4,burnin=R*0.5,thin=5,seed=c(123,456,789,135),trail=b,ty2=ty2,wt=wt,group.size=Nbar,sensitivity=TRUE,specificity=FALSE,
-                                                                      sensitivity.range=c(0.80,0.80),specificity.range=NULL)
+par <- c(log(0.005), groupedBBMH::logit(7e-04), groupedBBMH::logit(0.70)) ; initial <- par; k <- 0.0000
+MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.0 <- MH_Sampler_BB(par=par,cutoff=k,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
+                                                               sigma=0.2,num_chains=4,burnin=R*0.5,thin=5,seed=c(123,456,789,135),trail=b,ty=ty2,wt=wt,group.size=Nbar,sensitivity=TRUE,specificity=FALSE,
+                                                               sensitivity.range=c(0.80,0.80),specificity.range=NULL)
 save(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.0,file="submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.0.Rdata")
 
 
 # k=0.0025
 
 G=5000;R=50e3;
-par <- c(log(0.005), logit(7e-04), logit(0.70)) ; initial <- par; k <- 0.0025
-MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.a <- MH.Sampler.Chain.TBB(par=par,cutoff=k,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
-                                                                      sigma=0.2,num_chains=4,burnin=R*0.5,thin=5,seed=c(123,456,789,135),trail=b,ty2=ty2,wt=wt,group.size=Nbar,sensitivity=TRUE,specificity=FALSE,
-                                                                      sensitivity.range=c(0.80,0.80),specificity.range=NULL)
+par <- c(log(0.005), groupedBBMH::logit(7e-04), groupedBBMH::logit(0.70)) ; initial <- par; k <- 0.0025
+MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.a <- MH_Sampler_BB(par=par,cutoff=k,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
+                                                               sigma=0.2,num_chains=4,burnin=R*0.5,thin=5,seed=c(123,456,789,135),trail=b,ty=ty2,wt=wt,group.size=Nbar,sensitivity=TRUE,specificity=FALSE,
+                                                               sensitivity.range=c(0.80,0.80),specificity.range=NULL)
 save(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.a,file="submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.a.Rdata")
 
 
 # k=0.005
 G=5000;R=50e3;
-par <- c(log(0.005), logit(7e-04), logit(0.70)) ; initial <- par; k <- 0.005
-MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.b <- MH.Sampler.Chain.TBB(par=par,cutoff=k,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
-                                                                      sigma=0.2,num_chains=4,burnin=R*0.5,thin=5,seed=c(123,456,789,135),trail=b,ty2=ty2,wt=wt,group.size=Nbar,sensitivity=TRUE,specificity=FALSE,
-                                                                      sensitivity.range=c(0.80,0.80),specificity.range=NULL)
+par <- c(log(0.005), groupedBBMH::logit(7e-04), groupedBBMH::logit(0.70)) ; initial <- par; k <- 0.005
+MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.b <- MH_Sampler_BB(par=par,cutoff=k,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
+                                                               sigma=0.2,num_chains=4,burnin=R*0.5,thin=5,seed=c(123,456,789,135),trail=b,ty=ty2,wt=wt,group.size=Nbar,sensitivity=TRUE,specificity=FALSE,
+                                                               sensitivity.range=c(0.80,0.80),specificity.range=NULL)
 save(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.b,file="submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.b.Rdata")
 
 # k=0.01
 G=5000;R=50e3;
-par <- c(log(0.005), logit(7e-04), logit(0.70)) ; initial <- par; k <- 0.010
-MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c <- MH.Sampler.Chain.TBB(par=par,cutoff=k,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
-                                                                      sigma=0.2,num_chains=4,burnin=R*0.5,thin=5,seed=c(123,456,789,135),trail=b,ty2=ty2,wt=wt,group.size=Nbar,sensitivity=TRUE,specificity=FALSE,
-                                                                      sensitivity.range=c(0.80,0.80),specificity.range=NULL)
+par <- c(log(0.005), groupedBBMH::logit(7e-04), groupedBBMH::logit(0.70)) ; initial <- par; k <- 0.010
+MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c <- MH_Sampler_BB(par=par,cutoff=k,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
+                                                               sigma=0.2,num_chains=4,burnin=R*0.5,thin=5,seed=c(123,456,789,135),trail=b,ty=ty2,wt=wt,group.size=Nbar,sensitivity=TRUE,specificity=FALSE,
+                                                               sensitivity.range=c(0.80,0.80),specificity.range=NULL)
 save(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c,file="submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c.Rdata")
 
 # k=0.02
 G=5000;R=50e3;
-par <- c(log(0.005), logit(7e-04), logit(0.70)) ; initial <- par; k <- 0.020
-MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.d <- MH.Sampler.Chain.TBB(par=par,cutoff=k,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
-                                                                      sigma=0.2,num_chains=4,burnin=R*0.5,thin=5,seed=c(123,456,789,135),trail=b,ty2=ty2,wt=wt,group.size=Nbar,sensitivity=TRUE,specificity=FALSE,
-                                                                      sensitivity.range=c(0.80,0.80),specificity.range=NULL)
+par <- c(log(0.005), groupedBBMH::logit(7e-04), groupedBBMH::logit(0.70)) ; initial <- par; k <- 0.020
+MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.d <- MH_Sampler_BB(par=par,cutoff=k,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
+                                                               sigma=0.2,num_chains=4,burnin=R*0.5,thin=5,seed=c(123,456,789,135),trail=b,ty=ty2,wt=wt,group.size=Nbar,sensitivity=TRUE,specificity=FALSE,
+                                                               sensitivity.range=c(0.80,0.80),specificity.range=NULL)
 save(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.d,file="submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.d.Rdata")
 
 
@@ -220,12 +220,12 @@ Summ.P.L.cutoff.02.imperfect.80 <- summarise_Mean_CI(E.P.trBB.cutoff.02.imperfec
 
 Table_4 <- as.data.frame(
   rbind(
-c(Summ.alpha.cutoff.00.imperfect.80,Summ.alpha.cutoff.01.imperfect.80,Summ.alpha.cutoff.02.imperfect.80),
-c(Summ.beta.cutoff.00.imperfect.80,Summ.beta.cutoff.01.imperfect.80,Summ.beta.cutoff.02.imperfect.80),
-c(Summ.mu.cutoff.00.imperfect.80,Summ.mu.cutoff.01.imperfect.80,Summ.mu.cutoff.02.imperfect.80),
-c(Summ.E.L.cutoff.00.imperfect.80,Summ.E.L.cutoff.01.imperfect.80,Summ.E.L.cutoff.02.imperfect.80),
-c(Summ.P.L.cutoff.00.imperfect.80,Summ.P.L.cutoff.01.imperfect.80,Summ.P.L.cutoff.02.imperfect.80)
-)
+    c(Summ.alpha.cutoff.00.imperfect.80,Summ.alpha.cutoff.01.imperfect.80,Summ.alpha.cutoff.02.imperfect.80),
+    c(Summ.beta.cutoff.00.imperfect.80,Summ.beta.cutoff.01.imperfect.80,Summ.beta.cutoff.02.imperfect.80),
+    c(Summ.mu.cutoff.00.imperfect.80,Summ.mu.cutoff.01.imperfect.80,Summ.mu.cutoff.02.imperfect.80),
+    c(Summ.E.L.cutoff.00.imperfect.80,Summ.E.L.cutoff.01.imperfect.80,Summ.E.L.cutoff.02.imperfect.80),
+    c(Summ.P.L.cutoff.00.imperfect.80,Summ.P.L.cutoff.01.imperfect.80,Summ.P.L.cutoff.02.imperfect.80)
+  )
 )
 rownames(Table_4) <- c("alpha*10^3","beta","mu*10^3","E.L","P.L*10^2")
 colnames(Table_4) <- c("k0:Mean","k0:Q_2.5%","k0:Q_97.5%","k01:Mean","k01:Q_2.5%","k01:Q_97.5%","k02:Mean","k02:Q_2.5%","k02:Q_97.5%")
@@ -413,6 +413,6 @@ E.P.Li.Estimate.Cutoff.Sensitivity <- E.P.Li.Estimate.Cutoff.Sensitivity[order(-
 colnames(E.P.Li.Estimate.Cutoff.Sensitivity) <- c("cutoff","sensitivity","E.Li","E.Li.ll",
                                                   "E.Li.ul","P.Li","P.Li.ll","P.Li.ul")
 
-# write.csv(E.P.Li.Community.Risk,file="E.P.Li.Community.Risk.csv")
-# write.csv(E.P.Li.Estimate.Cutoff.Sensitivity,file="E.P.Li.Estimate.Cutoff.Sensitivity.csv")
+# write.csv(E.P.Li.Community.Risk,file="submission/E.P.Li.Community.Risk.csv")
+# write.csv(E.P.Li.Estimate.Cutoff.Sensitivity,file="submission/E.P.Li.Estimate.Cutoff.Sensitivity.csv")
 

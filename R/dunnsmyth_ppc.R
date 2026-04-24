@@ -56,12 +56,42 @@ DunnSmythTestBB <- function(ObservedResponse, size, group_size, alpha, beta, app
       F_ymin1[valid_idx] <- pbetabinom.ab(ObservedResponse[valid_idx] - 1, size_vector[valid_idx], alpha_vec[valid_idx], beta_vec[valid_idx] / group_size)
       F_y <- pbetabinom.ab(ObservedResponse, size_vector, alpha_vec, beta_vec / group_size)
     } else {
-      N_samples <- 1000
-      probs <- rowMeans(matrix(rbeta(D * N_samples, unique(alpha_vec), unique(beta_vec)), ncol = N_samples))
-      probs_m <- 1 - (1 - probs)^group_size
-      F_ymin1[valid_idx] <- pbinom(ObservedResponse[valid_idx] - 1, size_vector[valid_idx], probs_m[valid_idx])
-      F_y <- pbinom(ObservedResponse, size_vector, probs_m)
+    
+    # else {
+    #   N_samples <- 10000
+    #   probs <- rowMeans(matrix(rbeta(D * N_samples, unique(alpha_vec), unique(beta_vec)), ncol = N_samples))
+    #   probs_m <- 1 - (1 - probs)^group_size
+    #   F_ymin1[valid_idx] <- pbinom(ObservedResponse[valid_idx] - 1, size_vector[valid_idx], probs_m[valid_idx])
+    #   F_y <- pbinom(ObservedResponse, size_vector, probs_m)
+    # }
+    
+    
+      N_samples <- 10000  # increase for smoother approximation
+      
+      # 1. Generate Beta draws for all observations at once
+      p_sim <- matrix(rbeta(D * N_samples, alpha_vec, beta_vec), nrow = D, ncol = N_samples)
+      phi_sim <- 1 - (1 - p_sim)^group_size  # transform for group size
+      
+      # 2. Expand ObservedResponse and size_vector to matrices
+      y_minus1_mat <- matrix(pmax(ObservedResponse - 1, 0), nrow = D, ncol = N_samples)
+      y_mat        <- matrix(ObservedResponse, nrow = D, ncol = N_samples)
+      size_mat     <- matrix(size_vector, nrow = D, ncol = N_samples)
+      
+      # 3. Compute CDFs per observation by averaging over samples
+      F_ymin1 <- rowMeans(pbinom(y_minus1_mat, size_mat, phi_sim))
+      F_y      <- rowMeans(pbinom(y_mat, size_mat, phi_sim))
     }
+    
+    
+    for(i in 1:D){
+      p_sim <- rbeta(N_samples, alpha, beta)
+      phi_sim <- 1 - (1 - p_sim)^group_size
+      F_y[i] <- mean(pbinom(ObservedResponse[i], size, phi_sim))
+      F_ymin1[i] <- mean(pbinom(ObservedResponse[i]-1, size, phi_sim))
+    }
+    
+    
+    
   } else {
     # Posterior samples: Simulate CDF via empirical quantiles
     S <- length(alpha_hat)

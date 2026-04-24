@@ -23,7 +23,7 @@ library(MASS)         # For multivariate normal distribution functions
 # Deidentified Frozen Seafood Data
 #-------------------------------------------------------------@
 
-df.seafood <- read.csv("submission//deidentified_frozen_seafood.csv")
+df.seafood <- read.csv("submission/deidentified_frozen_seafood.csv")
 df.seafood$Yfac <- factor(df.seafood$numPos,levels=c(0:13))
 x <- as.numeric(names(table(df.seafood$Yfac)))
 freq <- as.numeric(table(df.seafood$Yfac))
@@ -55,7 +55,7 @@ store_specificity_values_prawn_imperfect <- function(specificity) {
     m = 5,                             # Number of items per group
     M = 40,                            # Total number of items per consignment
     theta = Inf,                       # Overdispersion parameter to consider No clustering
-    #R = 1e4,                           # Number of static quantile from Beta distribution
+    #G= 1e4,                           # Number of static quantile from Beta distribution
     sensitivity = 0.8,                 # Fixed test sensitivity
     specificity = specificity,         # Input test specificity
     cutoff = 0,                        # Detection cutoff
@@ -117,7 +117,7 @@ PLLF_Specificity_imperfect_Sensitivity_Prawn <-
 # Save the combined results to an .Rdata file
 save(
   PLLF_Specificity_imperfect_Sensitivity_Prawn,
-  file = "PLLF_Specificity_imperfect_Sensitivity_Prawn_Re4.Rdata"
+  file = "submission/PLLF_Specificity_imperfect_Sensitivity_Prawn_Re4.Rdata"
 )
 
 
@@ -140,7 +140,7 @@ store_sensitivity_values_prawn_perfect <- function(sensitivity) {
     m = 5,                             # Number of items per group
     M = 40,                            # Total number of items per consignment
     theta = Inf,                       # Overdispersion parameter to consider No clustering
-    R = 1e4,                           # Number of static quantile from Beta distribution
+    G= 1e4,                           # Number of static quantile from Beta distribution
     sensitivity = sensitivity,         # Input sensitivity value
     specificity = 1.0,                 # Fixed perfect specificity
     cutoff = 0,                        # Detection cutoff
@@ -196,7 +196,7 @@ PLLF_Sensitivity_perfect_Specificity_Prawn <-
 # Save the combined results to an .Rdata file
 save(
   PLLF_Sensitivity_perfect_Specificity_Prawn,
-  file = "PLLF_Sensitivity_perfect_Specificity_Prawn_Re4.Rdata"
+  file = "submission/PLLF_Sensitivity_perfect_Specificity_Prawn_Re4.Rdata"
 )
 
 #-------------------------------------------------------------
@@ -204,8 +204,8 @@ save(
 # Figure 1: Manuscript
 #-------------------------------------------------------------
 
-load("PLLF_Specificity_imperfect_Sensitivity_Prawn_Re4.Rdata") # Using Generailzed function
-load("PLLF_Sensitivity_perfect_Specificity_Prawn_Re4.Rdata")   # Using Generailzed function
+load("submission/PLLF_Specificity_imperfect_Sensitivity_Prawn_Re4.Rdata") # Using Generailzed function
+load("submission/PLLF_Sensitivity_perfect_Specificity_Prawn_Re4.Rdata")   # Using Generailzed function
 
 df.pllf.sn.sp.1.prawn.0.45<-PLLF_Sensitivity_perfect_Specificity_Prawn
 df.pllf.sn.sp.1.prawn.0.45$logL <- df.pllf.sn.sp.1.prawn.0.45$value
@@ -214,7 +214,7 @@ ll.sensitivity <- df.pllf.sn.sp.1.prawn.0.45$sensitivity[which(df.pllf.sn.sp.1.p
 mle.sensitivity <- df.pllf.sn.sp.1.prawn.0.45$sensitivity[which(df.pllf.sn.sp.1.prawn.0.45$logL==max(df.pllf.sn.sp.1.prawn.0.45$logL,na.rm=T))]
 ul.sensitivity <- 1
 
-pllf.CI.estimate.sensitivity.95 <- pllf.CI.estimate(df.pllf.sn.sp.1.prawn.0.45$sensitivity,df.pllf.sn.sp.1.prawn.0.45$logL,level = 0.95)
+pllf.CI.estimate.sensitivity.95 <- pllfCIestimate(df.pllf.sn.sp.1.prawn.0.45$sensitivity,df.pllf.sn.sp.1.prawn.0.45$logL,level = 0.95)
 
 df.pllf.sp.sn.1.prawn.0.999<-PLLF_Specificity_imperfect_Sensitivity_Prawn
 df.pllf.sp.sn.1.prawn.0.999$logL <- df.pllf.sp.sn.1.prawn.0.999$value
@@ -223,13 +223,13 @@ ll.specificity <- df.pllf.sp.sn.1.prawn.0.999$specificity[which(df.pllf.sp.sn.1.
 mle.specificity <- df.pllf.sp.sn.1.prawn.0.999$specificity[which(df.pllf.sp.sn.1.prawn.0.999$logL==max(df.pllf.sp.sn.1.prawn.0.999$logL,na.rm=T))]
 ul.specificity <- 1
 
-pllf.CI.estimate.specificity.95 <- pllf.CI.estimate(df.pllf.sp.sn.1.prawn.0.999$specificity,df.pllf.sp.sn.1.prawn.0.999$logL,level = 0.95)
+pllf.CI.estimate.specificity.95 <- pllfCIestimate(df.pllf.sp.sn.1.prawn.0.999$specificity,df.pllf.sp.sn.1.prawn.0.999$logL,level = 0.95)
 
 
 # ---------------------------------------------#
 # Figure 1 : On Original scael of logL
 # ---------------------------------------------#
-png(file="pllf CI sensitivity specifity.png", width = 8,height = 4,units = "in",res = 300)
+png(file="submission/pllf CI sensitivity specifity.png", width = 8,height = 4,units = "in",res = 300)
 
 par(mfrow=c(1,2), mgp=c(3, 0.5, 0), oma=c(0,0,0,0), mar=c(5, 4, 4, 2))  # Adjusted margins
 
@@ -290,7 +290,7 @@ dev.off()
 # Figure 1 : On Re-scaled logL  (logL - maxlogL)
 # ---------------------------------------------#
 
-png(file="pllf CI sensitivity specifity rescaled.png", width = 8,height = 4,units = "in",res = 300)
+png(file="submission/pllf CI sensitivity specifity rescaled.png", width = 8,height = 4,units = "in",res = 300)
 
 par(mfrow=c(1,2), mgp=c(3.25, 0.5, 0), oma=c(0,0,0,0), mar=c(5, 5, 4, 2))  # Adjusted margins
 
@@ -392,7 +392,7 @@ dev.off()
 # MLE Estimates: alpha, beta and sensitivity
 o.theta.inf.prawn.sp.sn <- optim(c(0,0,0),loglik_group_bb,ty=summ.seafood.data$ty,freq=summ.seafood.data$freq,b=13,
                                  theta=Inf,m=5,M=40,specificity=1,deviance=FALSE,control=list(factr=1e-12,fnscale=-1,trace=T),
-                                 R=1e4,hessian=FALSE,method = "L-BFGS-B",lower = c(log(0.0001),log(0.0001),log(0.50)),upper = c(Inf,Inf,0))
+                                 G=1e4,hessian=FALSE,method = "L-BFGS-B",lower = c(log(0.0001),log(0.0001),log(0.50)),upper = c(Inf,Inf,0))
 
 # PLLF Calculation: Specificity without restricting Sensitivity
 # Function to run the optimization for a given specificity value
@@ -407,7 +407,7 @@ store_specificity_values_prawn_imperfect <- function(specificity) {
     m = 5,                            # Number of items per group
     M = 40,                           # Total items per consignment
     theta = Inf,                       # Overdispersion parameter to consider No clustering
-    R = 1e4,                           # Number of static quantile from Beta distribution
+    G= 1e4,                           # Number of static quantile from Beta distribution
     specificity = specificity,        # Input test specificity
     deviance = FALSE,                 # Do not return deviance
     hessian = FALSE,                  # No Hessian required
@@ -465,7 +465,7 @@ PLLF_Specificity_Free_Parameter_Prawn <-
 # Save the final combined results
 save(
   PLLF_Specificity_Free_Parameter_Prawn,
-  file = "PLLF_Specificity_Free_Parameter_Prawn_Re4.Rdata"
+  file = "submission/PLLF_Specificity_Free_Parameter_Prawn_Re4.Rdata"
 )
 
 
@@ -477,7 +477,7 @@ save(
 # MLE Estimates: alpha, beta and specificity
 o.theta.inf.prawn.sp.sn <- optim(c(0,0,0),loglik_group_bb,ty=summ.seafood.data$ty,freq=summ.seafood.data$freq,b=13,
                                  theta=Inf,m=5,M=40,sensitivity=1,deviance=FALSE,control=list(factr=1e-12,fnscale=-1,trace=T),
-                                 R=1e4,hessian=FALSE,method = "L-BFGS-B",lower = c(log(0.0001),log(0.0001),log(0.9999)),upper = c(Inf,Inf,0))
+                                 G=1e4,hessian=FALSE,method = "L-BFGS-B",lower = c(log(0.0001),log(0.0001),log(0.9999)),upper = c(Inf,Inf,0))
 
 # PLLF Calculation: Sensitivity  without restricting Specificity
 # Function to run the optimization for a given Sensitivity value
@@ -490,8 +490,8 @@ store_sensitivity_values_prawn_imperfect <- function(sensitivity) {
                         m = 5,
                         M = 40,
                         theta = Inf,
-                        R = 1e4,
-                        # R = 3e4,
+                        G= 1e4,
+                        # G= 3e4,
                         # sensitivity = 0.8,
                         sensitivity = sensitivity,
                         deviance = FALSE,
@@ -544,7 +544,7 @@ PLLF_Sensitivity_Free_Parameter_Prawn <-
 # Save the final combined results
 save(
   PLLF_Sensitivity_Free_Parameter_Prawn,
-  file = "PLLF_Sensitivity_Free_Parameter_Prawn_Re4.Rdata"
+  file = "submission/PLLF_Sensitivity_Free_Parameter_Prawn_Re4.Rdata"
 )
 
 
@@ -553,24 +553,24 @@ save(
 # Supplementary Figure 2
 #-------------------------------------------------------------
 
-load("PLLF_Specificity_Free_Parameter_Prawn_Re4.Rdata")
+load("submission/PLLF_Specificity_Free_Parameter_Prawn_Re4.Rdata")
 
 PLLF_Specificity_Free_Parameter_Prawn <- PLLF_Specificity_Free_Parameter_Prawn[!is.na(PLLF_Specificity_Free_Parameter_Prawn$convergence) & PLLF_Specificity_Free_Parameter_Prawn$convergence==0,]
 PLLF_Specificity_Free_Parameter_Prawn$logL <- PLLF_Specificity_Free_Parameter_Prawn$value
 
-pllf.CI.estimate.specificity.95 <- pllf.CI.estimate(PLLF_Specificity_Free_Parameter_Prawn$value,parameter = PLLF_Specificity_Free_Parameter_Prawn$specificity,level = 0.95)
-pllf.CI.estimate.specificity.90 <- pllf.CI.estimate(PLLF_Specificity_Free_Parameter_Prawn$value,parameter = PLLF_Specificity_Free_Parameter_Prawn$specificity,level = 0.90)
+pllf.CI.estimate.specificity.95 <- pllfCIestimate(PLLF_Specificity_Free_Parameter_Prawn$value,parameter = PLLF_Specificity_Free_Parameter_Prawn$specificity,level = 0.95)
+pllf.CI.estimate.specificity.90 <- pllfCIestimate(PLLF_Specificity_Free_Parameter_Prawn$value,parameter = PLLF_Specificity_Free_Parameter_Prawn$specificity,level = 0.90)
 
 plot(PLLF_Specificity_Free_Parameter_Prawn$specificity,PLLF_Specificity_Free_Parameter_Prawn$value,typ="l")
 plot(PLLF_Specificity_Free_Parameter_Prawn$sensitivity,PLLF_Specificity_Free_Parameter_Prawn$value,typ="l")
 
-load("PLLF_Sensitivity_Free_Parameter_Prawn_Re4.Rdata")
+load("submission/PLLF_Sensitivity_Free_Parameter_Prawn_Re4.Rdata")
 
 PLLF_Sensitivity_Free_Parameter_Prawn <- PLLF_Sensitivity_Free_Parameter_Prawn[!is.na(PLLF_Sensitivity_Free_Parameter_Prawn$convergence) & PLLF_Sensitivity_Free_Parameter_Prawn$convergence==0,]
 
 o.theta.inf.prawn.sn.sp.1 <- optim(c(0,0),loglik_group_bb,ty=summ.seafood.data$ty,freq=summ.seafood.data$freq,b=13,
                                    theta=Inf,m=5,M=40,deviance=FALSE,control=list(reltol=1e-12,fnscale=-1),
-                                   R=1e4,hessian=FALSE,sensitivity=1,specificity=1)
+                                   G=1e4,hessian=FALSE,sensitivity=1,specificity=1)
 
 PLLF_Sensitivity_Free_Parameter_Prawn$value[PLLF_Sensitivity_Free_Parameter_Prawn$sensitivity==1]<- o.theta.inf.prawn.sn.sp.1$value
 PLLF_Sensitivity_Free_Parameter_Prawn$alpha[PLLF_Sensitivity_Free_Parameter_Prawn$sensitivity==1]<- exp(o.theta.inf.prawn.sn.sp.1$par[1])
@@ -582,8 +582,8 @@ PLLF_Sensitivity_Free_Parameter_Prawn<- PLLF_Sensitivity_Free_Parameter_Prawn[PL
 
 PLLF_Sensitivity_Free_Parameter_Prawn$logL <- PLLF_Sensitivity_Free_Parameter_Prawn$value
 
-pllf.CI.estimate.sensitivity.95 <- pllf.CI.estimate(PLLF_Sensitivity_Free_Parameter_Prawn$value,parameter = PLLF_Sensitivity_Free_Parameter_Prawn$sensitivity,level = 0.95)
-pllf.CI.estimate.sensitivity.90 <- pllf.CI.estimate(PLLF_Sensitivity_Free_Parameter_Prawn$value,parameter = PLLF_Sensitivity_Free_Parameter_Prawn$sensitivity,level = 0.90)
+pllf.CI.estimate.sensitivity.95 <- pllfCIestimate(PLLF_Sensitivity_Free_Parameter_Prawn$value,parameter = PLLF_Sensitivity_Free_Parameter_Prawn$sensitivity,level = 0.95)
+pllf.CI.estimate.sensitivity.90 <- pllfCIestimate(PLLF_Sensitivity_Free_Parameter_Prawn$value,parameter = PLLF_Sensitivity_Free_Parameter_Prawn$sensitivity,level = 0.90)
 
 
 
@@ -591,7 +591,7 @@ pllf.CI.estimate.sensitivity.90 <- pllf.CI.estimate(PLLF_Sensitivity_Free_Parame
 # Supplementary Figure 2 : On Original scale logL
 # ---------------------------------------------#
 
-png(file="pllf CI sensitivity specifity free parameter.png", width = 10,height = 5,units = "in",res = 300)
+png(file="submission/pllf CI sensitivity specifity free parameter.png", width = 10,height = 5,units = "in",res = 300)
 
 par(mfrow=c(1,2), mgp=c(3, 0.5, 0), oma=c(0,0,0,0), mar=c(5, 4, 4, 2))  # Adjusted margins
 
@@ -671,7 +671,7 @@ dev.off()
 
 
 
-png(file="pllf CI sensitivity specifity free parameter Rescaled.png", width = 10,height = 5,units = "in",res = 300)
+png(file="submission/pllf CI sensitivity specifity free parameter Rescaled.png", width = 10,height = 5,units = "in",res = 300)
 
 par(mfrow=c(1,2), mgp=c(3, 0.5, 0), oma=c(0,0,0,0), mar=c(5, 4, 4, 2))  # Adjusted margins
 

@@ -20,6 +20,7 @@ library(MASS)         # For multivariate normal distribution functions
 
 # --------------------------------------------------------------------------- #
 # Load MCMC Results for Known and Unknown Sensitivity Models
+# These MH models are developed in "Figure_3_paper.R" and "Table_3_paper.R" respectively
 # --------------------------------------------------------------------------- #
 load("submission/MH.alpha.mu.sigma.20.known.sn.80.Prawn.Rdata")
 load("submission/MH.alpha.mu.sigma.20.unknown.sn.80.Prawn.Rdata")
@@ -59,11 +60,11 @@ p2_Prawn_dens_overlay <- mcmc_dens_overlay(prawn_mcmc_unknown_imperfect_sensitiv
 
 # Combine and save known sensitivity plots
 ggarrange(p1_Prawn, p1_Prawn_dens_overlay, ncol = 1, common.legend = TRUE)
-# ggsave("Trace_Plot_Prawn_known_sensitivity.png", width = 6, height = 8)
+# ggsave("submission/Trace_Plot_Prawn_known_sensitivity.png", width = 6, height = 8)
 
 # Combine and save unknown sensitivity plots
 ggarrange(p2_Prawn, p2_Prawn_dens_overlay, ncol = 1, common.legend = TRUE)
-#ggsave("Trace_Plot_Prawn_unknown_sensitivity.png", width = 8, height = 8)
+#ggsave("submission/Trace_Plot_Prawn_unknown_sensitivity.png", width = 8, height = 8)
 
 
 # --------------------------------------------------------------------------- #

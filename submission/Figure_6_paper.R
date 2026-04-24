@@ -39,9 +39,11 @@ library(xtable)
 #   Beta distribution parameters used in this model were derived
 #   under the specific assumption of delta = 0.80 and k = 0.01.
 #
+# MH model is available in "Table_4_paper.R" file
+
 # ------------------------------------------------------------------- #
 
-load("submission\\MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c.Rdata")
+load("submission/MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c.Rdata")
 
 alpha_TrBB <- sample(unlist(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c$target.parameters$alpha_sample),5000)
 beta_TrBB <- sample(unlist(MH.alpha.mu.sigma.20.Imperfect.80.Prawn.TBB.c$target.parameters$beta_sample),5000)
@@ -55,17 +57,17 @@ summary(beta_TrBB)
 # b=13
 set.seed(2015)
 Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80 <- run_infection_simulations(alpha=alpha_TrBB,beta=beta_TrBB, cutoff = cut_off, D = 10000,B = 8000,M = 40,m = 5,b = 13,sensitivity_values = c(0.7,0.8,0.9,0.95,1.0),NSim = length(alpha_TrBB),seed = 2015)
-save(Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80,file="Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80.Rdata")
+save(Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80,file="submission/Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80.Rdata")
 
 # b=20
 set.seed(2015)
 Sim_Tx_TrBB_Prawn_m5_b20_MH_01_Imperfect_Sn_80 <- run_infection_simulations(alpha=alpha_TrBB,beta=beta_TrBB, cutoff = cut_off, D = 10000,B = 8000,M = 40,m = 5,b = 20,sensitivity_values = c(0.7,0.8,0.9,0.95,1.0),NSim = length(alpha_TrBB),seed = 2015)
-save(Sim_Tx_TrBB_Prawn_m5_b20_MH_01_Imperfect_Sn_80,file="Sim_Tx_TrBB_Prawn_m5_b20_MH_01_Imperfect_Sn_80.Rdata")
+save(Sim_Tx_TrBB_Prawn_m5_b20_MH_01_Imperfect_Sn_80,file="submission/Sim_Tx_TrBB_Prawn_m5_b20_MH_01_Imperfect_Sn_80.Rdata")
 
 # b=26
 set.seed(2015)
 Sim_Tx_TrBB_Prawn_m5_b26_MH_01_Imperfect_Sn_80 <- run_infection_simulations(alpha=alpha_TrBB,beta=beta_TrBB, cutoff = cut_off, D = 10000,B = 8000,M = 40,m = 5,b = 26,sensitivity_values = c(0.7,0.8,0.9,0.95,1.0),NSim = length(alpha_TrBB),seed = 2015)
-save(Sim_Tx_TrBB_Prawn_m5_b26_MH_01_Imperfect_Sn_80,file="Sim_Tx_TrBB_Prawn_m5_b26_MH_01_Imperfect_Sn_80.Rdata")
+save(Sim_Tx_TrBB_Prawn_m5_b26_MH_01_Imperfect_Sn_80,file="submission/Sim_Tx_TrBB_Prawn_m5_b26_MH_01_Imperfect_Sn_80.Rdata")
 
 
 prop.table(table(Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80$`0.7`$Simulation_Infection_Ty_Results))
@@ -91,14 +93,58 @@ prop.table(table(Sim_Tx_TrBB_Prawn_m5_b26_MH_01_Imperfect_Sn_80$`1`$Simulation_I
 # Define parameter values for Figure 2: Community Risk under varying b=13,20,26 values
 # Using model m=5 with Metropolis-Hastings (MH), imperfect sensitivity (Sn = 80%)
 
-load("submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80.Rdata")
-load("submission\\Sim_Tx_TrBB_Prawn_m5_b20_MH_01_Imperfect_Sn_80.Rdata")
-load("submission\\Sim_Tx_TrBB_Prawn_m5_b26_MH_01_Imperfect_Sn_80.Rdata")
+load("submission/Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80.Rdata")
+load("submission/Sim_Tx_TrBB_Prawn_m5_b20_MH_01_Imperfect_Sn_80.Rdata")
+load("submission/Sim_Tx_TrBB_Prawn_m5_b26_MH_01_Imperfect_Sn_80.Rdata")
 
 Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80
 Sim_Tx_TrBB_Prawn_m5_b20_MH_01_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b20_MH_01_Imperfect_Sn_80
 Sim_Tx_TrBB_Prawn_m5_b26_MH_01_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b26_MH_01_Imperfect_Sn_80
 
+
+process_tx_results <- function(sim_data, index) {
+
+  # ---- Step 1: Extract Tx and Inspection Results from the simulation ----
+  df <- as.data.frame(cbind(
+    Tx = as.vector(sim_data[[as.character(index)]]$Simulation_Tx),
+    Inspection.Results = as.vector(sim_data[[as.character(index)]]$Simulation_Infection_Tx_Results)
+  ))
+
+  # ---- Step 2: Convert Tx to numeric and attach Sensitivity ----
+  df$Tx <- as.numeric(paste(df$Tx))
+  df$Sensitivity <- as.character(index)
+
+  # ---- Step 3: Relabel Inspection Results ----
+  # Convert to factor with descriptive labels: TP = True Positive, TN = True Negative, FN = False Negative
+  df$Inspection.Results <- factor(
+    as.factor(sim_data[[as.character(index)]]$Simulation_Infection_Ty_Results),
+    labels = c("TP", "TN", "FN")
+  )
+
+  # ---- Step 4: Create Tx_range column (categorical bins for Tx values) ----
+  df$Tx_range <- "0"
+  df$Tx_range[df$Tx <= 100 & df$Tx > 0]    <- "1-100"
+  df$Tx_range[df$Tx <= 500 & df$Tx > 100]  <- "101-500"
+  df$Tx_range[df$Tx <= 1000 & df$Tx > 500] <- "501-1000"
+  df$Tx_range[df$Tx <= 2000 & df$Tx > 1000] <- "1001-2000"
+  df$Tx_range[df$Tx <= 3000 & df$Tx > 2000] <- "2001-3000"
+  df$Tx_range[df$Tx <= 4000 & df$Tx > 3000] <- "3001-4000"
+  df$Tx_range[df$Tx <= 5000 & df$Tx > 4000] <- "4001-5000"
+  df$Tx_range[df$Tx <= 10000 & df$Tx > 5000] <- "5001-10000"
+  df$Tx_range[df$Tx <= 15000 & df$Tx > 10001] <- "10001-15000"
+  df$Tx_range[df$Tx <= 30000 & df$Tx > 15001] <- "15001-30000"
+  df$Tx_range[df$Tx > 30000] <- "30000+"
+
+  # ---- Step 5: Make Tx_range an ordered factor ----
+  df$Tx_range <- factor(
+    as.factor(df$Tx_range),
+    levels = c("0", "1-100", "101-500", "501-1000", "1001-2000", "2001-3000",
+               "3001-4000", "4001-5000", "5001-10000", "10001-15000", "15001-30000", "30000+")
+  )
+
+  # ---- Step 6: Return processed dataframe ----
+  return(df)
+}
 
 # Create Dataframe for creating plot --------------------------------------------------
 # Define parameter values --------------------------------------------------#
@@ -213,7 +259,7 @@ df_combined$Freq <- (df_combined$Freq / sum(df_combined$Freq)) *
 df_combined$Perc <- (df_combined$Freq / 1000) * 100
 
 # Save the final combined data frame for use in figures
-save(df_combined, file = "df_combined_Model_Based_Simulation_Sn.0.80_varying_b.Rdata")
+save(df_combined, file = "submission/df_combined_Model_Based_Simulation_Sn.0.80_varying_b.Rdata")
 
 # -------------------------------------------------------------------------------
 # Figure 6
@@ -227,7 +273,7 @@ library(ggplot2)
 library(ggpubr)
 library(dplyr)
 
-load("df_combined_Model_Based_Simulation_Sn.0.80_varying_b.Rdata")
+load("submission/df_combined_Model_Based_Simulation_Sn.0.80_varying_b.Rdata")
 
 
 # Figure 6 for Community Risk - Main Manuscript --------------#
@@ -256,7 +302,7 @@ df_fixed <- df_nonzero_TP_FN %>%
   mutate(Freq_fixed = ifelse(total_TP_FN > 0,
                              Freq / total_TP_FN * max_total,
                              0)) %>%
-  select(b, Tx, Outcome, Freq_fixed)
+  dplyr::select(b, Tx, Outcome, Freq_fixed)
 
 # Check sums: should be identical across b for each Tx
 df_fixed %>%
@@ -300,14 +346,14 @@ zero <- ggplot(df_zero, aes(x = b, y = Freq, fill = Outcome)) +
 
 # Combine the zero and nonzero plots
 
-    plot_m_b_13_20_26 <- annotate_figure(
-      ggarrange(zero, nonzero, nrow = 1, common.legend = TRUE, legend = "top",
-                widths = c(0.15, 0.85)))
+plot_m_b_13_20_26 <- annotate_figure(
+  ggarrange(zero, nonzero, nrow = 1, common.legend = TRUE, legend = "top",
+            widths = c(0.15, 0.85)))
 
 
-    plot_m_b_13_20_26
+plot_m_b_13_20_26
 
-ggsave("Test_Outcome_m5_b13_20_26_Imperfect_Manuscript.png",width = 10,height = 6,units = "in")
+ggsave("submission/Test_Outcome_m5_b13_20_26_Imperfect_Manuscript.png",width = 10,height = 6,units = "in")
 
 # --------------------------------------------------------------------------------
 # Supplementary Table S5
@@ -319,13 +365,13 @@ ggsave("Test_Outcome_m5_b13_20_26_Imperfect_Manuscript.png",width = 10,height = 
 # Leakage parameters: By Sampled bag size - b=13,20,26: k=0
 # --------------------------------------------------------------------------------
 
-load("submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80.Rdata")
+load("submission/Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80.Rdata")
 Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80
 Sim_Tx_TrBB_Prawn_m5_b13_MH_00_Imperfect_Sn_80 <- NULL
-load("submission\\Sim_Tx_TrBB_Prawn_m5_b20_MH_00_Imperfect_Sn_80.Rdata")
+load("submission/Sim_Tx_TrBB_Prawn_m5_b20_MH_00_Imperfect_Sn_80.Rdata")
 Sim_Tx_TrBB_Prawn_m5_b20_MH_00_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b20_MH_00_Imperfect_Sn_80
 Sim_Tx_TrBB_Prawn_m5_b20_MH_00_Imperfect_Sn_80 <- NULL
-load("submission\\Sim_Tx_TrBB_Prawn_m5_b26_MH_00_Imperfect_Sn_80.Rdata")
+load("submission/Sim_Tx_TrBB_Prawn_m5_b26_MH_00_Imperfect_Sn_80.Rdata")
 Sim_Tx_TrBB_Prawn_m5_b26_MH_00_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b26_MH_00_Imperfect_Sn_80
 Sim_Tx_TrBB_Prawn_m5_b26_MH_00_Imperfect_Sn_80 <- NULL
 
@@ -476,6 +522,7 @@ write.csv(P_E_Li_13_20_26_MH_00,file="P_E_Li_13_20_26_MH_00.csv")
 
 P_E_Li_13_20_26_MH_00 <- read.csv("P_E_Li_13_20_26_MH_00.csv",header = TRUE)
 
+library(xtable)
 print(xtable(P_E_Li_13_20_26_MH_00),rownames=FALSE)
 
 # --------------------------------------------------------------------------------
@@ -483,13 +530,13 @@ print(xtable(P_E_Li_13_20_26_MH_00),rownames=FALSE)
 # --------------------------------------------------------------------------------
 
 
-load("submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80.Rdata")
+load("submission/Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80.Rdata")
 Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80
 Sim_Tx_TrBB_Prawn_m5_b13_MH_01_Imperfect_Sn_80 <- NULL
-load("submission\\Sim_Tx_TrBB_Prawn_m5_b20_MH_01_Imperfect_Sn_80.Rdata")
+load("submission/Sim_Tx_TrBB_Prawn_m5_b20_MH_01_Imperfect_Sn_80.Rdata")
 Sim_Tx_TrBB_Prawn_m5_b20_MH_01_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b20_MH_01_Imperfect_Sn_80
 Sim_Tx_TrBB_Prawn_m5_b20_MH_01_Imperfect_Sn_80 <- NULL
-load("submission\\Sim_Tx_TrBB_Prawn_m5_b26_MH_01_Imperfect_Sn_80.Rdata")
+load("submission/Sim_Tx_TrBB_Prawn_m5_b26_MH_01_Imperfect_Sn_80.Rdata")
 Sim_Tx_TrBB_Prawn_m5_b26_MH_01_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b26_MH_01_Imperfect_Sn_80
 Sim_Tx_TrBB_Prawn_m5_b26_MH_01_Imperfect_Sn_80 <- NULL
 
@@ -650,9 +697,9 @@ print(xtable(P_E_Li_13_20_26_MH_01),rownames=FALSE)
 # Leakage parameters: By Sampled bag size - b=13,20,26: k=0.02
 # --------------------------------------------------------------------------------
 
-load("submission\\Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80.Rdata")
-load("submission\\Sim_Tx_TrBB_Prawn_m5_b20_MH_02_Imperfect_Sn_80.Rdata")
-load("submission\\Sim_Tx_TrBB_Prawn_m5_b26_MH_02_Imperfect_Sn_80.Rdata")
+load("submission/Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80.Rdata")
+load("submission/Sim_Tx_TrBB_Prawn_m5_b20_MH_02_Imperfect_Sn_80.Rdata")
+load("submission/Sim_Tx_TrBB_Prawn_m5_b26_MH_02_Imperfect_Sn_80.Rdata")
 
 Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect <- Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80
 Sim_Tx_TrBB_Prawn_m5_b13_MH_02_Imperfect_Sn_80 <- NULL

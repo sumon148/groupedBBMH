@@ -280,15 +280,15 @@ DunnSmythTestBB_Custom <- function(ObservedResponse,size,group_size,alpha,beta,a
     geom_point(alpha = 0.7) +  # Q-Q points
     geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed", size = 1.2) +  # Reference line
     labs(
-     # title = "Normal Q-Q Plot: Dunn-Smyth scaled residuals",
+      # title = "Normal Q-Q Plot: Dunn-Smyth scaled residuals",
       x = "Theoretical Quantiles",
       y = "Sample Quantiles",
       color = "Group"
     ) +
     scale_color_manual(values = c("Zero" = "grey", "Non-zero" = "blue")) +  # Define colors
- #   annotate("text", x = min(qq_df$theoretical), y = max(qq_df$sample),
- #            label = paste("KS test for Uniform: p =", ks_p_value),
- #            hjust = 0, vjust = 1, size = 4) +  # KS test annotation
+    #   annotate("text", x = min(qq_df$theoretical), y = max(qq_df$sample),
+    #            label = paste("KS test for Uniform: p =", ks_p_value),
+    #            hjust = 0, vjust = 1, size = 4) +  # KS test annotation
     theme_minimal()  +
     theme(
       plot.title = element_text(size = 10),
@@ -306,7 +306,7 @@ DunnSmythTestBB_Custom <- function(ObservedResponse,size,group_size,alpha,beta,a
   DS_hist <- ggplot(df, aes(x = residuals)) +
     geom_histogram(breaks = breaks, fill = "lightblue", color = "black", alpha = 0.7) +
     labs(
-   #   title = "Distribution of Dunn-Smyth Residuals",
+      #   title = "Distribution of Dunn-Smyth Residuals",
       x = "Residuals",
       y = "Frequency"
     ) +
@@ -337,11 +337,29 @@ seafood.data$ID <- c(1:dim(seafood.data)[1])
 seafood.data$ty <- as.numeric(paste(seafood.data$ty))
 seafood.data <- seafood.data[order(seafood.data$ty),]
 
+# Exact BB Model: MH algorithm assuming Perfect specificity and imperfect Sensitivity #
+
+#-----------------------------------------@
+# define data
+b <- 13
+Nbar <- 5
+ty <- seafood.data$ty
+D <- length(ty)
+ty2 <- x
+wt <- freq
+d <- length(ty2)
+
+G=3000;R=50e3;
+par <- c(log(0.005), groupedBBMH::logit(7e-04), groupedBBMH::logit(0.75)) ; initial <- par; k <- 0.0000;
+MH.alpha.mu.sigma.20.known.sn.80.Prawn <- MH_Sampler_BB(par=par,cutoff=k,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
+                                                        sigma=c(0.2,0.2,0.2),num_chains=4,burnin=R*0.5,thin=5,seed=c(123,456,789,135),trail=b,ty=ty2,wt=wt,group.size=Nbar,sensitivity=TRUE,specificity=FALSE,
+                                                        sensitivity.range=c(0.80,0.80),specificity.range=NULL)
+save(MH.alpha.mu.sigma.20.known.sn.80.Prawn,file="submission/MH.alpha.mu.sigma.20.known.sn.80.Prawn.Rdata")
+
 
 # ------------------------------------------------------------------#
 # Dunn-Smyth Residual Goodness-of-Fit: MH Estimator with known Imperfect Test Sensitivity (0.80)
 # ------------------------------------------------------------------#
-
 # Load MH-fitted model output (imperfect test sensitivity = 0.80)
 load("submission/MH.alpha.mu.sigma.20.known.sn.80.Prawn.Rdata")
 
@@ -380,7 +398,7 @@ annotate_figure(
     ncol = 2, nrow = 1
   )
 )
-ggsave("Dunn_Smyth_Test_MH_Estimator_imperfect_Case_sn_0.80.png", height = 4, width = 8, units = "in")
+ggsave("submission/Dunn_Smyth_Test_MH_Estimator_imperfect_Case_sn_0.80.png", height = 4, width = 8, units = "in")
 
 
 
@@ -425,7 +443,7 @@ annotate_figure(
     ncol = 2, nrow = 1
   )
 )
-ggsave("Dunn_Smyth_Test_MH_Estimator_imperfect_Case_sn_Unif_0.80.png", height = 4, width = 8, units = "in")
+ggsave("submission/Dunn_Smyth_Test_MH_Estimator_imperfect_Case_sn_Unif_0.80.png", height = 4, width = 8, units = "in")
 
 
 

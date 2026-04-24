@@ -74,12 +74,18 @@ simulate_infection_sampling <- function(alpha, beta, cutoff, D, B, M, m, b, sens
   #-----------------------------
   # Step 2: Generate true number of infected cases per group (D x B)
   #-----------------------------
-  X_ij <- matrix(NA, nrow = D, ncol = B)
-  for (i in 1:D) {
-    P_i <- P_u[i]
-    X_ij[i, ] <- rbinom(B, size = M, prob = P_i)
-  }
 
+  # X_ij <- matrix(NA, nrow = D, ncol = B)
+  # for (i in 1:D) {
+  #   P_i <- P_u[i]
+  #   X_ij[i, ] <- rbinom(B, size = M, prob = P_i)
+  # }
+
+  X_ij <- matrix(
+    rbinom(D * B, size = M, prob = rep(P_u, each = B)),
+    nrow = D, ncol = B, byrow = TRUE
+  )
+  
   # Total contaminated items per batch
   T_Xi <- apply(X_ij, 1, sum)
 
@@ -293,6 +299,114 @@ run_infection_simulations <- function(alpha, beta, cutoff, D, B, M, m, b, sensit
   return(results)
 }
 
+
+#' Run Repeated Infection Sampling Simulations: Parallel
+#'
+#' Runs multiple simulations of infection prevalence and sampling using the
+#' `simulate_infection_sampling()` function in parallel. Results are stored
+#' across multiple simulated batches and iterations for each sensitivity level.
+#'
+#' @param alpha Numeric. Scalar or vector of shape parameters \eqn{\alpha} for the beta distribution.
+#'        If scalar, it is repeated across simulations.
+#' @param beta Numeric. Scalar or vector of shape parameters \eqn{\beta} for the beta distribution.
+#'        If scalar, it is repeated across simulations.
+#' @param cutoff Numeric. Scalar or vector of truncation points (0 < cutoff ≤ 1). If scalar, repeated.
+#' @param D Integer. Number of batches per simulation.
+#' @param B Integer. Number of groups per batch.
+#' @param M Integer. Number of items in each group.
+#' @param m Integer. Number of items sampled per group.
+#' @param b Integer. Number of groups sampled per batch.
+#' @param sensitivity_values Numeric vector. Vector of sensitivity values (between 0 and 1).
+#' @param NSim Integer. Number of simulation runs.
+#' @param seed Integer. Random seed for reproducibility.
+#'
+#' @return A nested list containing simulation results for each sensitivity level. Each list includes:
+#' \describe{
+#'   \item{`Simulation_Ty`}{Matrix of true positive group counts (D x NSim).}
+#'   \item{`Simulation_ty`}{Matrix of observed positive group counts after applying sensitivity.}
+#'   \item{`Simulation_Tx`}{Matrix of true positive item counts per batch.}
+#'   \item{`Simulation_tx`}{Matrix of observed positive item counts after sensitivity.}
+#'   \item{`Simulation_Infection_Ty_Results`}{Comparison matrix for group-level detection.}
+#'   \item{`Simulation_Infection_Tx_Results`}{Comparison matrix for item-level detection.}
+#' }
+#' An additional element `Inputs` stores the function inputs for reference.
+#'
+#' @export
+
+run_infection_simulations_parallel <- function(
+    alpha, beta, cutoff, D, B, M, m, b,
+    sensitivity_values, NSim, seed) {
+  
+  # ---- STEP 1: Prepare inputs ----#
+  no.sim <- NSim
+  
+  alpha_vector  <- if (length(alpha)  == 1) rep(alpha,  no.sim) else alpha
+  beta_vector   <- if (length(beta)   == 1) rep(beta,   no.sim) else beta
+  cutoff_vector <- if (length(cutoff) == 1) rep(cutoff, no.sim) else cutoff
+  
+  # ---- STEP 2: Parallel simulation ----#
+  Sim_list <- future_lapply(
+    X = seq_len(no.sim),
+    FUN = function(i) {
+      
+      simulate_infection_sampling(
+        alpha  = alpha_vector[i],
+        beta   = beta_vector[i],
+        cutoff = cutoff_vector[i],
+        D = D, B = B, M = M, m = m, b = b,
+        sensitivity_values = sensitivity_values
+      )
+    },
+    future.seed = seed   # ✅ reproducible + parallel-safe
+  )
+  
+  # ---- STEP 3: Allocate result containers ----#
+  results <- lapply(
+    as.character(sensitivity_values),
+    function(s) {
+      list(
+        Simulation_Ty = matrix(NA, D, no.sim),
+        Simulation_ty = matrix(NA, D, no.sim),
+        Simulation_Tx = matrix(NA, D, no.sim),
+        Simulation_tx = matrix(NA, D, no.sim),
+        Simulation_Infection_Ty_Results = matrix(NA, D, no.sim),
+        Simulation_Infection_Tx_Results = matrix(NA, D, no.sim)
+      )
+    }
+  )
+  names(results) <- as.character(sensitivity_values)
+  
+  # ---- STEP 4: Combine results ----#
+  for (i in seq_len(no.sim)) {
+    Sim <- Sim_list[[i]]
+    
+    for (s in sensitivity_values) {
+      s_char <- as.character(s)
+      results[[s_char]]$Simulation_Ty[, i] <- Sim[[s_char]]$T_Yi
+      results[[s_char]]$Simulation_ty[, i] <- Sim[[s_char]]$t_Yi_adjusted
+      results[[s_char]]$Simulation_Tx[, i] <- Sim[[s_char]]$T_Xi
+      results[[s_char]]$Simulation_tx[, i] <- Sim[[s_char]]$t_Xi_adjusted
+      results[[s_char]]$Simulation_Infection_Ty_Results[, i] <- Sim[[s_char]]$comparison_ty
+      results[[s_char]]$Simulation_Infection_Tx_Results[, i] <- Sim[[s_char]]$comparison_tx
+    }
+  }
+  
+  # ---- STEP 5: Attach inputs ----#
+  results$Inputs <- list(
+    alpha = alpha,
+    beta = beta,
+    cutoff = cutoff,
+    D = D,
+    B = B,
+    M = M,
+    m = m,
+    b = b,
+    sensitivity_values = sensitivity_values,
+    NSim = NSim
+  )
+  
+  return(results)
+}
 
 #' Compute Expected Leakage and Probability of Leakage from Model-based Simulation Output
 #'

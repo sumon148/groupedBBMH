@@ -315,6 +315,25 @@ summ.seafood.data$ty <- as.numeric(paste(summ.seafood.data$ty))
 # Purpose: Generate posterior predictive samples under imperfect test sensitivity
 # ----------------------------------------------------------------------------------
 
+# Exact BB Model: MH algorithm assuming Perfect Specificity and imperfect Sensitivity #
+
+#-----------------------------------------@
+# define data
+b <- 13
+Nbar <- 5
+ty <- seafood.data$ty
+D <- length(ty)
+ty2 <- x
+wt <- freq
+d <- length(ty2)
+
+G=3000;R=50e3;
+par <- c(log(0.005), groupedBBMH::logit(7e-04), groupedBBMH::logit(0.75)) ; initial <- par; k <- 0.0000;
+MH.alpha.mu.sigma.20.known.sn.80.Prawn <- MH_Sampler_BB(par=par,cutoff=k,initial=par,alpha=TRUE,beta=FALSE,mu=TRUE,rho=FALSE,G=G,R=R,
+                                                        sigma=c(0.2,0.2,0.2),num_chains=4,burnin=R*0.5,thin=5,seed=c(123,456,789,135),trail=b,ty=ty2,wt=wt,group.size=Nbar,sensitivity=TRUE,specificity=FALSE,
+                                                        sensitivity.range=c(0.80,0.80),specificity.range=NULL)
+save(MH.alpha.mu.sigma.20.known.sn.80.Prawn,file="submission/MH.alpha.mu.sigma.20.known.sn.80.Prawn.Rdata")
+
 # Load posterior samples from MCMC output (Metropolis-Hastings)
 load("submission/MH.alpha.mu.sigma.20.known.sn.80.Prawn.Rdata")
 
@@ -385,7 +404,7 @@ ppc.barplot.imperfect.case$p.zero.non.zero <-
 
 # Save final plot to file
 ggsave(
-  filename = "PPC_Prawn_imperfect_Case_sn_0.80.png",
+  filename = "submission/PPC_Prawn_imperfect_Case_sn_0.80.png",
   plot = ppc.barplot.imperfect.case$p.zero.non.zero,
   width = 8,
   height = 4.5,
@@ -403,7 +422,8 @@ ggsave(
 # ----------------------------------------------------------------------------------
 
 # Load posterior samples from MCMC output
-load("MH.alpha.mu.sigma.20.unknown.sn.80.Prawn.Rdata")
+# This model is available in `Table_3_paper.R` file
+load("submission/MH.alpha.mu.sigma.20.unknown.sn.80.Prawn.Rdata")
 
 # Extract number of test groups from observed data
 D <- length(seafood.data$ty)
@@ -431,7 +451,7 @@ prop.table(table(ty_rep_imperfect_unif_case)) # Simulated
 # ----------------------------------------------------------------------------------#
 
 # Generate PPC plots using a custom function with fixed Y-axis scaling
-ppc.barplot.imperfect.uniform.case <- ppc_barplot_prawn_fixed_y_scale(
+ppc.barplot.imperfect.uniform.case <- ppc_barplot_fixed_y_scale(
   ty = ty,
   yrep = ty_rep_imperfect_unif_case,
   trial = 13
@@ -467,7 +487,7 @@ ppc.barplot.imperfect.uniform.case$p.zero.non.zero <-
 # ----------------------------------------------------------------------------------#
 
 ggsave(
-  filename = "PPC_Prawn_imperfect_Case_sn_Unif_0.80_revised.png",  # Output file name
+  filename = "submission/PPC_Prawn_imperfect_Case_sn_Unif_0.80_revised.png",  # Output file name
   plot = ppc.barplot.imperfect.uniform.case$p.zero.non.zero,       # Plot to save
   width = 8,
   height = 4.5,

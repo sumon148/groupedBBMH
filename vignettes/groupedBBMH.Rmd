@@ -51,7 +51,7 @@ devtools::install_github("sumon148/groupedBBMH")
 ```
 
 
-```{r setup}
+```{r setup, message=FALSE,warning=FALSE}
 library(groupedBBMH)
 library(ggplot2)
 library(ggpubr)
@@ -84,8 +84,8 @@ For each batch, the only observed outcome is the number of positive groups ($t_{
 - $T_{Xi}$: Total number of contaminated units in consignment $i$, $T_{Xi} = \sum_{j=1}^{B} X_{ij}$  
 - $t_{xi}$: Number of contaminated units among sampled groups, $t_{xi} = \sum_{j=1}^{b} X_{ij}$  
 - $t_{yi}$: Number of positive groups among sampled groups, $t_{yi} = \sum_{j=1}^{b} Y_{ij}$  
-- $\tilde{t}_{yi}$: Number of positive tests among sampled groups, $\tilde{t}_{yi} = \sum_{j=1}^{b} \widetilde{Y}_{ij}$  
-- $L_i$: Leakage in consignment $i$, defined as $L_i = T_{Xi} \, I(\tilde{t}_{yi}=0)$  
+- $\widetilde{t}_{yi}$: Number of positive tests among sampled groups, $\widetilde{t}_{yi} = \sum_{j=1}^{b} \widetilde{Y}_{ij}$  
+- $L_i$: Leakage in consignment $i$, defined as $L_i = T_{Xi} \, I(\widetilde{t}_{yi}=0)$  
 - $k$: Minimum biologically plausible positive prevalence  
 
 ## Nested Beta-binomial models
@@ -96,46 +96,46 @@ Now let $p_i$ denote the true prevalence of contamination in batch $i$, and defi
 X_{ij} \mid p_i \overset{\text{i.i.d.}}{\sim} \text{Bin}(m, p_i), \quad p_i \overset{\text{i.i.d.}}{\sim} \text{Beta}(\alpha, \beta).
 \]
 
-The group-level test outcome $\tilde{Y}_{ij}$ follows:
+The group-level test outcome $\widetilde{Y}_{ij}$ follows:
 
 \[
-\tilde{Y}_{ij} \mid p_i \sim \text{Bernoulli}(\tilde{\phi}_i), 
+\widetilde{Y}_{ij} \mid p_i \sim \text{Bernoulli}(\widetilde{\phi}_i), 
 \]
 
 and the observed number of positive groups in the sample follows:
 
 \[
-\tilde{t}_{yi} \mid p_i \sim \text{Binomial}(b, \tilde{\phi}_i).
+\widetilde{t}_{yi} \mid p_i \sim \text{Binomial}(b, \widetilde{\phi}_i).
 \]
 
 where the effective probability of a positive test is: 
 
 \[
-\tilde{\phi}_i = \Delta \phi_i + (1 - \Lambda)(1 - \phi_i) ; \quad \phi_i = 1 - (1 - p_i)^m.
+\widetilde{\phi}_i = \Delta \phi_i + (1 - \Lambda)(1 - \phi_i) ; \quad \phi_i = 1 - (1 - p_i)^m.
 \]
 
 
 Under perfect specificity ($\Lambda = 1$), this simplifies to:
 
 \[
-\tilde{\phi}_i = \Delta \phi_i.
+\widetilde{\phi}_i = \Delta \phi_i.
 \]
 
 When $\beta \gg \alpha$, the contamination prevalence $\beta p_i$ is approximately Gamma distributed, leading to:
 
 \[
-\tilde{\phi}_i \sim (1 - \Lambda) + \text{Beta} \left( \alpha, \frac{\beta}{m(\Delta + \Lambda - 1)} \right).
+\widetilde{\phi}_i \sim (1 - \Lambda) + \text{Beta} \left( \alpha, \frac{\beta}{m(\Delta + \Lambda - 1)} \right).
 \]
 
 Then two important special cases can be considered as:
 
-* **Perfect testing** ($\Delta = 1$, $\Lambda = 1$): $\tilde{\phi}_i \sim \text{Beta}(\alpha, \beta / m)$,
-* **Perfect specificity** ($\Lambda = 1$): $\tilde{\phi}_i \sim \text{Beta}(\alpha, \frac{\beta}{m \Delta})$.
+* **Perfect testing** ($\Delta = 1$, $\Lambda = 1$): $\widetilde{\phi}_i \sim \text{Beta}(\alpha, \beta / m)$,
+* **Perfect specificity** ($\Lambda = 1$): $\widetilde{\phi}_i \sim \text{Beta}(\alpha, \frac{\beta}{m \Delta})$.
 
-In either case, $\tilde{t}_{yi}$ approximately follows a Beta-Binomial distribution when the infection is rare:
+In either case, $\widetilde{t}_{yi}$ approximately follows a Beta-Binomial distribution when the infection is rare:
 
 \[
-\tilde{t}_{yi} \sim \textbf{Beta-Binomial}\ \Bigg(b, \alpha, \frac{\beta}{m \Delta}\Bigg).
+\widetilde{t}_{yi} \sim \textbf{Beta-Binomial}\ \Bigg(b, \alpha, \frac{\beta}{m \Delta}\Bigg).
 \]
 
 When a regulatory threshold ($k$) is defined such that contamination levels below a certain prevalence cut-off are considered unlikely, the effective prevalence can then be expressed as:
@@ -198,15 +198,14 @@ These functions allow users to fit exact models by incorporating minimum prevale
 The following equations from the Barnes et al. (2025) form the statistical foundation of the `groupedHG` package:
 
 - **Equation (1) & (2):** Two-level BB model for $X_{ij}$ 
-- **Equation (3), (4) & (5):** Two-level BB model for $\tilde{t}_{yi}$ under imperfect testing
-- **Equation (6):** PMF of $\tilde{t}_{yi}$ under imperfect testing  
-- **Equation (12):** Approximate distribution $\tilde{t}_{yi}$  under imperfect testing  
-- **Equation (12):** Approximate distribution $\tilde{t}_{yi}$  under imperfect sensitivity  
-- **Equation (16):** Exact distribution $\tilde{t}_{yi}$  under imperfect testing
-- **Equation (17):** Exact $\Pr[L_i>0]$ under perfect testing
-- **Equation (18):** Exact $E(L_i)$ under perfect testing
-- **Equation (19):** Approximate $\Pr[L_i>0]$ under imperfect sensitivity
-- **Equation (20):** Approximate $E(L_i)$ under imperfect sensitivity
+- **Equation (3), (4) & (5):** Two-level BB model for $\widetilde{t}_{yi}$ under imperfect testing
+- **Equation (6):** PMF of $\widetilde{t}_{yi}$ under imperfect testing  
+- **Equation (12):** Approximate distribution $\widetilde{t}_{yi}$  under imperfect testing  
+- **Equation (12):** Approximate distribution $\widetilde{t}_{yi}$  under imperfect sensitivity  
+- **Equation (16):** Exact $\Pr[L_i>0]$ under perfect testing
+- **Equation (17):** Exact $E(L_i)$ under perfect testing
+- **Equation (18):** Approximate $\Pr[L_i>0]$ under imperfect sensitivity
+- **Equation (19):** Approximate $E(L_i)$ under imperfect sensitivity
 
 
 
@@ -226,7 +225,7 @@ The data used in this package for illustration and reproducibility are publicly 
 [**Zenodo**](https://zenodo.org/records/7762164). 
 
 For illustration, the frequency distribution of the number of positive test outcomes per batch, 
-$\tilde{t}_{yi}$, is summarized as 
+$\widetilde{t}_{yi}$, is summarized as 
 $t_y = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)$ and 
 $f_y = (2815, 9, 10, 6, 1, 3, 2, 0, 1, 2, 1, 0, 0, 0)$. 
 
@@ -252,7 +251,7 @@ The function can be flexibly parameterized to estimate the shape parameters of t
 In the first example, we estimate the parameters of the grouped BB model assuming a perfect test (i.e., sensitivity and specificity both equal to 1). The optimization relies on numerical integration using $R = 10^4$ random draws from the Beta distribution. The optimization is performed on the log-scale to ensure positivity of parameters, and the resulting estimates for $\alpha$ and $\beta$ are obtained by exponentiating the optimized parameter values.
 
 
-```{r chunk 1, eval=TRUE, echo=TRUE}
+```{r chunk 1, eval=TRUE, echo=TRUE, message=FALSE,warning=FALSE}
 ty=c(0:13)
 freq=c(2815, 9, 10, 6, 1, 3, 2, 0, 1, 2, 1, 0, 0, 0)
 MLE.BB.m1 <- optim(c(0,0), loglik_group_bb, ty=ty, freq=freq, b=13,
@@ -271,7 +270,7 @@ In the second example, we fit the model to estimate all parameters simultaneousl
 
 To ensure stable optimization, lower and upper bounds are specified for all parameters. The optimization process searches the parameter space within these limits to find the combination that maximizes the log-likelihood function. The results demonstrate that the maximum log-likelihood occurs when $\Delta = 0.74$ and $\Lambda = 1$, corresponding to $\alpha = 0.0045$ and $\beta = 3.78$. These results indicate moderate overdispersion in the underlying Beta-Binomial model and the test has imperfect sensitivity but near-perfect specificity.
 
-```{r chunk 2, eval=TRUE, echo=TRUE}
+```{r chunk 2, eval=TRUE, echo=TRUE, message=FALSE,warning=FALSE}
 MLE.BB.m6 <- optim(
   c(0,0,0,0), loglik_group_bb,
   ty = ty, freq = freq, b = 13,
@@ -297,17 +296,17 @@ Overall, these two examples illustrate how the grouped Beta-Binomial likelihood 
 As a user-friendly alternative to manual optimization, the `fit_GroupedBB()` function offers a convenient interface for fitting the grouped Beta-Binomial model. For a given set of sensitivity and specificity values, it estimates the Beta-Binomial parameters by maximizing the likelihood function. The function returns the estimated Beta distribution parameters and, when `leakage = TRUE` is specified, also provides estimates of leakage parameters - expected leakage and probability of leakage per batch. It is noted that for leakage estimation, the number of groups per batch $B$ and the actual group size in the cases study ($M$) is required.  
 
 
-```{r chunk 3, eval=TRUE, echo=TRUE}
+```{r chunk 3, eval=TRUE, echo=TRUE, message=FALSE,warning=FALSE}
 bb.m1 <- fit_GroupedBB(ty = ty, freq = freq, b = 13, m = 5,
                        sensitivity = 1, specificity = 1)
-summary(bb.m1)
+bb.m1
 ```
 
-```{r chunk 4, eval=TRUE, echo=TRUE}
+```{r chunk 4, eval=TRUE, echo=TRUE, message=FALSE,warning=FALSE}
 # Fit model with leakage (requires B and M)
 bb.m2 <- fit_GroupedBB(ty = ty, freq = freq, b = 13, m = 5, M = 40, B = 8000,
                        sensitivity = 1, specificity = 1, leakage = TRUE)
-summary(bb.m2)
+bb.m2
 ```
 
 When a biologically meaningful threshold is introduced for the batch-level infection prevalence ($p_i$), the model must account for the fact that values below this threshold are biologically implausible. The `groupedBBMH` package accommodates this feature through the truncated beta-binomial model, where the log-likelihood is maximized using the function `loglik_group_trbb()`.
@@ -320,18 +319,18 @@ In the second example, we demonstrate a model fit with a 1% minimum prevalence t
 
 
 
-```{r chunk 5, eval=TRUE, echo=TRUE}
+```{r chunk 5, eval=TRUE, echo=TRUE, message=FALSE,warning=FALSE}
 # Fit truncated grouped beta-binomial model with cutoff = 0 (no truncation) with perfect test
 trbb.m1 <- fit_trGroupedBB(ty, freq, b = 13, m = 5, cutoff = 0,G=1e4)
 trbb.m1
 ```
 
 
-```{r chunk 6, eval=TRUE, echo=TRUE}
+```{r chunk 6, eval=TRUE, echo=TRUE, message=FALSE,warning=FALSE}
 # Fit truncated grouped beta-binomial model with cutoff = 0.01 and imperfect sensitivity
 trbb.m2 <- fit_trGroupedBB(ty, freq, b = 13, m = 5, cutoff = 0.01,
                        sensitivity = 0.8, specificity = 1)
-summary(trbb.m2)
+trbb.m2
 ```
 
 
@@ -339,7 +338,7 @@ summary(trbb.m2)
 
 Now, we fit the grouped beta-binomial (BB) model using the Metropolis–Hastings (MH) algorithm. The `MH_Sampler_BB()` function implements the MH sampling procedure for specified values of test sensitivity and specificity. Following the setup described in the paper, two prior specifications were considered for the test sensitivity: one with fixed $\Delta = 0.8$, and another where $\Delta$ was uniformly distributed between 0.75 and 0.85.
 
-The MH algorithm is constructed based on the frequency distribution of $\tilde{t}_{yi}$, allowing the weighted log-likelihood of the beta-binomial model to be computed exactly through numerical integration. The priors for the model parameters (e.g., $\alpha$ and $\mu$) were chosen to ensure that parameter estimates remain within expected, interpretable ranges.
+The MH algorithm is constructed based on the frequency distribution of $\widetilde{t}_{yi}$, allowing the weighted log-likelihood of the beta-binomial model to be computed exactly through numerical integration. The priors for the model parameters (e.g., $\alpha$ and $\mu$) were chosen to ensure that parameter estimates remain within expected, interpretable ranges.
 
 The MH algorithm was run on the parameter set $\theta_1$, $\theta_2$, and, when $\Delta$ was not fixed, $\theta_3$. Specifically, we defined $\theta_1 = \log(\alpha)$ with prior $\theta_1 \sim U(-A, A)$, and $\mu = \text{expit}(\theta_2)$. When $\Delta$ was not fixed, it was parameterized as $\Delta = 0.75 + 0.1 \times \text{expit}(\theta_3)$. These definitions yield induced priors of $\mu \sim U(0,1)$ and $\Delta \sim U(0.75, 0.85)$.
 
@@ -349,7 +348,7 @@ Convergence was evaluated using trace plots and posterior density plots. For dem
 
 We fit the first model using the R code shown below for the fixed sensitivity $\Delta = 0.8$ and examined the summary statistics of the target parameters of the beta distribution. These summaries provide insight into the posterior location and variability of the parameters, helping to assess the model’s fit and stability. Additionally, the estimated posterior means and credible intervals can be compared with the maximum likelihood estimates obtained earlier to evaluate the consistency and robustness of the inference.
 
-```{r chunk 7, eval=TRUE, echo=TRUE}
+```{r chunk 7, eval=TRUE, echo=TRUE, message=FALSE,warning=FALSE}
 MH.trbb.m1 <- MH_Sampler_BB(par = c(log(0.005), logit(7e-04), logit(0.75)),
   cutoff = 0.01,
   alpha = TRUE, beta = FALSE, mu = TRUE, rho = FALSE,
@@ -370,7 +369,7 @@ MH.trbb.m1 <- MH_Sampler_BB(par = c(log(0.005), logit(7e-04), logit(0.75)),
 
 Summary statistics of the target parameters, obtained using the `summary_mcmc()` function, provide a comprehensive overview of the posterior distributions, including measures such as the mean, standard deviation, and credible intervals. In addition, the function reports key MCMC diagnostics — such as effective sample size and potential scale reduction factor (R-hat) — which help assess convergence and sampling efficiency. Together, these outputs offer valuable insights into the stability and reliability of the parameter estimates derived from the Metropolis–Hastings algorithm.
 
-```{r chunk 8, eval=TRUE, echo=TRUE}
+```{r chunk 8, eval=TRUE, echo=TRUE, message=FALSE,warning=FALSE}
 summ.MH.m1 <- summary_mcmc(MH.trbb.m1$target.parameters$alpha_sample,
                            MH.trbb.m1$target.parameters$beta_sample,
                            MH.trbb.m1$target.parameters$mu_sample,
@@ -379,7 +378,7 @@ summ.MH.m1 <- summary_mcmc(MH.trbb.m1$target.parameters$alpha_sample,
 ```
 We now fit the second MH-based BB model using the R code below, assuming the sensitivity parameter follows a uniform distribution on $(0.75, 0.85)$. In this setup, we set a proposal standard deviation of $\sigma = 2$ for the sensitivity parameter, while retaining $\sigma = 0.2$ for the $\alpha$ and $\mu$ parameters.
 
-```{r chunk 9, eval=TRUE, echo=TRUE}
+```{r chunk 9, eval=TRUE, echo=TRUE, message=FALSE,warning=FALSE}
 MH.trbb.m2 <- MH_Sampler_BB(par = c(log(0.005), logit(7e-04), logit(0.75)),
   cutoff = 0.01,
   alpha = TRUE, beta = FALSE, mu = TRUE, rho = FALSE,
@@ -400,7 +399,7 @@ MH.trbb.m2 <- MH_Sampler_BB(par = c(log(0.005), logit(7e-04), logit(0.75)),
 
 The `summary_mcmc` function provides summary statistics for the MCMC simulations of all targeted parameters, including $\alpha$, $\mu$, and $\Delta$.
 
-```{r chunk 10, eval=TRUE, echo=TRUE}
+```{r chunk 10, eval=TRUE, echo=TRUE, message=FALSE,warning=FALSE}
 summ.MH.m2 <- summary_mcmc(MH.trbb.m2$target.parameters$alpha_sample,
                            MH.trbb.m2$target.parameters$beta_sample,
                            MH.trbb.m2$target.parameters$sensitivity_sample,
@@ -410,7 +409,7 @@ summ.MH.m2 <- summary_mcmc(MH.trbb.m2$target.parameters$alpha_sample,
 
 MCMC diagnostics can be conveniently performed using the `bayesplot` R package, which provides a rich set of visualization tools for assessing convergence, autocorrelation, and distribution of MCMC samples. To use `bayesplot`, the MCMC simulations must first be converted into a format compatible with the package. The `create_mcmc_BP()` function in `groupedBBMH` facilitates this conversion by transforming the MCMC output into a three-dimensional array of shape (iterations × chains × parameters). Once the array is prepared, `bayesplot` functions can be applied to visualize the posterior distributions, trace plots, and other diagnostics for the transformed parameters across different chains. The R code below illustrates how to convert the MCMC output and generate diagnostic plots to assess convergence and parameter behavior across chains.
 
-```{r chunk 11, eval=TRUE, echo=TRUE}
+```{r chunk 11, eval=TRUE, echo=TRUE, message=FALSE,warning=FALSE}
 MCMC.MH.m2 <- lapply(MH.trbb.m2$parameters, function(mat) mat[, 1:3])
 var.names <- c("log(alpha)","logit(mu)","logit(sensitivity)")
 MCMC.MH.m2 <- create_mcmc_BP(MCMC.MH.m2,var.names)
@@ -427,7 +426,7 @@ The trace plots and overlay density plots provide visual diagnostics of MCMC con
 
 For illustration, we evaluated the MH-fitted BB model with fixed sensitivity $\Delta=0.8$ using Dunn-Smyth randomized quantile residuals (Dunn and Smyth, 1996) and posterior predictive checks against the observed frequency data. Although similar diagnostics could be applied to ML- or HMC-fitted models, or for positive thresholds $k$, we focus here on the MH fit with $k=0$ for simplicity. Posterior uncertainty is incorporated in the Dunn-Smyth residuals through the empirical cumulative distribution of simulated counts, and the residuals are subsequently transformed to a standard normal scale for Q-Q plot evaluation. Further details are provided in Das et al. (2025).
 
-```{r chunk 12, eval=TRUE, echo=TRUE}
+```{r chunk 12, eval=TRUE, echo=TRUE, message=FALSE,warning=FALSE}
 # Expand frequency table into a vector of observed responses
 ObservedResponse <- rep(ty, times = freq)
 
@@ -451,7 +450,7 @@ DSTest_MH_Imperfect$KS
 
 ```
 
-For doing Posterior predictive check of the fitted model, we use the posterior distribution of $\alpha$ and $\beta$ obtained from the fitted model `MH.trbb.m1` considering $k=0.01$ and $\Delta=0.8$. The comparison of counts and their proportions from the observed outcomes are compared with simulated counts. In the below two bar-plots, the shaded areas represent the observed counts (proportions), while the error bars indicate the 95\% credible interval of simulated counts (proportions). For the plot of counts, the left y-axis is scaled from 0 to 3000 for zero value of $\tilde{t}_{yi}$, while the right y-axis is scaled from 0 to 30 for non-zero values of $\tilde{t}_{yi}$.
+For doing Posterior predictive check of the fitted model, we use the posterior distribution of $\alpha$ and $\beta$ obtained from the fitted model `MH.trbb.m1` considering $k=0.01$ and $\Delta=0.8$. The comparison of counts and their proportions from the observed outcomes are compared with simulated counts. In the below two bar-plots, the shaded areas represent the observed counts (proportions), while the error bars indicate the 95\% credible interval of simulated counts (proportions). For the plot of counts, the left y-axis is scaled from 0 to 3000 for zero value of $\widetilde{t}_{yi}$, while the right y-axis is scaled from 0 to 30 for non-zero values of $\widetilde{t}_{yi}$.
 
 
 ```{r chunk 13, eval=TRUE, echo=TRUE,warning=FALSE,message=FALSE}
@@ -490,7 +489,7 @@ ppc.barplot.imperfect.case$prop.zero.non.zero  # Zero vs non-zero proportion val
 
 ## Leakage Calculation
 
-Using the derived formulas presented in **Equations (17)–(20)** of the manuscript, the leakage quantities $E(L_i)$ and $\Pr(L_i > 0)$ can be estimated from the posterior distributions of the model parameters $\alpha$ and $\beta$. These quantities are computed for specified values of the minimum positive propensity ($k$) and test sensitivity ($\Delta$), which together determine the expected rate and probability of undetected infection (leakage) in consignments.
+Using the derived formulas presented in **Equations (16)–(19)** of the manuscript, the leakage quantities $E(L_i)$ and $\Pr(L_i > 0)$ can be estimated from the posterior distributions of the model parameters $\alpha$ and $\beta$. These quantities are computed for specified values of the minimum positive propensity ($k$) and test sensitivity ($\Delta$), which together determine the expected rate and probability of undetected infection (leakage) in consignments.
 
 For example, the posterior samples obtained from the fitted model `MH.trbb.m1` can be used to estimate leakage parameters via the function `estimate_leakage()`. This function integrates over the posterior distribution to produce summaries of both the **expected leakage** — the average number of infected items that escape detection per consignment — and the **probability of leakage**, representing the likelihood that at least one infected item remains undetected.
 
@@ -532,7 +531,7 @@ The R package provides a framework for model-based simulation to support the com
 
 To provide a more intuitive and visual representation of leakage, we summarize the simulated number of infected items in a consignment, $T_{Xi}$, classified by detection status: true positives (infection correctly detected), false negatives (infection undetected), and true negatives (no infection). Leakage arises in consignments that are false negatives, where infection is present but not detected.
 
-To make these results more tangible, the package allows users to simulate expected outcomes for a notional set of 1,000 consignments, representing approximately one year of import activity. Outcomes are generated by simulating both $T_{Xi}$ and $\tilde{t}_{yi}$ from the assumed model, using parameters drawn from their Metropolis–Hastings posterior distributions, with test sensitivity fixed at $\Delta = 0.8$. Users can explore alternative values of the minimum positive propensity, $k$ (e.g., 0%, 1%, or 2%). These simulation capabilities help translate statistical inference into interpretable measures of risk, improving how uncertainty and leakage potential are communicated in biosecurity decision-making.
+To make these results more tangible, the package allows users to simulate expected outcomes for a notional set of 1,000 consignments, representing approximately one year of import activity. Outcomes are generated by simulating both $T_{Xi}$ and $\widetilde{t}_{yi}$ from the assumed model, using parameters drawn from their Metropolis–Hastings posterior distributions, with test sensitivity fixed at $\Delta = 0.8$. Users can explore alternative values of the minimum positive propensity, $k$ (e.g., 0%, 1%, or 2%). These simulation capabilities help translate statistical inference into interpretable measures of risk, improving how uncertainty and leakage potential are communicated in biosecurity decision-making.
 
 For illustration, we use posterior samples of the parameters $\alpha$ and $\beta$ estimated from the frozen seafood data, assuming a 1% minimum positive propensity. These posterior samples are used to generate infection outcomes $X_{ij}$ and group test results $Y_{ij}$ for $D = 1000$ batches, each containing $B = 8000$ groups. Following the case study, we also consider $m = 5$, $M = 40$, and $b = 13$. The function `run_infection_simulations()` can be used to generate the population and perform sampling while adjusting the test sensitivity (e.g., $\Delta = 0.80$). This function compares sampled group test outcomes with the true infection or contamination status and classifies batches into three categories: true negatives (TN), true positives (TP), and false negatives (FN). The simulated outcomes are then used to estimate (i) the **expected leakage** — the average number of infected items missed due to undetected infection — and (ii) the **probability of leakage**, defined as the proportion of batches resulting in FN outcomes. Increasing the number of posterior samples of $\alpha$ and $\beta$ along with the number of batches  $D$ provide better results.
 
@@ -550,7 +549,7 @@ prop.table(table(Sim_Tx_TrBB$`0.8`$Simulation_Infection_Ty_Results)) # Proportio
 ```
 
 
-We can calculate **leakage estimates** based on the simulated observations using the function `compute_simulated_leakage`. This function produces both the expected leakage and the probability of leakage per batch, summarizing the outcomes of the simulation under different assumptions of test sensitivity. From the model-based simulations, additional leakage summaries, including the median of non-zero leakage, $Q_2(L_i > 0)$, and the pseudo-expected leakage, $\E_p(L_i) = P(L_i > 0) \times Q_2(L_i > 0)$ can be computed using `compute_simulated_leakage` function. These measures provide complementary insights by quantifying the typical size of leakage events when they occur and the combined effect of their frequency and magnitude, offering a more nuanced view of leakage behavior beyond the mean-based summaries.
+We can calculate **leakage estimates** based on the simulated observations using the function `compute_simulated_leakage`. This function produces both the expected leakage and the probability of leakage per batch, summarizing the outcomes of the simulation under different assumptions of test sensitivity. From the model-based simulations, additional leakage summaries, including the median of non-zero leakage, $Q_2(L_i > 0)$, and the pseudo-expected leakage, $E_p(L_i) = P(L_i > 0) \times Q_2(L_i > 0)$ can be computed using `compute_simulated_leakage` function. These measures provide complementary insights by quantifying the typical size of leakage events when they occur and the combined effect of their frequency and magnitude, offering a more nuanced view of leakage behavior beyond the mean-based summaries.
 
 
 ```{r chunk 16 MB simulation Leakage, eval=TRUE, echo=TRUE,warning=FALSE,message=FALSE}
@@ -570,7 +569,7 @@ hist(leakage_01_imperf$E.Li,breaks=30,main="Distribution of expected leakage: Si
 hist(leakage_01_imperf$P.Li,breaks=30,main="Distribution of probability of leakage: Simulation")
 ```
 
-The estimated leakage values ($E(L_i)$ and $\Pr(L_i > 0)$), derived from the posterior distributions of $\alpha$ and $\beta$ through analytic formulas (17) - (20), are generally consistent with those obtained from the model-based simulation. Under the assumption of perfect test sensitivity, the approximate analytic formula provides estimates that closely align with the simulated values, confirming the robustness of the analytic approach for practical applications. Minor deviations between the analytic and simulation-based estimates primarily reflect stochastic variability introduced through simulation and posterior sampling, as well as approximations in the analytical expressions under imperfect sensitivity.
+The estimated leakage values ($E(L_i)$ and $\Pr(L_i > 0)$), derived from the posterior distributions of $\alpha$ and $\beta$ through analytic formulas (16) - (19), are generally consistent with those obtained from the model-based simulation. Under the assumption of perfect test sensitivity, the approximate analytic formula provides estimates that closely align with the simulated values, confirming the robustness of the analytic approach for practical applications. Minor deviations between the analytic and simulation-based estimates primarily reflect stochastic variability introduced through simulation and posterior sampling, as well as approximations in the analytical expressions under imperfect sensitivity.
 
 
 # Session Info & References
@@ -581,6 +580,6 @@ sessionInfo()
 
 # References
 
-- Das, S., Clark, R., Parsa, M.,  &  Barnes, B. (2025). *Inferring Leakage in Imports of Frozen Seafood allowing for Censoring, Testing Accuracy and a Minimum Positive Prevalence*. Submitted to *Journal of the American Statistical Association*.
+- Das, S., Clark, R., Parsa, M.,  &  Barnes, B. (2025). *Inferring Leakage in Imports of Frozen Seafood allowing for Censoring, Testing Accuracy and a Minimum Positive Prevalence*. Submitted for publication.
 - Clark, R. G., Barnes, B., & Parsa, M. (2024). Clustered and unclustered group testing for biosecurity. *Journal of Agricultural, Biological and Environmental Statistics*, 29(2), 193-211.
 - Clark, R. G. (2023). *Deidentified Frozen Seafood Dataset* (1.0) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.7762164

@@ -8,7 +8,7 @@ It implements maximum likelihood estimation (MLE) and a Metropolis-Hastings (MH)
 
 
 > **Das, S., Clark, R., Parsa, M., &  Barnes, B. (2025). Inferring Leakage in Imports of Frozen Seafood allowing for Censoring, Testing Accuracy and a Minimum Positive Prevalence.**
-> *Journal of the American Statistical Association*, 
+> *Submitted for publication*, 
 
 The methodology is described in detail in the accompanying paper and supplementary material.
 
@@ -135,7 +135,7 @@ head(deidentified_frozen_seafood)
 
 The package implements the analytical results described in:
 
-* Das, S., Clark, R., Parsa, M., & Barnes, B. (2025). Inferring Leakage in Imports of Frozen Seafood allowing for Censoring, Testing Accuracy and a Minimum Positive Prevalence. *Journal of the American Statistical Association* (under review).
+* Das, S., Clark, R., Parsa, M., & Barnes, B. (2025). Inferring Leakage in Imports of Frozen Seafood allowing for Censoring, Testing Accuracy and a Minimum Positive Prevalence. Submitted for publication.
 
 
 

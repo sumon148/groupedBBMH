@@ -195,7 +195,7 @@ These functions allow users to fit exact models by incorporating minimum prevale
 
 ## Correspondence to Equations in Das et al. (2025) paper
 
-The following equations from the Barnes et al. (2025) form the statistical foundation of the `groupedHG` package:
+The following equations from the Das et al. (2025) form the statistical foundation of the `groupedBBMH` package:
 
 - **Equation (1) & (2):** Two-level BB model for $X_{ij}$ 
 - **Equation (3), (4) & (5):** Two-level BB model for $\widetilde{t}_{yi}$ under imperfect testing
